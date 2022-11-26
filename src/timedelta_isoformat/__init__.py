@@ -22,7 +22,7 @@ class timedelta(datetime.timedelta):
     @classmethod
     def fromisoformat(cls, duration_string):
         def _parse_error(reason):
-            return TypeError(f"could not parse duration '{duration_string}': {reason}")
+            return ValueError(f"could not parse duration '{duration_string}': {reason}")
 
         input_stream = iter(duration_string)
         if next(input_stream, None) != "P":
