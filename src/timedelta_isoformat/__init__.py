@@ -113,8 +113,8 @@ class timedelta(datetime.timedelta):
 
             if char == "T":
                 measurements.update(cls._filter(cls._fromdatestring(value)))
-                value = ""
                 designators, units = time_designators, _TIME_UNITS
+                value = ""
                 continue
 
             if char == "W":
