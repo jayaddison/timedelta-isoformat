@@ -50,6 +50,7 @@ invalid_durations = [
     ("PT0.0.0S", "unable to intepret '0.0.0' as a numeric value"),
     ("P1.,0D", "unable to intepret '1.,0' as a numeric value"),
     # date-format durations exceeding calendar limits
+    ("P0000-400", "days value of 400 exceeds range 0..365"),
     ("P0000-13-00", "months value of 13 exceeds range 0..12"),
     ("PT12:61:00", "minutes value of 61 exceeds range 0..60"),
     # invalid date-format style durations
