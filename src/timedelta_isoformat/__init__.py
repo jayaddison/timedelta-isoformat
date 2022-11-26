@@ -58,8 +58,6 @@ class timedelta(datetime.timedelta):
                 yield int(date_string[6:8]), "days", 31
                 return
 
-        raise ValueError()
-
     @staticmethod
     def _fromtimestring(time_string):
         if not time_string:
@@ -78,8 +76,6 @@ class timedelta(datetime.timedelta):
             yield int(time_string[2:4]), "minutes", 60
             yield float(time_string[4:]), "seconds", 60
             return
-
-        raise ValueError()
 
     @classmethod
     def fromisoformat(cls, duration_string):
