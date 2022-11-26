@@ -37,7 +37,7 @@ class timedelta(datetime.timedelta):
         value, measurements = "", {}
         while char := next(input_stream, None):
             if char in _NUMERIC_CHARACTERS:
-                value += "." if char == "," else char
+                value += char
                 continue
 
             if char == "T":
@@ -53,7 +53,12 @@ class timedelta(datetime.timedelta):
 
             if not value:
                 raise _parse_error(f"missing measurement before '{char}'")
-            value, measurements[units[char]] = "", float(value)
+
+            try:
+                quantity = float(value.replace(",", "."))
+            except ValueError:
+                raise _parse_error(f"unable to intepret '{value}' as a numeric value")
+            value, measurements[units[char]] = "", quantity
 
         if not measurements:
             raise _parse_error("no measurements found")

@@ -37,6 +37,9 @@ invalid_durations = [
     ("P1HT0S", "unexpected character 'H'"),
     # mixing week units with other units
     ("P1WT1H", "cannot mix weeks with other units"),
+    # incorrect quantities
+    ("PT0.0.0S", "unable to intepret '0.0.0' as a numeric value"),
+    ("P1.,0D", "unable to intepret '1.,0' as a numeric value"),
 ]
 
 
