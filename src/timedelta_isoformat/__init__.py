@@ -1,7 +1,7 @@
 import datetime
 from string import digits
 
-_NUMERIC_CHARACTERS = frozenset(digits + ",.")
+_FIELD_CHARACTERS = frozenset(digits + ",-.:")
 
 _DATE_UNITS = {
     "Y": "years",
@@ -19,6 +19,68 @@ _WEEK_UNITS = {
 
 
 class timedelta(datetime.timedelta):
+    @staticmethod
+    def _filter(segments):
+        for quantity, unit, limit in segments:
+            if limit and quantity > limit:
+                raise ValueError(f"{unit} value of {quantity} exceeds range 0..{limit}")
+            if quantity != 0:
+                yield unit, quantity
+
+    @staticmethod
+    def _fromdatestring(date_string):
+        if not date_string:
+            return
+
+        date_length = len(date_string)
+
+        # YYYY-DDD or YYYY-MM-DD
+        if date_string[4] == "-" and date_length in (8, 10):
+            if date_length == 8:
+                yield int(date_string[0:4]), "years", None
+                yield int(date_string[5:8]), "days", 365
+                return
+            else:
+                yield int(date_string[0:4]), "years", None
+                yield int(date_string[5:7]), "months", 12
+                yield int(date_string[8:10]), "days", 31
+                return
+
+        # YYYYDDD or YYYYMMDD
+        else:
+            if len(date_string) == 7:
+                yield int(date_string[0:4]), "years", None
+                yield int(date_string[4:7]), "days", 365
+                return
+            else:
+                yield int(date_string[0:4]), "years", None
+                yield int(date_string[4:6]), "months", 12
+                yield int(date_string[6:8]), "days", 31
+                return
+
+        raise ValueError()
+
+    @staticmethod
+    def _fromtimestring(time_string):
+        if not time_string:
+            return
+
+        # HH:MM:SS[.ssssss]
+        if time_string[2] == ":":
+            yield int(time_string[0:2]), "hours", 24
+            yield int(time_string[3:5]), "minutes", 60
+            yield float(time_string[6:]), "seconds", 60
+            return
+
+        # HHMMSS[.ssssss]
+        else:
+            yield int(time_string[0:2]), "hours", 24
+            yield int(time_string[2:4]), "minutes", 60
+            yield float(time_string[4:]), "seconds", 60
+            return
+
+        raise ValueError()
+
     @classmethod
     def fromisoformat(cls, duration_string):
         def _parse_error(reason):
@@ -36,11 +98,14 @@ class timedelta(datetime.timedelta):
 
         value, measurements = "", {}
         while char := next(input_stream, None):
-            if char in _NUMERIC_CHARACTERS:
+            if char in _FIELD_CHARACTERS:
                 value += char
                 continue
 
             if char == "T":
+                if value:
+                    measurements.update(cls._filter(cls._fromdatestring(value)))
+                    value = ""
                 designators, units = time_designators, _TIME_UNITS
                 continue
 
@@ -59,6 +124,9 @@ class timedelta(datetime.timedelta):
             except ValueError:
                 raise _parse_error(f"unable to intepret '{value}' as a numeric value")
             value, measurements[units[char]] = "", quantity
+
+        segments = cls._fromdatestring if units == _DATE_UNITS else cls._fromtimestring
+        measurements.update(cls._filter(segments(value)))
 
         if not measurements:
             raise _parse_error("no measurements found")

@@ -18,6 +18,11 @@ valid_durations = [
     ("PT1.5S", timedelta(seconds=1, microseconds=500000)),
     ("P2DT0.5H", timedelta(days=2, minutes=30)),
     ("PT0,01S", timedelta(seconds=0.01)),
+    # date-format durations
+    ("P0000360", timedelta(days=360)),
+    ("P00000004", timedelta(days=4)),
+    ("P0000-00-05", timedelta(days=5)),
+    ("P0000-00-00T01:02:03", timedelta(hours=1, minutes=2, seconds=3)),
 ]
 
 invalid_durations = [
@@ -40,6 +45,9 @@ invalid_durations = [
     # incorrect quantities
     ("PT0.0.0S", "unable to intepret '0.0.0' as a numeric value"),
     ("P1.,0D", "unable to intepret '1.,0' as a numeric value"),
+    # date-format durations exceeding calendar limits
+    ("P0000-13-00", "months value of 13 exceeds range 0..12"),
+    ("PT12:61:00", "minutes value of 61 exceeds range 0..60"),
 ]
 
 
