@@ -52,7 +52,7 @@ class timedelta(datetime.timedelta):
                 raise _parse_error(f"unexpected character '{char}'")
 
             if not value:
-                raise _parse_error(f"missing measurement before '{char}'")
+                raise _parse_error(f"missing measurement before character '{char}'")
 
             try:
                 quantity = float(value.replace(",", "."))
