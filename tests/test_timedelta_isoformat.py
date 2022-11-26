@@ -53,7 +53,7 @@ class TimedeltaISOFormat(unittest.TestCase):
     def test_fromisoformat_invalid(self):
         for duration_string, expected_reason in invalid_durations:
             with self.subTest(duration_string=duration_string):
-                with self.assertRaises(TypeError) as context:
+                with self.assertRaises(ValueError) as context:
                     timedelta.fromisoformat(duration_string)
                 self.assertIn(expected_reason, str(context.exception))
 
