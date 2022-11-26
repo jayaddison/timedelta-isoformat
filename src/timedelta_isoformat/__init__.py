@@ -134,12 +134,12 @@ class timedelta(datetime.timedelta):
                 raise _parse_error(f"unable to intepret '{value}' as a numeric value")
             value, measurements[units[char]] = "", quantity
 
-        if value:
-            segment_parser = {
-                date_designators: cls._fromdatestring,
-                time_designators: cls._fromtimestring,
-            }[designators]
-            measurements.update(cls._filter(segment_parser(value)))
+        segment_parser = {
+            date_designators: cls._fromdatestring,
+            time_designators: cls._fromtimestring,
+            week_designators: lambda _: [],
+        }[designators]
+        measurements.update(cls._filter(segment_parser(value)))
 
         if not measurements:
             raise _parse_error("no measurements found")
