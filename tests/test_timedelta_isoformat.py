@@ -7,6 +7,10 @@ valid_durations = [
     # empty duration
     ("P0D", timedelta()),
     ("PT0S", timedelta()),
+    # designator-format durations
+    ("P3D", timedelta(days=3)),
+    ("P3DT1H", timedelta(days=3, hours=1)),
+    ("P0DT1H20M", timedelta(hours=1, minutes=20)),
 ]
 
 invalid_durations = [
