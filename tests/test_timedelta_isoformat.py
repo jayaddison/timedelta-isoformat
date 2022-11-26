@@ -25,7 +25,7 @@ invalid_durations = [
     ("", "durations must begin with the character 'P'"),
     ("P", "no measurements found"),
     # missing measurements
-    ("P0YD", "missing measurement before 'D'"),
+    ("P0YD", "missing measurement before character 'D'"),
     # repeated designators
     ("P1DT1H3H1M", "unexpected character 'H'"),
     ("P1D3D", "unexpected character 'D'"),
