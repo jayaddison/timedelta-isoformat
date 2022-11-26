@@ -32,50 +32,63 @@ class timedelta(datetime.timedelta):
         if not date_string:
             return
 
+        found = False
+        separator_positions = [i for i, c in enumerate(date_string) if c == "-"]
         date_length = len(date_string)
 
-        # YYYY-DDD or YYYY-MM-DD
-        if date_string[4] == "-" and date_length in (8, 10):
-            if date_length == 8:
-                yield int(date_string[0:4]), "years", None
-                yield int(date_string[5:8]), "days", 365
-                return
-            else:
-                yield int(date_string[0:4]), "years", None
-                yield int(date_string[5:7]), "months", 12
-                yield int(date_string[8:10]), "days", 31
-                return
+        # YYYY-DDD
+        if date_length == 8 and separator_positions == [4]:
+            yield int(date_string[0:4]), "years", None
+            yield int(date_string[5:8]), "days", 365
+            found = True
 
-        # YYYYDDD or YYYYMMDD
-        else:
-            if len(date_string) == 7:
-                yield int(date_string[0:4]), "years", None
-                yield int(date_string[4:7]), "days", 365
-                return
-            else:
-                yield int(date_string[0:4]), "years", None
-                yield int(date_string[4:6]), "months", 12
-                yield int(date_string[6:8]), "days", 31
-                return
+        # YYYY-MM-DD
+        if date_length == 10 and separator_positions == [4, 7]:
+            yield int(date_string[0:4]), "years", None
+            yield int(date_string[5:7]), "months", 12
+            yield int(date_string[8:10]), "days", 31
+            found = True
+
+        # YYYYDDD
+        if date_length == 7 and separator_positions == []:
+            yield int(date_string[0:4]), "years", None
+            yield int(date_string[4:7]), "days", 365
+            found = True
+
+        # YYYYMMDD
+        if date_length == 8 and separator_positions == []:
+            yield int(date_string[0:4]), "years", None
+            yield int(date_string[4:6]), "months", 12
+            yield int(date_string[6:8]), "days", 31
+            found = True
+
+        if not found:
+            raise ValueError(f"unable to parse '{date_string}' into date components")
 
     @staticmethod
     def _fromtimestring(time_string):
         if not time_string:
             return
 
+        found = False
+        separator_positions = [i for i, c in enumerate(time_string) if c == ":"]
+
         # HH:MM:SS[.ssssss]
-        if time_string[2] == ":":
+        if separator_positions == [2, 5]:
             yield int(time_string[0:2]), "hours", 24
             yield int(time_string[3:5]), "minutes", 60
             yield float(time_string[6:]), "seconds", 60
-            return
+            found = True
 
         # HHMMSS[.ssssss]
-        else:
+        if separator_positions == []:
             yield int(time_string[0:2]), "hours", 24
             yield int(time_string[2:4]), "minutes", 60
             yield float(time_string[4:]), "seconds", 60
-            return
+            found = True
+
+        if not found:
+            raise ValueError(f"unable to parse '{time_string}' into time components")
 
     @classmethod
     def fromisoformat(cls, duration_string):
