@@ -8,5 +8,6 @@ classifiers = [
 description = "Supplemental ISO8601 duration format support for datetime.timedelta"
 license = { text = "AGPL-3.0-or-later" }
 name = "timedelta-isoformat"
+readme = "README.rst"
 urls = { Homepage = "https://pypi.org/project/timedelta-isoformat/" }
 version = "0.0.1"
