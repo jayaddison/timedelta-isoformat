@@ -10,4 +10,4 @@ license = { text = "AGPL-3.0-or-later" }
 name = "timedelta-isoformat"
 readme = "README.rst"
 urls = { Homepage = "https://pypi.org/project/timedelta-isoformat/" }
-version = "0.0.1"
+version = "0.0.2"
