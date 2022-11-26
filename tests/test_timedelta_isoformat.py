@@ -15,12 +15,12 @@ valid_durations = [
 
 invalid_durations = [
     # incomplete strings
-    (""),
-    ("P"),
+    ("", "durations must begin with the character 'P'"),
+    ("P", "no measurements found"),
     # missing measurements
-    ("P0YD"),
+    ("P0YD", "missing measurement before 'D'"),
     # invalid units within segment
-    ("PT1DS"),
+    ("PT1DS", "unexpected character 'D'"),
 ]
 
 
@@ -32,10 +32,11 @@ class TimedeltaISOFormat(unittest.TestCase):
                 self.assertEqual(parsed_timedelta, expected_timedelta)
 
     def test_fromisoformat_invalid(self):
-        for duration_string in invalid_durations:
+        for duration_string, expected_reason in invalid_durations:
             with self.subTest(duration_string=duration_string):
-                with self.assertRaises(TypeError):
+                with self.assertRaises(TypeError) as context:
                     timedelta.fromisoformat(duration_string)
+                self.assertIn(expected_reason, str(context.exception))
 
     def test_roundtrip_valid(self):
         for _, valid_timedelta in valid_durations:
