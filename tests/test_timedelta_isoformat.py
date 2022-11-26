@@ -19,6 +19,7 @@ invalid_durations = [
     ("P"),
     # missing measurements
     ("P0YD"),
+    # invalid units within segment
     ("PT1DS"),
 ]
 
