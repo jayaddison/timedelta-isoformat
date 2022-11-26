@@ -4,7 +4,11 @@ import datetime
 class timedelta(datetime.timedelta):
     @classmethod
     def fromisoformat(cls, duration_string):
-        pass
+        def _parse_error(reason):
+            return TypeError(f"could not parse duration '{duration_string}': {reason}")
+
+        if not duration_string.startswith("P"):
+            raise _parse_error("durations must begin with the character 'P'")
 
     def isoformat(self):
         if not self:
