@@ -11,6 +11,7 @@ Usage
 -----
 
 .. code-block:: pycon
+
    >>> from timedelta_isoformat import timedelta
    >>> from datetime import datetime
    >>>
