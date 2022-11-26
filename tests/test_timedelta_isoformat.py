@@ -11,6 +11,9 @@ valid_durations = [
     ("P3D", timedelta(days=3)),
     ("P3DT1H", timedelta(days=3, hours=1)),
     ("P0DT1H20M", timedelta(hours=1, minutes=20)),
+    # week durations
+    ("P1W", timedelta(days=7)),
+    ("P3W", timedelta(days=21)),
 ]
 
 invalid_durations = [
@@ -22,6 +25,8 @@ invalid_durations = [
     # invalid units within segment
     ("PT1DS", "unexpected character 'D'"),
     ("P1HT0S", "unexpected character 'H'"),
+    # mixing week units with other units
+    ("P1WT1H", "cannot mix weeks with other units"),
 ]
 
 

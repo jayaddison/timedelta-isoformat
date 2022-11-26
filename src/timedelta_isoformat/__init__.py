@@ -45,9 +45,7 @@ class timedelta(datetime.timedelta):
                 continue
 
             if char == "W":
-                value, measurements[units[char]] = "", float(value)
                 designators, units = week_designators, _WEEK_UNITS
-                continue
 
             # Note: this advances and may exhaust the iterator
             if char not in designators:
@@ -59,6 +57,8 @@ class timedelta(datetime.timedelta):
 
         if not measurements:
             raise _parse_error("no measurements found")
+        if "weeks" in measurements and len(measurements) > 1:
+            raise _parse_error("cannot mix weeks with other units")
         return cls(**measurements)
 
     def isoformat(self):
