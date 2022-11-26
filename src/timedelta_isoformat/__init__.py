@@ -1,4 +1,21 @@
 import datetime
+from string import digits
+
+_NUMERIC_CHARACTERS = frozenset(digits + ",.")
+
+_DATE_UNITS = {
+    "Y": "years",
+    "M": "months",
+    "D": "days",
+}
+_TIME_UNITS = {
+    "H": "hours",
+    "M": "minutes",
+    "S": "seconds",
+}
+_WEEK_UNITS = {
+    "W": "weeks",
+}
 
 
 class timedelta(datetime.timedelta):
@@ -7,8 +24,40 @@ class timedelta(datetime.timedelta):
         def _parse_error(reason):
             return TypeError(f"could not parse duration '{duration_string}': {reason}")
 
-        if not duration_string.startswith("P"):
+        input_stream = iter(duration_string)
+        if next(input_stream, None) != "P":
             raise _parse_error("durations must begin with the character 'P'")
+
+        date_designators = iter(("Y", "M", "D"))
+        time_designators = iter(("H", "M", "S"))
+        week_designators = iter(("W",))
+
+        designators, units = date_designators, _DATE_UNITS
+
+        value, measurements = "", {}
+        while char := next(input_stream, None):
+            if char in _NUMERIC_CHARACTERS:
+                value += char
+                continue
+
+            if char == "T":
+                designators, units = time_designators, _TIME_UNITS
+                continue
+
+            if char == "W":
+                value, measurements[units[char]] = "", float(value)
+                designators, units = week_designators, _WEEK_UNITS
+                continue
+
+            # Note: this advances and may exhaust the iterator
+            if char not in designators:
+                raise _parse_error("unexpected character '{char}'")
+
+            value, measurements[units[char]] = "", float(value)
+
+        if not measurements:
+            raise _parse_error("no measurements found")
+        return cls(**measurements)
 
     def isoformat(self):
         if not self:
