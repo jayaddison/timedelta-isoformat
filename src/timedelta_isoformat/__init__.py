@@ -129,8 +129,8 @@ class timedelta(datetime.timedelta):
 
             try:
                 quantity = float(value.replace(",", "."))
-            except ValueError:
-                raise _parse_error(f"unable to parse '{value}' as a number")
+            except ValueError as exc:
+                raise _parse_error(f"unable to parse '{value}' as a number") from exc
             value, measurements[units[char]] = "", quantity
 
         segment_parser = {
