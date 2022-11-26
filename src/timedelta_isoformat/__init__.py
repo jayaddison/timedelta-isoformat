@@ -37,7 +37,7 @@ class timedelta(datetime.timedelta):
         value, measurements = "", {}
         while char := next(input_stream, None):
             if char in _NUMERIC_CHARACTERS:
-                value += char
+                value += "." if char == "," else char
                 continue
 
             if char == "T":
@@ -69,6 +69,8 @@ class timedelta(datetime.timedelta):
         hours, minutes, seconds = 0, 0, self.seconds
         minutes, seconds = int(seconds / 60), seconds % 60
         hours, minutes = int(minutes / 60), minutes % 60
+        if self.microseconds:
+            seconds += self.microseconds / 10 ** 6
 
         result = "P"
         result += f"{years}Y" if years else ""

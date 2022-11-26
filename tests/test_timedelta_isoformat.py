@@ -14,6 +14,10 @@ valid_durations = [
     # week durations
     ("P1W", timedelta(days=7)),
     ("P3W", timedelta(days=21)),
+    # decimal measurements
+    ("PT1.5S", timedelta(seconds=1, microseconds=500000)),
+    ("P2DT0.5H", timedelta(days=2, minutes=30)),
+    ("PT0,01S", timedelta(seconds=0.01)),
 ]
 
 invalid_durations = [
