@@ -20,8 +20,8 @@ _WEEK_UNITS = {
 
 class timedelta(datetime.timedelta):
     @staticmethod
-    def _filter(segments):
-        for quantity, unit, limit in segments:
+    def _filter(components):
+        for quantity, unit, limit in components:
             if limit and quantity > limit:
                 raise ValueError(f"{unit} value of {quantity} exceeds range 0..{limit}")
             if quantity != 0 or unit == "days":
@@ -125,8 +125,12 @@ class timedelta(datetime.timedelta):
                 raise _parse_error(f"unable to intepret '{value}' as a numeric value")
             value, measurements[units[char]] = "", quantity
 
-        segments = cls._fromdatestring if units == _DATE_UNITS else cls._fromtimestring
-        measurements.update(cls._filter(segments(value)))
+        if value:
+            segment_parser = {
+                date_designators: cls._fromdatestring,
+                time_designators: cls._fromtimestring,
+            }[designators]
+            measurements.update(cls._filter(segment_parser(value)))
 
         if not measurements:
             raise _parse_error("no measurements found")
