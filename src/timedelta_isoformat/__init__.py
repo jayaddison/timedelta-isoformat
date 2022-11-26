@@ -2,7 +2,8 @@ import datetime
 
 
 class timedelta(datetime.timedelta):
-    def fromisoformat(duration_string):
+    @classmethod
+    def fromisoformat(cls, duration_string):
         pass
 
     def isoformat(self):
