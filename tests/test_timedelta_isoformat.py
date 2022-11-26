@@ -22,6 +22,12 @@ invalid_durations = [
     ("P", "no measurements found"),
     # missing measurements
     ("P0YD", "missing measurement before 'D'"),
+    # repeated designators
+    ("P1DT1H3H1M", "unexpected character 'H'"),
+    ("P1D3D", "unexpected character 'D'"),
+    # incorrectly-ordered designators
+    ("PT5S1M", "unexpected character 'M'"),
+    ("P0DT5M1H", "unexpected character 'H'"),
     # invalid units within segment
     ("PT1DS", "unexpected character 'D'"),
     ("P1HT0S", "unexpected character 'H'"),
