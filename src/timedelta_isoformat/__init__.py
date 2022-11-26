@@ -53,6 +53,8 @@ class timedelta(datetime.timedelta):
             if char not in designators:
                 raise _parse_error("unexpected character '{char}'")
 
+            if not value:
+                raise _parse_error("missing measurement before '{char}'")
             value, measurements[units[char]] = "", float(value)
 
         if not measurements:

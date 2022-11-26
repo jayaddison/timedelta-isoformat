@@ -17,6 +17,9 @@ invalid_durations = [
     # incomplete strings
     (""),
     ("P"),
+    # missing measurements
+    ("P0YD"),
+    ("PT1DS"),
 ]
 
 
