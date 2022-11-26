@@ -1,0 +1,12 @@
+[project]
+authors = [
+  { email = "jay@jp-hosting.net", name = "James Addison" }
+]
+classifiers = [
+  "License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)"
+]
+description = "Supplemental ISO8601 duration format support for datetime.timedelta"
+license = { text = "AGPL-3.0-or-later" }
+name = "timedelta-isoformat"
+urls = { Homepage = "https://pypi.org/project/timedelta-isoformat/" }
+version = "0.0.1"
