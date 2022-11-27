@@ -157,9 +157,14 @@ class timedelta(datetime.timedelta):
             raise _parse_error("no measurements found in time segment")
         if "weeks" in measurements and len(measurements) > 1:
             raise _parse_error("cannot mix weeks with other units")
-        return cls(
-            **{unit: quantity for unit, quantity in measurements.items() if quantity}
-        )
+
+        filtered_measurements = {k: v for k, v in measurements.items() if v}
+        try:
+            return cls(**filtered_measurements)
+        except TypeError as exc:
+            if filtered_measurements.keys() & {"years", "months"}:
+                raise _parse_error("year and month fields are not supported") from exc
+            raise exc
 
     def isoformat(self):
         """Produce an ISO8601-style representation of this :py:class:`timedelta`"""
