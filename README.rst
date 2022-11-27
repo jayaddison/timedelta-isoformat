@@ -15,12 +15,12 @@ Usage
    >>> from timedelta_isoformat import timedelta
    >>> from datetime import datetime
    >>>
-   >>> epoch = datetime(year=2022, month=10, day=2)
-   >>> now = datetime.utcnow()
+   >>> first = datetime(year=2022, month=10, day=2)
+   >>> second = datetime(year=2022, month=11, day=27, hour=14)
    >>>
-   >>> td = timedelta(seconds=(now - epoch).total_seconds())
+   >>> td = timedelta(seconds=(second - first).total_seconds())
    >>> td.isoformat()
-   'P55DT17H28M51S'
+   'P56DT14H'
    >>>
-   >>> epoch + timedelta.fromisoformat('P55DT17H28M51S')
-   datetime.datetime(2022, 11, 26, 17, 28, 51)
+   >>> first + timedelta.fromisoformat('P56DT14H')
+   datetime.datetime(2022, 11, 27, 14, 0)
