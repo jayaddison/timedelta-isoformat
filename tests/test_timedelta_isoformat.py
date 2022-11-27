@@ -32,6 +32,7 @@ valid_durations = [
     ("PT04:05:06", timedelta(hours=4, minutes=5, seconds=6)),
     # calendar edge cases
     ("P0000-366", timedelta(days=366)),
+    ("PT23:59:59", timedelta(hours=23, minutes=59, seconds=59)),
 ]
 
 invalid_durations = [
@@ -64,6 +65,7 @@ invalid_durations = [
     ("PT12:60:00", "minutes value of 60 exceeds range 0..59"),
     ("PT12:61:00", "minutes value of 61 exceeds range 0..59"),
     ("PT15:25:60", "seconds value of 60 exceeds range 0..59"),
+    ("PT24:00:00", "hours value of 24 exceeds range 0..23"),
     # invalid date-format style durations
     ("P0000-1-0", "unable to parse '0000-1-0' into date components"),
     ("PT1:2:3", "unable to parse '1:2:3' into time components"),
