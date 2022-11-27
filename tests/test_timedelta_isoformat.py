@@ -55,7 +55,9 @@ invalid_durations = [
     # date-format durations exceeding calendar limits
     ("P0000-400", "days value of 400 exceeds range 0..366"),
     ("P0000-13-00", "months value of 13 exceeds range 0..12"),
-    ("PT12:61:00", "minutes value of 61 exceeds range 0..60"),
+    ("PT12:60:00", "minutes value of 60 exceeds range 0..59"),
+    ("PT12:61:00", "minutes value of 61 exceeds range 0..59"),
+    ("PT15:25:60", "seconds value of 60 exceeds range 0..59"),
     # invalid date-format style durations
     ("P0000-1-0", "unable to parse '0000-1-0' into date components"),
     ("PT1:2:3", "unable to parse '1:2:3' into time components"),

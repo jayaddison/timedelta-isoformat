@@ -80,16 +80,16 @@ class timedelta(datetime.timedelta):
 
         # HH:MM:SS[.ssssss]
         if separator_positions == [2, 5]:
-            yield int(time_string[0:2]), "hours", 24
-            yield int(time_string[3:5]), "minutes", 60
-            yield float(time_string[6:]), "seconds", 60
+            yield int(time_string[0:2]), "hours", 23
+            yield int(time_string[3:5]), "minutes", 59
+            yield float(time_string[6:]), "seconds", 59
             found = True
 
         # HHMMSS[.ssssss]
         if separator_positions == []:
-            yield int(time_string[0:2]), "hours", 24
-            yield int(time_string[2:4]), "minutes", 60
-            yield float(time_string[4:]), "seconds", 60
+            yield int(time_string[0:2]), "hours", 23
+            yield int(time_string[2:4]), "minutes", 59
+            yield float(time_string[4:]), "seconds", 59
             found = True
 
         if not found:
