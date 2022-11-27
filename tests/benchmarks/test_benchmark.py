@@ -40,7 +40,7 @@ class TimedeltaISOFormatBenchmark(unittest.TestCase):
 
     def test_fromisoformat_benchmark(self):
         """Benchmark the fromisoformat parser method"""
-        for duration_string, _ in valid_durations * 1000:
+        for duration_string, _ in valid_durations * 5000:
             timedelta.fromisoformat(duration_string)
 
     def test_isoformat_benchmark(self):
