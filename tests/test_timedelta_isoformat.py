@@ -12,6 +12,7 @@ valid_durations = [
     ("P3D", timedelta(days=3)),
     ("P3DT1H", timedelta(days=3, hours=1)),
     ("P0DT1H20M", timedelta(hours=1, minutes=20)),
+    ("P0Y0DT1H20M", timedelta(hours=1, minutes=20)),
     # week durations
     ("P1W", timedelta(days=7)),
     ("P3W", timedelta(days=21)),
