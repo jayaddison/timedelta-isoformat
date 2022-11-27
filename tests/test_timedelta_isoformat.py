@@ -25,6 +25,8 @@ valid_durations = [
     ("P00000004", timedelta(days=4)),
     ("P0000-00-05", timedelta(days=5)),
     ("P0000-00-00T01:02:03", timedelta(hours=1, minutes=2, seconds=3)),
+    # calendar edge cases
+    ("P0000-366", timedelta(days=366)),
 ]
 
 invalid_durations = [
@@ -51,7 +53,7 @@ invalid_durations = [
     ("PT0.0.0S", "unable to parse '0.0.0' as a number"),
     ("P1.,0D", "unable to parse '1.,0' as a number"),
     # date-format durations exceeding calendar limits
-    ("P0000-400", "days value of 400 exceeds range 0..365"),
+    ("P0000-400", "days value of 400 exceeds range 0..366"),
     ("P0000-13-00", "months value of 13 exceeds range 0..12"),
     ("PT12:61:00", "minutes value of 61 exceeds range 0..60"),
     # invalid date-format style durations

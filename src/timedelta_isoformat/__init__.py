@@ -44,7 +44,7 @@ class timedelta(datetime.timedelta):
         # YYYY-DDD
         if date_length == 8 and separator_positions == [4]:
             yield int(date_string[0:4]), "years", None
-            yield int(date_string[5:8]), "days", 365
+            yield int(date_string[5:8]), "days", 366
             found = True
 
         # YYYY-MM-DD
@@ -57,7 +57,7 @@ class timedelta(datetime.timedelta):
         # YYYYDDD
         if date_length == 7 and separator_positions == []:
             yield int(date_string[0:4]), "years", None
-            yield int(date_string[4:7]), "days", 365
+            yield int(date_string[4:7]), "days", 366
             found = True
 
         # YYYYMMDD
