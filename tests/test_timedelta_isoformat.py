@@ -67,6 +67,9 @@ invalid_durations = [
     # decimals must have a non-empty integer value before the separator
     ("PT.5S", "value '.5' does not start with a digit"),
     ("P1M.1D", "value '.1' does not start with a digit"),
+    # mixed segment formats
+    ("P0000-00-01T5S", "date segment format differs from time segment"),
+    ("P1DT00:00:00", "date segment format differs from time segment"),
 ]
 
 
