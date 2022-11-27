@@ -138,6 +138,9 @@ class timedelta(datetime.timedelta):
             if not value:
                 raise _parse_error(f"missing measurement before character '{char}'")
 
+            if not value[0].isdigit():
+                raise _parse_error(f"value '{value}' does not start with a digit")
+
             try:
                 quantity = float(value.replace(",", "."))
             except ValueError as exc:
