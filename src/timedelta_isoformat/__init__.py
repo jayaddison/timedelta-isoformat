@@ -161,7 +161,7 @@ class timedelta(datetime.timedelta):
 
         if not measurements:
             raise _parse_error("no measurements found")
-        if not measurements.keys() & _TIME_UNITS.values() and units == _TIME_UNITS:
+        if units == _TIME_UNITS and not measurements.keys() & units.values():
             raise _parse_error("no measurements found in time segment")
         if "weeks" in measurements and len(measurements) > 1:
             raise _parse_error("cannot mix weeks with other units")
