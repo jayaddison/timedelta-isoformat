@@ -98,7 +98,8 @@ class timedelta(datetime.timedelta):
     @classmethod
     def fromisoformat(cls, duration_string):
         """Parses an input string and returns a :py:class:`timedelta` result
-        :raises ValueError with an explanatory message when parsing fails
+
+        :raises: `ValueError` with an explanatory message when parsing fails
         """
 
         def _parse_error(reason):
