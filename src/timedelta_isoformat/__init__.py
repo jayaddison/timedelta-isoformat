@@ -1,3 +1,4 @@
+"""Supplemental ISO8601 duration format support for :py:class:`datetime.timedelta`"""
 import datetime
 from string import digits
 
@@ -19,6 +20,10 @@ _WEEK_UNITS = {
 
 
 class timedelta(datetime.timedelta):
+    """Subclass of :py:class:`datetime.timedelta` with additional methods to implement
+    ISO8601-style parsing and formatting.
+    """
+
     @staticmethod
     def _filter(components):
         for quantity, unit, limit in components:
@@ -92,6 +97,10 @@ class timedelta(datetime.timedelta):
 
     @classmethod
     def fromisoformat(cls, duration_string):
+        """Parses an input string and returns a :py:class:`timedelta` result
+        :raises ValueError with an explanatory message when parsing fails
+        """
+
         def _parse_error(reason):
             return ValueError(f"could not parse duration '{duration_string}': {reason}")
 
@@ -149,6 +158,7 @@ class timedelta(datetime.timedelta):
         return cls(**measurements)
 
     def isoformat(self):
+        """Produce an ISO8601-style representation of this :py:class:`timedelta`"""
         if not self:
             return "P0D"
 

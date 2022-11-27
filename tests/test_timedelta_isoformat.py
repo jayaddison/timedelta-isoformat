@@ -1,3 +1,4 @@
+"""Test coverage for :py:module:`timedelta_isoformat`"""
 import unittest
 
 from timedelta_isoformat import timedelta
@@ -60,13 +61,17 @@ invalid_durations = [
 
 
 class TimedeltaISOFormat(unittest.TestCase):
+    """Functional testing for :class:`timedelta_isoformat.timedelta`"""
+
     def test_fromisoformat_valid(self):
+        """Parsing cases that should all succeed"""
         for duration_string, expected_timedelta in valid_durations:
             with self.subTest(duration_string=duration_string):
                 parsed_timedelta = timedelta.fromisoformat(duration_string)
                 self.assertEqual(parsed_timedelta, expected_timedelta)
 
     def test_fromisoformat_invalid(self):
+        """Parsing cases that should all fail"""
         for duration_string, expected_reason in invalid_durations:
             with self.subTest(duration_string=duration_string):
                 with self.assertRaises(ValueError) as context:
@@ -74,6 +79,7 @@ class TimedeltaISOFormat(unittest.TestCase):
                 self.assertIn(expected_reason, str(context.exception))
 
     def test_roundtrip_valid(self):
+        """Round-trip from valid duration to string and back maintains the same value"""
         for _, valid_timedelta in valid_durations:
             with self.subTest(valid_timedelta=valid_timedelta):
                 duration_string = valid_timedelta.isoformat()
