@@ -122,12 +122,12 @@ class timedelta(datetime.timedelta):
                 value += char
                 continue
 
-            if char == "T":
+            if char == "T" and designators != time_designators:
                 segments[designators], value = value, ""
                 designators, units = time_designators, _TIME_UNITS
                 continue
 
-            if char == "W":
+            if char == "W" and designators == date_designators:
                 designators, units = week_designators, _WEEK_UNITS
 
             # Note: this advances and may exhaust the iterator

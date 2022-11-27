@@ -52,6 +52,7 @@ invalid_durations = [
     ("P1HT0S", "unexpected character 'H'"),
     # mixing week units with other units
     ("P1WT1H", "cannot mix weeks with other units"),
+    ("P0Y1W", "cannot mix weeks with other units"),
     # incorrect quantities
     ("PT0.0.0S", "unable to parse '0.0.0' as a number"),
     ("P1.,0D", "unable to parse '1.,0' as a number"),
@@ -70,6 +71,12 @@ invalid_durations = [
     # mixed segment formats
     ("P0000-00-01T5S", "date segment format differs from time segment"),
     ("P1DT00:00:00", "date segment format differs from time segment"),
+    # segment repetition
+    ("PT5MT5S", "unexpected character 'T'"),
+    ("P1W2W", "unexpected character 'W'"),
+    # segments out-of-order
+    ("P1DT5S2W", "unexpected character 'W'"),
+    ("P1W1D", "unexpected character 'D'"),
 ]
 
 
