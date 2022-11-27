@@ -29,8 +29,7 @@ class timedelta(datetime.timedelta):
         for quantity, unit, limit in components:
             if limit and quantity > limit:
                 raise ValueError(f"{unit} value of {quantity} exceeds range 0..{limit}")
-            if quantity != 0 or unit == "days":
-                yield unit, quantity
+            yield unit, quantity
 
     @staticmethod
     def _fromdatestring(date_string):
