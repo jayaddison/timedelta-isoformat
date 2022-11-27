@@ -35,6 +35,7 @@ valid_durations = [
     ("PT23:59:59", timedelta(hours=23, minutes=59, seconds=59)),
 ]
 
+
 class TimedeltaISOFormatBenchmark(unittest.TestCase):
     """Benchmark testing for :class:`timedelta_isoformat.timedelta`"""
 
