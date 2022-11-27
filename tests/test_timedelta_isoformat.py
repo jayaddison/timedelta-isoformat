@@ -28,6 +28,8 @@ valid_durations = [
     ("P00000004", timedelta(days=4)),
     ("P0000-00-05", timedelta(days=5)),
     ("P0000-00-00T01:02:03", timedelta(hours=1, minutes=2, seconds=3)),
+    ("PT040506", timedelta(hours=4, minutes=5, seconds=6)),
+    ("PT04:05:06", timedelta(hours=4, minutes=5, seconds=6)),
     # calendar edge cases
     ("P0000-366", timedelta(days=366)),
 ]
@@ -65,6 +67,7 @@ invalid_durations = [
     # invalid date-format style durations
     ("P0000-1-0", "unable to parse '0000-1-0' into date components"),
     ("PT1:2:3", "unable to parse '1:2:3' into time components"),
+    ("PT01:0203", "unable to parse '01:0203' into time components"),
     # decimals must have a non-empty integer value before the separator
     ("PT.5S", "value '.5' does not start with a digit"),
     ("P1M.1D", "value '.1' does not start with a digit"),
