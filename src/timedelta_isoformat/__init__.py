@@ -167,9 +167,12 @@ class timedelta(datetime.timedelta):
         if not self:
             return "P0D"
 
-        years, months, days = 0, 0, self.days
-        hours, minutes, seconds = 0, 0, self.seconds
-        minutes, seconds = int(seconds / 60), seconds % 60
+        years = getattr(self, "years", 0)
+        months = getattr(self, "months", 0)
+        days = self.days
+        seconds = self.seconds
+
+        minutes, seconds = int(seconds / 60), self.seconds % 60
         hours, minutes = int(minutes / 60), minutes % 60
         if self.microseconds:
             seconds += self.microseconds / 10 ** 6
