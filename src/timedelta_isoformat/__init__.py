@@ -122,7 +122,6 @@ class timedelta(datetime.timedelta):
             segment_parsers = {
                 date: cls._fromdatestring,
                 time: cls._fromtimestring,
-                week: lambda _: [],
             }
             measurements.update(cls._filter(segment_parsers[stream](value)))
 
