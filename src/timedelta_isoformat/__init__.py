@@ -1,8 +1,5 @@
 """Supplemental ISO8601 duration format support for :py:class:`datetime.timedelta`"""
 import datetime
-from string import digits
-
-_FIELD_CHARACTERS = frozenset(digits + ",-.:")
 
 
 class timedelta(datetime.timedelta):
@@ -88,7 +85,7 @@ class timedelta(datetime.timedelta):
 
         stream, value, measurements = date, "", {}
         while char := next(input_stream, None):
-            if char in _FIELD_CHARACTERS:
+            if char.isdigit() or char in ",-.:":
                 value += char
                 continue
 
