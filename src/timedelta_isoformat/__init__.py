@@ -129,10 +129,9 @@ class timedelta(datetime.timedelta):
                 raise _parse_error(f"value '{value}' does not start with a digit")
 
             try:
-                quantity = float(value.replace(",", "."))
+                measurements[units[char]] = float(value.replace(",", "."))
             except ValueError as exc:
                 raise _parse_error(f"unable to parse '{value}' as a number") from exc
-            measurements[units[char]] = quantity
             value = ""
 
         if value:
