@@ -33,9 +33,6 @@ class timedelta(datetime.timedelta):
 
     @staticmethod
     def _fromdatestring(date_string):
-        if not date_string:
-            return
-
         separator_positions = [i for i, c in enumerate(date_string) if c == "-"]
         date_length = len(date_string)
 
@@ -66,9 +63,6 @@ class timedelta(datetime.timedelta):
 
     @staticmethod
     def _fromtimestring(time_string):
-        if not time_string:
-            return
-
         separator_positions = [i for i, c in enumerate(time_string) if c == ":"]
 
         # HH:MM:SS[.ssssss]
@@ -144,6 +138,8 @@ class timedelta(datetime.timedelta):
             if measurements:
                 raise _parse_error("date segment format differs from time segment")
             for designators, value in segments.items():
+                if not value:
+                    continue
                 segment_parser = {
                     date_designators: cls._fromdatestring,
                     time_designators: cls._fromtimestring,
