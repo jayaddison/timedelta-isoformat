@@ -119,12 +119,12 @@ class timedelta(datetime.timedelta):
             value = ""
 
         if value:
-            segment_parser = {
+            segment_parsers = {
                 date: cls._fromdatestring,
                 time: cls._fromtimestring,
                 week: lambda _: [],
-            }[stream]
-            measurements.update(cls._filter(segment_parser(value)))
+            }
+            measurements.update(cls._filter(segment_parsers[stream](value)))
 
         if not measurements:
             raise _parse_error("no measurements found")
