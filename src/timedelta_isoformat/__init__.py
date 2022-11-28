@@ -82,28 +82,28 @@ class timedelta(datetime.timedelta):
         if next(input_stream, None) != "P":
             raise _parse_error("durations must begin with the character 'P'")
 
-        date_designators = iter(("Y", "years", "M", "months", "D", "days"))
-        time_designators = iter(("H", "hours", "M", "minutes", "S", "seconds"))
-        week_designators = iter(("W", "weeks"))
+        date = iter(("Y", "years", "M", "months", "D", "days"))
+        time = iter(("H", "hours", "M", "minutes", "S", "seconds"))
+        week = iter(("W", "weeks"))
 
-        designators, value, measurements = date_designators, "", {}
+        stream, value, measurements = date, "", {}
         while char := next(input_stream, None):
             if char in _FIELD_CHARACTERS:
                 value += char
                 continue
 
-            if char == "T" and designators != time_designators:
+            if char == "T" and stream != time:
                 if value:
                     measurements.update(cls._filter(cls._fromdatestring(value)))
                     value = ""
-                designators = time_designators
+                stream = time
                 continue
 
-            if char == "W" and designators == date_designators:
-                designators = week_designators
+            if char == "W" and stream == date:
+                stream = week
 
             # Note: this advances and may exhaust the iterator
-            if char not in designators:
+            if char not in stream:
                 raise _parse_error(f"unexpected character '{char}'")
 
             if not value:
@@ -113,26 +113,22 @@ class timedelta(datetime.timedelta):
                 raise _parse_error(f"value '{value}' does not start with a digit")
 
             try:
-                measurements[next(designators)] = float(value.replace(",", "."))
+                measurements[next(stream)] = float(value.replace(",", "."))
             except ValueError as exc:
                 raise _parse_error(f"unable to parse '{value}' as a number") from exc
             value = ""
 
         if value:
             segment_parser = {
-                date_designators: cls._fromdatestring,
-                time_designators: cls._fromtimestring,
-                week_designators: lambda _: [],
-            }[designators]
+                date: cls._fromdatestring,
+                time: cls._fromtimestring,
+                week: lambda _: [],
+            }[stream]
             measurements.update(cls._filter(segment_parser(value)))
 
         if not measurements:
             raise _parse_error("no measurements found")
-        if designators == time_designators and not measurements.keys() & {
-            "hours",
-            "minutes",
-            "seconds",
-        }:
+        if stream == time and not measurements.keys() & {"hours", "minutes", "seconds"}:
             raise _parse_error("no measurements found in time segment")
         if "weeks" in measurements and len(measurements) > 1:
             raise _parse_error("cannot mix weeks with other units")
