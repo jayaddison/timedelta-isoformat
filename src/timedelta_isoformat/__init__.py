@@ -92,14 +92,14 @@ class timedelta(datetime.timedelta):
                 value += char
                 continue
 
-            if char == "T" and stream != time:
+            if char == "T" and stream is not time:
                 if value:
                     measurements.update(cls._filter(cls._fromdatestring(value)))
                     value = ""
                 stream = time
                 continue
 
-            if char == "W" and stream == date:
+            if char == "W" and stream is date:
                 stream = week
 
             # Note: this advances and may exhaust the iterator
@@ -128,7 +128,7 @@ class timedelta(datetime.timedelta):
 
         if not measurements:
             raise _parse_error("no measurements found")
-        if stream == time and not measurements.keys() & {"hours", "minutes", "seconds"}:
+        if stream is time and not measurements.keys() & {"hours", "minutes", "seconds"}:
             raise _parse_error("no measurements found in time segment")
         if "weeks" in measurements and len(measurements) > 1:
             raise _parse_error("cannot mix weeks with other units")
