@@ -102,14 +102,16 @@ class timedelta(datetime.timedelta):
 
         designators, units = date_designators, _DATE_UNITS
 
-        value, measurements, segments = "", {}, {}
+        value, measurements = "", {}
         while char := next(input_stream, None):
             if char in _FIELD_CHARACTERS:
                 value += char
                 continue
 
             if char == "T" and designators != time_designators:
-                segments[designators], value = value, ""
+                if value:
+                    measurements.update(cls._filter(cls._fromdatestring(value)))
+                    value = ""
                 designators, units = time_designators, _TIME_UNITS
                 continue
 
@@ -133,19 +135,13 @@ class timedelta(datetime.timedelta):
             measurements[units[char]] = quantity
             value = ""
 
-        segments[designators] = value
-        if any(segments.values()):
-            if measurements:
-                raise _parse_error("date segment format differs from time segment")
-            for designators, value in segments.items():
-                if not value:
-                    continue
-                segment_parser = {
-                    date_designators: cls._fromdatestring,
-                    time_designators: cls._fromtimestring,
-                    week_designators: lambda _: [],
-                }[designators]
-                measurements.update(cls._filter(segment_parser(value)))
+        if value:
+            segment_parser = {
+                date_designators: cls._fromdatestring,
+                time_designators: cls._fromtimestring,
+                week_designators: lambda _: [],
+            }[designators]
+            measurements.update(cls._filter(segment_parser(value)))
 
         if not measurements:
             raise _parse_error("no measurements found")
