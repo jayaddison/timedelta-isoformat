@@ -4,20 +4,6 @@ from string import digits
 
 _FIELD_CHARACTERS = frozenset(digits + ",-.:")
 
-_DATE_UNITS = {
-    "Y": "years",
-    "M": "months",
-    "D": "days",
-}
-_TIME_UNITS = {
-    "H": "hours",
-    "M": "minutes",
-    "S": "seconds",
-}
-_WEEK_UNITS = {
-    "W": "weeks",
-}
-
 
 class timedelta(datetime.timedelta):
     """Subclass of :py:class:`datetime.timedelta` with additional methods to implement
@@ -96,13 +82,11 @@ class timedelta(datetime.timedelta):
         if next(input_stream, None) != "P":
             raise _parse_error("durations must begin with the character 'P'")
 
-        date_designators = iter(("Y", "M", "D"))
-        time_designators = iter(("H", "M", "S"))
-        week_designators = iter(("W",))
+        date_designators = iter(("Y", "years", "M", "months", "D", "days"))
+        time_designators = iter(("H", "hours", "M", "minutes", "S", "seconds"))
+        week_designators = iter(("W", "weeks"))
 
-        designators, units = date_designators, _DATE_UNITS
-
-        value, measurements = "", {}
+        designators, value, measurements = date_designators, "", {}
         while char := next(input_stream, None):
             if char in _FIELD_CHARACTERS:
                 value += char
@@ -112,11 +96,11 @@ class timedelta(datetime.timedelta):
                 if value:
                     measurements.update(cls._filter(cls._fromdatestring(value)))
                     value = ""
-                designators, units = time_designators, _TIME_UNITS
+                designators = time_designators
                 continue
 
             if char == "W" and designators == date_designators:
-                designators, units = week_designators, _WEEK_UNITS
+                designators = week_designators
 
             # Note: this advances and may exhaust the iterator
             if char not in designators:
@@ -129,7 +113,7 @@ class timedelta(datetime.timedelta):
                 raise _parse_error(f"value '{value}' does not start with a digit")
 
             try:
-                measurements[units[char]] = float(value.replace(",", "."))
+                measurements[next(designators)] = float(value.replace(",", "."))
             except ValueError as exc:
                 raise _parse_error(f"unable to parse '{value}' as a number") from exc
             value = ""
@@ -144,7 +128,11 @@ class timedelta(datetime.timedelta):
 
         if not measurements:
             raise _parse_error("no measurements found")
-        if units == _TIME_UNITS and not measurements.keys() & units.values():
+        if designators == time_designators and not measurements.keys() & {
+            "hours",
+            "minutes",
+            "seconds",
+        }:
             raise _parse_error("no measurements found in time segment")
         if "weeks" in measurements and len(measurements) > 1:
             raise _parse_error("cannot mix weeks with other units")
