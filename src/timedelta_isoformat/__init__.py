@@ -3,20 +3,6 @@ from string import digits
 
 _NUMERIC_CHARACTERS = frozenset(digits + ",.")
 
-_DATE_UNITS = {
-    "Y": "years",
-    "M": "months",
-    "D": "days",
-}
-_TIME_UNITS = {
-    "H": "hours",
-    "M": "minutes",
-    "S": "seconds",
-}
-_WEEK_UNITS = {
-    "W": "weeks",
-}
-
 
 class timedelta(datetime.timedelta):
     @classmethod
@@ -28,24 +14,22 @@ class timedelta(datetime.timedelta):
         if next(input_stream, None) != "P":
             raise _parse_error("durations must begin with the character 'P'")
 
-        date_designators = iter(("Y", "M", "D"))
-        time_designators = iter(("H", "M", "S"))
-        week_designators = iter(("W",))
+        date_designators = iter(("Y", "years", "M", "months", "D", "days"))
+        time_designators = iter(("H", "hours", "M", "minutes", "S", "seconds"))
+        week_designators = iter(("W", "weeks"))
 
-        designators, units = date_designators, _DATE_UNITS
-
-        value, measurements = "", {}
+        designators, value, measurements = date_designators, "", {}
         while char := next(input_stream, None):
             if char in _NUMERIC_CHARACTERS:
                 value += char
                 continue
 
             if char == "T":
-                designators, units = time_designators, _TIME_UNITS
+                designators = time_designators
                 continue
 
             if char == "W":
-                designators, units = week_designators, _WEEK_UNITS
+                designators = week_designators
 
             # Note: this advances and may exhaust the iterator
             if char not in designators:
@@ -58,7 +42,7 @@ class timedelta(datetime.timedelta):
                 quantity = float(value.replace(",", "."))
             except ValueError:
                 raise _parse_error(f"unable to intepret '{value}' as a numeric value")
-            value, measurements[units[char]] = "", quantity
+            value, measurements[next(designators)] = "", quantity
 
         if not measurements:
             raise _parse_error("no measurements found")
