@@ -36,7 +36,6 @@ class timedelta(datetime.timedelta):
         if not date_string:
             return
 
-        found = False
         separator_positions = [i for i, c in enumerate(date_string) if c == "-"]
         date_length = len(date_string)
 
@@ -44,29 +43,25 @@ class timedelta(datetime.timedelta):
         if date_length == 8 and separator_positions == [4]:
             yield int(date_string[0:4]), "years", None
             yield int(date_string[5:8]), "days", 366
-            found = True
 
         # YYYY-MM-DD
-        if date_length == 10 and separator_positions == [4, 7]:
+        elif date_length == 10 and separator_positions == [4, 7]:
             yield int(date_string[0:4]), "years", None
             yield int(date_string[5:7]), "months", 12
             yield int(date_string[8:10]), "days", 31
-            found = True
 
         # YYYYDDD
-        if date_length == 7 and separator_positions == []:
+        elif date_length == 7 and separator_positions == []:
             yield int(date_string[0:4]), "years", None
             yield int(date_string[4:7]), "days", 366
-            found = True
 
         # YYYYMMDD
-        if date_length == 8 and separator_positions == []:
+        elif date_length == 8 and separator_positions == []:
             yield int(date_string[0:4]), "years", None
             yield int(date_string[4:6]), "months", 12
             yield int(date_string[6:8]), "days", 31
-            found = True
 
-        if not found:
+        else:
             raise ValueError(f"unable to parse '{date_string}' into date components")
 
     @staticmethod
@@ -74,7 +69,6 @@ class timedelta(datetime.timedelta):
         if not time_string:
             return
 
-        found = False
         separator_positions = [i for i, c in enumerate(time_string) if c == ":"]
 
         # HH:MM:SS[.ssssss]
@@ -83,17 +77,15 @@ class timedelta(datetime.timedelta):
             yield int(time_string[0:2]), "hours", 23
             yield int(time_string[3:5]), "minutes", 59
             yield seconds_type(time_string[6:]), "seconds", 59
-            found = True
 
         # HHMMSS[.ssssss]
-        if separator_positions == []:
+        elif separator_positions == []:
             seconds_type = float if time_string[6:7] == "." else int
             yield int(time_string[0:2]), "hours", 23
             yield int(time_string[2:4]), "minutes", 59
             yield seconds_type(time_string[4:]), "seconds", 59
-            found = True
 
-        if not found:
+        else:
             raise ValueError(f"unable to parse '{time_string}' into time components")
 
     @classmethod
