@@ -142,7 +142,7 @@ class timedelta(datetime.timedelta):
         try:
             return cls(**filtered_measurements)
         except TypeError as exc:
-            if "years" in measurements or "months" in measurements:
+            if "years" in filtered_measurements or "months" in filtered_measurements:
                 raise _parse_error("year and month fields are not supported") from exc
             raise exc
 
