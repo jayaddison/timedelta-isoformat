@@ -98,7 +98,7 @@ class timedelta(datetime.timedelta):
 
             if char == "T" and stream is not time:
                 if value:
-                    measurements.update(cls._filter(cls._fromdatestring(value)))
+                    measurements |= cls._filter(cls._fromdatestring(value))
                     value = ""
                 stream = time
                 continue
@@ -124,7 +124,7 @@ class timedelta(datetime.timedelta):
 
         if value:
             parse = cls._fromtimestring if stream is time else cls._fromdatestring
-            measurements.update(cls._filter(parse(value)))
+            measurements |= cls._filter(parse(value))
 
         if not measurements:
             raise _parse_error("no measurements found")
