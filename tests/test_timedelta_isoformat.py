@@ -49,6 +49,7 @@ invalid_durations = [
     # repeated designators
     ("P1DT1H3H1M", "unexpected character 'H'"),
     ("P1D3D", "unexpected character 'D'"),
+    ("P0MT1HP1D", "unexpected character 'P'"),
     # incorrectly-ordered designators
     ("PT5S1M", "unexpected character 'M'"),
     ("P0DT5M1H", "unexpected character 'H'"),
