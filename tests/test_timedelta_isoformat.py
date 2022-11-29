@@ -81,6 +81,9 @@ invalid_durations = [
     # segments out-of-order
     ("P1DT5S2W", "unexpected character 'W'"),
     ("P1W1D", "unexpected character 'D'"),
+    # unexpected characters within date/time components
+    ("PT01:-2:03", "expected a positive integer within minutes component"),
+    ("P000000.1", "expected a positive integer within days component"),
 ]
 
 # ambiguous cases

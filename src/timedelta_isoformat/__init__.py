@@ -15,6 +15,8 @@ class timedelta(datetime.timedelta):
         for quantity, unit, limit in components:
             if not quantity:
                 raise ValueError(f"{unit} component not found")
+            if not quantity.isdigit():
+                raise ValueError(f"expected a positive integer within {unit} component")
             if quantity > limit:
                 raise ValueError(f"{unit} value of {quantity} exceeds range 0..{limit}")
             yield unit, int(quantity)
