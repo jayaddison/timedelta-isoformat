@@ -13,9 +13,9 @@ class timedelta(datetime.timedelta):
     @staticmethod
     def _filter(components):
         for quantity, unit, limit in components:
-            if limit and quantity > limit:
+            if quantity > limit:
                 raise ValueError(f"{unit} value of {quantity} exceeds range 0..{limit}")
-            yield unit, quantity
+            yield unit, int(quantity)
 
     @staticmethod
     def _fromdatestring(date_string):
@@ -24,25 +24,25 @@ class timedelta(datetime.timedelta):
 
         # YYYY-DDD
         if date_length == 8 and separator_positions == [4]:
-            yield int(date_string[0:4]), "years", None
-            yield int(date_string[5:8]), "days", 366
+            yield date_string[0:4], "years", "a"
+            yield date_string[5:8], "days", "366"
 
         # YYYY-MM-DD
         elif date_length == 10 and separator_positions == [4, 7]:
-            yield int(date_string[0:4]), "years", None
-            yield int(date_string[5:7]), "months", 12
-            yield int(date_string[8:10]), "days", 31
+            yield date_string[0:4], "years", "a"
+            yield date_string[5:7], "months", "12"
+            yield date_string[8:10], "days", "31"
 
         # YYYYDDD
         elif date_length == 7 and separator_positions == []:
-            yield int(date_string[0:4]), "years", None
-            yield int(date_string[4:7]), "days", 366
+            yield date_string[0:4], "years", "a"
+            yield date_string[4:7], "days", "366"
 
         # YYYYMMDD
         elif date_length == 8 and separator_positions == []:
-            yield int(date_string[0:4]), "years", None
-            yield int(date_string[4:6]), "months", 12
-            yield int(date_string[6:8]), "days", 31
+            yield date_string[0:4], "years", "a"
+            yield date_string[4:6], "months", "12"
+            yield date_string[6:8], "days", "31"
 
         else:
             raise ValueError(f"unable to parse '{date_string}' into date components")
@@ -53,21 +53,21 @@ class timedelta(datetime.timedelta):
 
         # HH:MM:SS[.ssssss]
         if separator_positions == [2, 5]:
-            yield int(time_string[0:2]), "hours", 23
-            yield int(time_string[3:5]), "minutes", 59
-            yield int(time_string[6:8]), "seconds", 59
+            yield time_string[0:2], "hours", "23"
+            yield time_string[3:5], "minutes", "59"
+            yield time_string[6:8], "seconds", "59"
             if time_string[8:9] != ".":
                 return
-            yield int(time_string[9:15].ljust(6, "0")), "microseconds", None
+            yield time_string[9:15].ljust(6, "0"), "microseconds", "a"
 
         # HHMMSS[.ssssss]
         elif separator_positions == []:
-            yield int(time_string[0:2]), "hours", 23
-            yield int(time_string[2:4]), "minutes", 59
-            yield int(time_string[4:]), "seconds", 59
+            yield time_string[0:2], "hours", "23"
+            yield time_string[2:4], "minutes", "59"
+            yield time_string[4:], "seconds", "59"
             if time_string[6:7] != ".":
                 return
-            yield int(time_string[7:13].ljust(6, "0")), "microseconds", None
+            yield time_string[7:13].ljust(6, "0"), "microseconds", "a"
 
         else:
             raise ValueError(f"unable to parse '{time_string}' into time components")
