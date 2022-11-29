@@ -84,6 +84,8 @@ invalid_durations = [
     # unexpected characters within date/time components
     ("PT01:-2:03", "expected a positive integer within minutes component"),
     ("P000000.1", "expected a positive integer within days component"),
+    ("PT000000--", "unexpected character '-'"),
+    ("PT00:00:00,-", "unexpected character ','"),
 ]
 
 # ambiguous cases

@@ -54,14 +54,17 @@ class timedelta(datetime.timedelta):
     @staticmethod
     def _fromtimestring(time_string):
         separator_positions = [i for i, c in enumerate(time_string[0:15]) if c == ":"]
+        time_length = len(time_string)
 
         # HH:MM:SS[.ssssss]
         if separator_positions == [2, 5]:
             yield time_string[0:2], "hours", "23"
             yield time_string[3:5], "minutes", "59"
             yield time_string[6:8], "seconds", "59"
-            if time_string[8:9] != ".":
+            if time_length == 8:
                 return
+            if time_string[8] != ".":
+                raise ValueError(f"unexpected character '{time_string[8]}'")
             yield time_string[9:15].ljust(6, "0"), "microseconds", "a"
 
         # HHMMSS[.ssssss]
@@ -69,8 +72,10 @@ class timedelta(datetime.timedelta):
             yield time_string[0:2], "hours", "23"
             yield time_string[2:4], "minutes", "59"
             yield time_string[4:6], "seconds", "59"
-            if time_string[6:7] != ".":
+            if time_length == 6:
                 return
+            if time_string[6] != ".":
+                raise ValueError(f"unexpected character '{time_string[6]}'")
             yield time_string[7:13].ljust(6, "0"), "microseconds", "a"
 
         else:
