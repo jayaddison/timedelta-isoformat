@@ -80,18 +80,11 @@ class timedelta(datetime.timedelta):
             raise ValueError(f"unable to parse '{time_string}' into time components")
 
     @classmethod
-    def fromisoformat(cls, duration_string):
-        """Parses an input string and returns a :py:class:`timedelta` result
-
-        :raises: `ValueError` with an explanatory message when parsing fails
-        """
-
-        def _parse_error(reason):
-            return ValueError(f"could not parse duration '{duration_string}': {reason}")
+    def _parse(cls, duration_string):
 
         input_stream = iter(duration_string)
         if next(input_stream, None) != "P":
-            raise _parse_error("durations must begin with the character 'P'")
+            raise ValueError("durations must begin with the character 'P'")
 
         date = iter(("Y", "years", "M", "months", "D", "days"))
         time = iter(("H", "hours", "M", "minutes", "S", "seconds"))
@@ -113,43 +106,55 @@ class timedelta(datetime.timedelta):
 
             # Note: this advances and may exhaust the iterator
             if char not in stream:
-                raise _parse_error(f"unexpected character '{char}'")
+                raise ValueError(f"unexpected character '{char}'")
 
             if not value:
-                raise _parse_error(f"missing measurement before character '{char}'")
+                raise ValueError(f"missing measurement before character '{char}'")
 
             if not value[0].isdigit():
-                raise _parse_error(f"value '{value}' does not start with a digit")
+                raise ValueError(f"value '{value}' does not start with a digit")
 
             try:
                 measurements[next(stream)] = float(value.replace(",", "."))
             except ValueError as exc:
-                raise _parse_error(f"unable to parse '{value}' as a number") from exc
+                raise ValueError(f"unable to parse '{value}' as a number") from exc
             value = ""
 
         date_tail, time_tail = (tail, value) if stream is time else (value, None)
-        try:
-            if date_tail:
-                measurements |= cls._filter(cls._fromdatestring(date_tail))
-            if time_tail:
-                measurements |= cls._filter(cls._fromtimestring(time_tail))
-        except ValueError as exc:
-            raise _parse_error(exc) from None
+        if date_tail:
+            measurements |= timedelta._filter(timedelta._fromdatestring(date_tail))
+        if time_tail:
+            measurements |= timedelta._filter(timedelta._fromtimestring(time_tail))
 
         if not measurements:
-            raise _parse_error("no measurements found")
+            raise ValueError("no measurements found")
         if "weeks" in measurements and len(measurements) > 1:
-            raise _parse_error("cannot mix weeks with other units")
+            raise ValueError("cannot mix weeks with other units")
         if (
             stream is time
             and "hours" not in measurements
             and "minutes" not in measurements
             and "seconds" not in measurements
         ):
-            raise _parse_error("no measurements found in time segment")
+            raise ValueError("no measurements found in time segment")
+
+        return {k: v for k, v in measurements.items() if v}
+
+    @classmethod
+    def fromisoformat(cls, duration_string):
+        """Parses an input string and returns a :py:class:`timedelta` result
+
+        :raises: `ValueError` with an explanatory message when parsing fails
+        """
+
+        def _parse_error(reason):
+            return ValueError(f"could not parse duration '{duration_string}': {reason}")
 
         try:
-            return cls(**{k: v for k, v in measurements.items() if v})
+            measurements = cls._parse(duration_string)
+            return cls(**measurements)
+        except ValueError as exc:
+            raise _parse_error(exc) from None
         except TypeError as exc:
             if measurements.get("years") or measurements.get("months"):
                 raise _parse_error("year and month fields are not supported") from exc
