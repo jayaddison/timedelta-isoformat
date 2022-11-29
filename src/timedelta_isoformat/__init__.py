@@ -106,7 +106,7 @@ class timedelta(datetime.timedelta):
                 continue
 
             if char == "T" and stream is not time:
-                stream, value, tail = time, "", value
+                value, tail, stream = "", value, time
                 continue
 
             if char == "W" and stream is date:
