@@ -13,8 +13,6 @@ class timedelta(datetime.timedelta):
     @staticmethod
     def _filter(components):
         for quantity, unit, limit in components:
-            if not quantity:
-                raise ValueError(f"{unit} component not found")
             if not quantity.isdigit():
                 raise ValueError(f"expected a positive integer within {unit} component")
             if quantity > limit:
@@ -57,7 +55,7 @@ class timedelta(datetime.timedelta):
         time_length = len(time_string)
 
         # HH:MM:SS[.ssssss]
-        if separator_positions == [2, 5]:
+        if time_length >= 8 and separator_positions == [2, 5]:
             yield time_string[0:2], "hours", "23"
             yield time_string[3:5], "minutes", "59"
             yield time_string[6:8], "seconds", "59"
@@ -68,7 +66,7 @@ class timedelta(datetime.timedelta):
             yield time_string[9:15].ljust(6, "0"), "microseconds", "a"
 
         # HHMMSS[.ssssss]
-        elif separator_positions == []:
+        elif time_length >= 6 and separator_positions == []:
             yield time_string[0:2], "hours", "23"
             yield time_string[2:4], "minutes", "59"
             yield time_string[4:6], "seconds", "59"
