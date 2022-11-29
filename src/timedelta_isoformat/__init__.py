@@ -83,16 +83,19 @@ class timedelta(datetime.timedelta):
     def _parse(cls, duration):
         assert duration.startswith("P"), "durations must begin with the character 'P'"
         input_stream = iter(duration)
-        next(input_stream)
 
         date = iter(("Y", "years", "M", "months", "D", "days"))
         time = iter(("H", "hours", "M", "minutes", "S", "seconds"))
         week = iter(("W", "weeks"))
 
-        stream, value, tail, measurements = date, "", None, {}
+        stream, value, tail, measurements = None, "", None, {}
         while char := next(input_stream, None):
             if char in _FIELD_CHARACTERS:
                 value += char
+                continue
+
+            if char == "P" and not stream:
+                stream = date
                 continue
 
             if char == "T" and stream is not time:
