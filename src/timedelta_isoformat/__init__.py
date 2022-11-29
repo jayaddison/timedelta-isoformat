@@ -103,7 +103,7 @@ class timedelta(datetime.timedelta):
                 tokens = week_tokens
                 pass
 
-            # Note: this advances and may exhaust the iterator
+            # Note: this advances and may exhaust the token iterator
             assert char in tokens, f"unexpected character '{char}'"
             assert value, f"missing measurement before character '{char}'"
             assert value[0].isdigit(), f"value '{value}' does not start with a digit"
