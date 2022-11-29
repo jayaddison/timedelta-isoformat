@@ -38,7 +38,7 @@ valid_durations = [
 
 invalid_durations = [
     # incomplete strings
-    ("", "durations must begin with the character 'P'"),
+    ("", "no measurements found"),
     ("P", "no measurements found"),
     ("P0DT", "no measurements found in time segment"),
     ("P1DT", "no measurements found in time segment"),

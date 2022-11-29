@@ -81,8 +81,6 @@ class timedelta(datetime.timedelta):
 
     @classmethod
     def _parse(cls, duration):
-        assert duration.startswith("P"), "durations must begin with the character 'P'"
-
         date = iter(("Y", "years", "M", "months", "D", "days"))
         time = iter(("H", "hours", "M", "minutes", "S", "seconds"))
         week = iter(("W", "weeks"))
