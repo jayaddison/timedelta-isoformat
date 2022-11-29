@@ -21,7 +21,7 @@ class timedelta(datetime.timedelta):
 
     @staticmethod
     def _fromdatestring(date_string):
-        separator_positions = [i for i, c in enumerate(date_string) if c == "-"]
+        separator_positions = [i for i, c in enumerate(date_string[0:8]) if c == "-"]
         date_length = len(date_string)
 
         # YYYY-DDD
@@ -51,7 +51,7 @@ class timedelta(datetime.timedelta):
 
     @staticmethod
     def _fromtimestring(time_string):
-        separator_positions = [i for i, c in enumerate(time_string) if c == ":"]
+        separator_positions = [i for i, c in enumerate(time_string[0:6]) if c == ":"]
 
         # HH:MM:SS[.ssssss]
         if separator_positions == [2, 5]:
