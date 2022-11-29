@@ -99,16 +99,14 @@ class timedelta(datetime.timedelta):
         time = iter(("H", "hours", "M", "minutes", "S", "seconds"))
         week = iter(("W", "weeks"))
 
-        stream, value, measurements = date, "", {}
+        stream, value, tail, measurements = date, "", None, {}
         while char := next(input_stream, None):
             if char in _FIELD_CHARACTERS:
                 value += char
                 continue
 
             if char == "T" and stream is not time:
-                if value:
-                    measurements |= cls._filter(cls._fromdatestring(value))
-                    value = ""
+                value, tail = "", value
                 stream = time
                 continue
 
@@ -131,9 +129,11 @@ class timedelta(datetime.timedelta):
                 raise _parse_error(f"unable to parse '{value}' as a number") from exc
             value = ""
 
-        if value:
-            parse = cls._fromtimestring if stream is time else cls._fromdatestring
-            measurements |= cls._filter(parse(value))
+        date_tail, time_tail = (tail, value) if stream is time else (value, None)
+        if date_tail:
+            measurements |= cls._filter(cls._fromdatestring(date_tail))
+        if time_tail:
+            measurements |= cls._filter(cls._fromtimestring(time_tail))
 
         if not measurements:
             raise _parse_error("no measurements found")
