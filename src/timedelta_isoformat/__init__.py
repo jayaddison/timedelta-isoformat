@@ -123,11 +123,8 @@ class timedelta(datetime.timedelta):
             value = ""
 
         if value:
-            segment_parsers = {
-                date: cls._fromdatestring,
-                time: cls._fromtimestring,
-            }
-            measurements.update(cls._filter(segment_parsers[stream](value)))
+            parse = cls._fromtimestring if stream is time else cls._fromdatestring
+            measurements.update(cls._filter(parse(value)))
 
         if not measurements:
             raise _parse_error("no measurements found")
