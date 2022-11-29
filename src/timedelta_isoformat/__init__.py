@@ -14,7 +14,7 @@ class timedelta(datetime.timedelta):
     def _filter(components):
         for quantity, unit, limit in components:
             if not quantity.isdigit():
-                raise ValueError(f"expected a positive integer within {unit} component")
+                raise ValueError(f"expected a positive integer {unit} component")
             if quantity > limit:
                 raise ValueError(f"{unit} value of {quantity} exceeds range 0..{limit}")
             yield unit, int(quantity)

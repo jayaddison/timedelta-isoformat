@@ -83,8 +83,8 @@ invalid_durations = [
     ("P1DT5S2W", "unexpected character 'W'"),
     ("P1W1D", "unexpected character 'D'"),
     # unexpected characters within date/time components
-    ("PT01:-2:03", "expected a positive integer within minutes component"),
-    ("P000000.1", "expected a positive integer within days component"),
+    ("PT01:-2:03", "expected a positive integer minutes component"),
+    ("P000000.1", "expected a positive integer days component"),
     ("PT000000--", "unexpected character '-'"),
     ("PT00:00:00,-", "unexpected character ','"),
     # negative designator-separated values
