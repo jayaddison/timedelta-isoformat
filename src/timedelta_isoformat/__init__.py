@@ -100,7 +100,9 @@ class timedelta(datetime.timedelta):
                 pass
 
             # Note: this advances and may exhaust the token iterator
-            assert char in tokens, f"unexpected character '{char}'"
+            if char not in tokens:
+                raise ValueError(f"unexpected character '{char}'")
+
             assert value, f"missing measurement before character '{char}'"
             assert value[0].isdigit(), f"value '{value}' does not start with a digit"
 
