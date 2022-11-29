@@ -81,10 +81,10 @@ class timedelta(datetime.timedelta):
 
     @classmethod
     def _parse(cls, duration_string):
-
         input_stream = iter(duration_string)
-        if next(input_stream, None) != "P":
-            raise ValueError("durations must begin with the character 'P'")
+        assert (
+            next(input_stream, None) == "P"
+        ), "durations must begin with the character 'P'"
 
         date = iter(("Y", "years", "M", "months", "D", "days"))
         time = iter(("H", "hours", "M", "minutes", "S", "seconds"))
@@ -105,14 +105,9 @@ class timedelta(datetime.timedelta):
                 pass
 
             # Note: this advances and may exhaust the iterator
-            if char not in stream:
-                raise ValueError(f"unexpected character '{char}'")
-
-            if not value:
-                raise ValueError(f"missing measurement before character '{char}'")
-
-            if not value[0].isdigit():
-                raise ValueError(f"value '{value}' does not start with a digit")
+            assert char in stream, f"unexpected character '{char}'"
+            assert value, f"missing measurement before character '{char}'"
+            assert value[0].isdigit(), f"value '{value}' does not start with a digit"
 
             try:
                 measurements[next(stream)] = float(value.replace(",", "."))
@@ -126,17 +121,16 @@ class timedelta(datetime.timedelta):
         if time_tail:
             measurements |= timedelta._filter(timedelta._fromtimestring(time_tail))
 
-        if not measurements:
-            raise ValueError("no measurements found")
-        if "weeks" in measurements and len(measurements) > 1:
-            raise ValueError("cannot mix weeks with other units")
-        if (
+        assert measurements, "no measurements found"
+        assert not (
+            "weeks" in measurements and len(measurements) > 1
+        ), "cannot mix weeks with other units"
+        assert not (
             stream is time
             and "hours" not in measurements
             and "minutes" not in measurements
             and "seconds" not in measurements
-        ):
-            raise ValueError("no measurements found in time segment")
+        ), "no measurements found in time segment"
 
         return {k: v for k, v in measurements.items() if v}
 
@@ -153,7 +147,7 @@ class timedelta(datetime.timedelta):
         try:
             measurements = cls._parse(duration_string)
             return cls(**measurements)
-        except ValueError as exc:
+        except (AssertionError, ValueError) as exc:
             raise _parse_error(exc) from None
         except TypeError as exc:
             if measurements.get("years") or measurements.get("months"):
