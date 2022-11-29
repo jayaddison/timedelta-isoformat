@@ -12,10 +12,10 @@ class timedelta(datetime.timedelta):
 
     @staticmethod
     def _filter(components):
-        for quantity, unit, limit in components:
-            assert quantity.isdigit(), f"expected a positive integer {unit} component"
-            assert quantity <= limit, f"{unit} value of {quantity} exceeds range 0..{limit}"
-            yield unit, int(quantity)
+        for value, unit, limit in components:
+            assert value.isdigit(), f"expected a positive integer {unit} component"
+            assert value <= limit, f"{unit} value of {value} exceeds range 0..{limit}"
+            yield unit, int(value)
 
     @staticmethod
     def _fromdatestring(date_string):
