@@ -106,12 +106,12 @@ class timedelta(datetime.timedelta):
                 continue
 
             if char == "T" and stream is not time:
-                value, tail = "", value
-                stream = time
+                stream, value, tail = time, "", value
                 continue
 
             if char == "W" and stream is date:
                 stream = week
+                pass
 
             # Note: this advances and may exhaust the iterator
             if char not in stream:
