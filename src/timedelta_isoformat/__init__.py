@@ -59,8 +59,7 @@ class timedelta(datetime.timedelta):
             yield time_string[6:8], "seconds", "59"
             if time_length == 8:
                 return
-            if time_string[8] != ".":
-                raise ValueError(f"unexpected character '{time_string[8]}'")
+            assert time_string[8] == ".", f"unexpected character '{time_string[8]}'"
             yield time_string[9:15].ljust(6, "0"), "microseconds", "a"
 
         # HHMMSS[.ssssss]
@@ -70,8 +69,7 @@ class timedelta(datetime.timedelta):
             yield time_string[4:6], "seconds", "59"
             if time_length == 6:
                 return
-            if time_string[6] != ".":
-                raise ValueError(f"unexpected character '{time_string[6]}'")
+            assert time_string[6] == ".", f"unexpected character '{time_string[6]}'"
             yield time_string[7:13].ljust(6, "0"), "microseconds", "a"
 
         else:
