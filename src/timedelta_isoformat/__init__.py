@@ -64,7 +64,7 @@ class timedelta(datetime.timedelta):
         elif separator_positions == []:
             yield time_string[0:2], "hours", "23"
             yield time_string[2:4], "minutes", "59"
-            yield time_string[4:], "seconds", "59"
+            yield time_string[4:6], "seconds", "59"
             if time_string[6:7] != ".":
                 return
             yield time_string[7:13].ljust(6, "0"), "microseconds", "a"
