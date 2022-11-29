@@ -53,17 +53,17 @@ class timedelta(datetime.timedelta):
 
         # HH:MM:SS[.ssssss]
         if separator_positions == [2, 5]:
-            seconds_type = float if time_string[8:9] == "." else int
             yield int(time_string[0:2]), "hours", 23
             yield int(time_string[3:5]), "minutes", 59
-            yield seconds_type(time_string[6:]), "seconds", 59
+            yield int(time_string[6:8]), "seconds", 59
+            yield int(time_string[8:9] == "." and time_string[9:15].ljust(6, "0")), "microseconds", None
 
         # HHMMSS[.ssssss]
         elif separator_positions == []:
-            seconds_type = float if time_string[6:7] == "." else int
             yield int(time_string[0:2]), "hours", 23
             yield int(time_string[2:4]), "minutes", 59
-            yield seconds_type(time_string[4:]), "seconds", 59
+            yield int(time_string[4:]), "seconds", 59
+            yield int(time_string[6:7] == "." and time_string[7:13].ljust(6, "0")), "microseconds", None
 
         else:
             raise ValueError(f"unable to parse '{time_string}' into time components")
