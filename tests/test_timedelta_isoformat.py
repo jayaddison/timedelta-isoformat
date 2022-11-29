@@ -86,6 +86,10 @@ invalid_durations = [
     ("P000000.1", "expected a positive integer within days component"),
     ("PT000000--", "unexpected character '-'"),
     ("PT00:00:00,-", "unexpected character ','"),
+    # negative designator-separated values
+    ("P-1DT0S", "value '-1' does not start with a digit"),
+    ("P0M-2D", "value '-2' does not start with a digit"),
+    ("P0DT1M-3S", "value '-3' does not start with a digit"),
 ]
 
 # ambiguous cases
