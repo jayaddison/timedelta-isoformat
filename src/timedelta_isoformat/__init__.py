@@ -81,40 +81,40 @@ class timedelta(datetime.timedelta):
 
     @classmethod
     def _parse(cls, duration):
-        date = iter(("Y", "years", "M", "months", "D", "days"))
-        time = iter(("H", "hours", "M", "minutes", "S", "seconds"))
-        week = iter(("W", "weeks"))
+        date_tokens = iter(("Y", "years", "M", "months", "D", "days"))
+        time_tokens = iter(("H", "hours", "M", "minutes", "S", "seconds"))
+        week_tokens = iter(("W", "weeks"))
 
-        stream, value, tail, measurements = None, "", None, {}
+        tokens, value, tail, measurements = None, "", None, {}
         for char in duration:
             if char in _FIELD_CHARACTERS:
                 value += char
                 continue
 
-            if char == "P" and not stream:
-                stream = date
+            if char == "P" and not tokens:
+                tokens = date_tokens
                 continue
 
-            if char == "T" and stream is not time:
-                value, tail, stream = "", value, time
+            if char == "T" and tokens is not time_tokens:
+                value, tail, tokens = "", value, time_tokens
                 continue
 
-            if char == "W" and stream is date:
-                stream = week
+            if char == "W" and tokens is date_tokens:
+                tokens = week_tokens
                 pass
 
             # Note: this advances and may exhaust the iterator
-            assert char in stream, f"unexpected character '{char}'"
+            assert char in tokens, f"unexpected character '{char}'"
             assert value, f"missing measurement before character '{char}'"
             assert value[0].isdigit(), f"value '{value}' does not start with a digit"
 
             try:
-                measurements[next(stream)] = float(value.replace(",", "."))
+                measurements[next(tokens)] = float(value.replace(",", "."))
             except ValueError as exc:
                 raise ValueError(f"unable to parse '{value}' as a number") from exc
             value = ""
 
-        date_tail, time_tail = (tail, value) if stream is time else (value, None)
+        date_tail, time_tail = (tail, value) if tokens is time_tokens else (value, None)
         if date_tail:
             measurements |= timedelta._filter(timedelta._fromdatestring(date_tail))
         if time_tail:
@@ -125,7 +125,7 @@ class timedelta(datetime.timedelta):
             "weeks" in measurements and len(measurements) > 1
         ), "cannot mix weeks with other units"
         assert not (
-            stream is time
+            tokens is time_tokens
             and "hours" not in measurements
             and "minutes" not in measurements
             and "seconds" not in measurements
