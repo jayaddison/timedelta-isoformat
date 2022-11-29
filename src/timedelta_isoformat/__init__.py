@@ -128,10 +128,13 @@ class timedelta(datetime.timedelta):
             value = ""
 
         date_tail, time_tail = (tail, value) if stream is time else (value, None)
-        if date_tail:
-            measurements |= cls._filter(cls._fromdatestring(date_tail))
-        if time_tail:
-            measurements |= cls._filter(cls._fromtimestring(time_tail))
+        try:
+            if date_tail:
+                measurements |= cls._filter(cls._fromdatestring(date_tail))
+            if time_tail:
+                measurements |= cls._filter(cls._fromtimestring(time_tail))
+        except ValueError as exc:
+            raise _parse_error(exc) from None
 
         if not measurements:
             raise _parse_error("no measurements found")
