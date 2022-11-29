@@ -80,8 +80,8 @@ class timedelta(datetime.timedelta):
             raise ValueError(f"unable to parse '{time_string}' into time components")
 
     @classmethod
-    def _parse(cls, duration_string):
-        input_stream = iter(duration_string)
+    def _parse(cls, duration):
+        input_stream = iter(duration)
         assert (
             next(input_stream, None) == "P"
         ), "durations must begin with the character 'P'"
@@ -135,17 +135,17 @@ class timedelta(datetime.timedelta):
         return {k: v for k, v in measurements.items() if v}
 
     @classmethod
-    def fromisoformat(cls, duration_string):
+    def fromisoformat(cls, duration):
         """Parses an input string and returns a :py:class:`timedelta` result
 
         :raises: `ValueError` with an explanatory message when parsing fails
         """
 
         def _parse_error(reason):
-            return ValueError(f"could not parse duration '{duration_string}': {reason}")
+            return ValueError(f"could not parse duration '{duration}': {reason}")
 
         try:
-            measurements = cls._parse(duration_string)
+            measurements = cls._parse(duration)
             return cls(**measurements)
         except (AssertionError, ValueError) as exc:
             raise _parse_error(exc) from None
