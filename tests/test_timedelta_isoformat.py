@@ -30,6 +30,7 @@ valid_durations = [
     ("P0000-00-00T01:02:03", timedelta(hours=1, minutes=2, seconds=3)),
     ("PT040506", timedelta(hours=4, minutes=5, seconds=6)),
     ("PT04:05:06", timedelta(hours=4, minutes=5, seconds=6)),
+    ("PT00:00:00.001", timedelta(microseconds=1000)),
     # calendar edge cases
     ("P0000-366", timedelta(days=366)),
     ("PT23:59:59", timedelta(hours=23, minutes=59, seconds=59)),
