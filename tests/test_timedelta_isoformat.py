@@ -47,6 +47,8 @@ valid_durations = [
     ("P0.00000000001D", timedelta(microseconds=1)),
     # decimal year-or-month values
     ("P5.0Y", timedelta(years=5)),
+    # ten-thousand-plus years
+    ("P12345Y", timedelta(years=12345)),
 ]
 
 invalid_durations = [
@@ -111,6 +113,8 @@ invalid_durations = [
     # imprecise designated date components
     ("P1.1Y", "unable to handle fractional years value '1.1'"),
     ("P0.5M", "unable to handle fractional months value '0.5'"),
+    # five-digit years
+    ("P10000-000", "unable to parse '10000-000' into date components"),
 ]
 
 # ambiguous cases
