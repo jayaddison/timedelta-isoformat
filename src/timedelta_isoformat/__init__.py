@@ -65,18 +65,16 @@ class timedelta(datetime.timedelta):
     @staticmethod
     def _fromtimestring(time_string):
         delimiters = [i for i, c in enumerate(time_string[0:15]) if c == ":"]
-        decimal_mark = time_string[6:7] if delimiters == [] else time_string[8:9]
+        decimal = time_string[6:7] if delimiters == [] else time_string[8:9]
 
         # HH:MM:SS[.ssssss]
         if delimiters == [2, 5]:
             yield time_string[0:2], "hours", "23"
             yield time_string[3:5], "minutes", "59"
             yield time_string[6:8], "seconds", "59"
-            if not decimal_mark:
+            if not decimal:
                 return
-            assert (
-                decimal_mark in _DECIMAL_CHARACTERS
-            ), f"unexpected character '{decimal_mark}'"
+            assert decimal in _DECIMAL_CHARACTERS, f"unexpected character '{decimal}'"
             yield time_string[9:15].ljust(6, "0"), "microseconds", None
 
         # HHMMSS[.ssssss]
@@ -84,11 +82,9 @@ class timedelta(datetime.timedelta):
             yield time_string[0:2], "hours", "23"
             yield time_string[2:4], "minutes", "59"
             yield time_string[4:6], "seconds", "59"
-            if not decimal_mark:
+            if not decimal:
                 return
-            assert (
-                decimal_mark in _DECIMAL_CHARACTERS
-            ), f"unexpected character '{decimal_mark}'"
+            assert decimal in _DECIMAL_CHARACTERS, f"unexpected character '{decimal}'"
             yield time_string[7:13].ljust(6, "0"), "microseconds", None
 
         else:
@@ -100,7 +96,7 @@ class timedelta(datetime.timedelta):
         time_tokens = iter(("H", "hours", "M", "minutes", "S", "seconds"))
         week_tokens = iter(("W", "weeks"))
 
-        tokens, value, tail, decimal_mark = None, "", None, None
+        tokens, value, tail, decimal = None, "", None, None
         for char in duration:
             if char in _FIELD_CHARACTERS:
                 value += char
@@ -118,8 +114,8 @@ class timedelta(datetime.timedelta):
                 tokens = week_tokens
                 pass
 
-            if char in _DECIMAL_CHARACTERS and not decimal_mark:
-                decimal_mark = len(value)
+            if char in _DECIMAL_CHARACTERS and not decimal:
+                decimal = len(value)
                 value += char
                 continue
 
@@ -131,17 +127,17 @@ class timedelta(datetime.timedelta):
 
             unit = next(tokens, None)
 
-            if decimal_mark:
+            if decimal:
                 carry_unit, carry_factor = _CARRY_DESTINATIONS.get(unit, (None, None))
                 assert carry_unit, f"unable to handle fractional {unit} value '{value}'"
-                carry_measurement = float(f".{value[decimal_mark+1:]}") * carry_factor
+                carry_measurement = float(f".{value[decimal+1:]}") * carry_factor
                 yield str(carry_measurement), carry_unit, None
 
-            integer_part = value[:decimal_mark]
+            integer_part = value[:decimal]
             if integer_part:
                 yield integer_part, unit, None
 
-            value, decimal_mark = "", None
+            value, decimal = "", None
 
         date_tail, time_tail = (tail, value) if tokens is time_tokens else (value, None)
         if date_tail:
