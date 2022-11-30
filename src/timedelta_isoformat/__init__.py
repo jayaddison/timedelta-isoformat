@@ -52,26 +52,26 @@ class timedelta(datetime.timedelta):
     @staticmethod
     def _fromtimestring(time_string):
         delimiters = [i for i, c in enumerate(time_string[0:15]) if c == ":"]
-        time_length = len(time_string)
+        decimal = time_string[6:7] if delimiters == [] else time_string[8:9]
 
         # HH:MM:SS[.ssssss]
-        if time_length >= 8 and delimiters == [2, 5]:
+        if delimiters == [2, 5]:
             yield time_string[0:2], "hours", 23
             yield time_string[3:5], "minutes", 59
             yield time_string[6:8], "seconds", 59
-            if time_length == 8:
+            if not decimal:
                 return
-            assert time_string[8] == ".", f"unexpected character '{time_string[8]}'"
+            assert decimal == ".", f"unexpected character '{decimal}'"
             yield time_string[9:15].ljust(6, "0"), "microseconds", None
 
         # HHMMSS[.ssssss]
-        elif time_length >= 6 and delimiters == []:
+        elif delimiters == []:
             yield time_string[0:2], "hours", 23
             yield time_string[2:4], "minutes", 59
             yield time_string[4:6], "seconds", 59
-            if time_length == 6:
+            if not decimal:
                 return
-            assert time_string[6] == ".", f"unexpected character '{time_string[6]}'"
+            assert decimal == ".", f"unexpected character '{decimal}'"
             yield time_string[7:13].ljust(6, "0"), "microseconds", None
 
         else:
