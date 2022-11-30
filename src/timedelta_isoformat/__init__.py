@@ -34,16 +34,6 @@ class timedelta(datetime.timedelta):
         return self.isoformat()
 
     @staticmethod
-    def _filter(components):
-        for value, unit, limit in components:
-            assert value[
-                :1
-            ].isdigit(), f"unexpected prefix '{value[:1]}' in {unit} value '{value}'"
-            value = int(value)
-            assert value <= limit, f"{unit} value of {value} exceeds range 0..{limit}"
-            yield unit, value
-
-    @staticmethod
     def _fromdatestring(date_string):
         delimiters = [i for i, c in enumerate(date_string[0:10]) if c == "-"]
         date_length = len(date_string)
@@ -146,23 +136,21 @@ class timedelta(datetime.timedelta):
                 value[:decimal_mark],
                 value[decimal_mark + 1 :].rstrip("0") if decimal_mark else "",
             )
-            assert value[
-                :1
-            ].isdigit(), f"unexpected prefix '{value[:1]}' in {unit} value '{value}'"
 
-            measurement = int(integer_part)
             if decimal_part:
                 carry_unit, carry_factor = _CARRY_DESTINATIONS.get(unit, (None, None))
                 assert carry_unit, f"unable to handle fractional {unit} value '{value}'"
-                yield carry_unit, float(f".{decimal_part}") * carry_factor
-            yield unit, measurement
+                carry_measurement = float(f".{decimal_part}") * carry_factor
+                yield str(carry_measurement), carry_unit, carry_measurement
+            if integer_part:
+                yield integer_part, unit, int(integer_part)
             value, decimal_mark = "", None
 
         date_tail, time_tail = (tail, value) if tokens is time_tokens else (value, None)
         if date_tail:
-            yield from timedelta._filter(timedelta._fromdatestring(date_tail))
+            yield from timedelta._fromdatestring(date_tail)
         if time_tail:
-            yield from timedelta._filter(timedelta._fromtimestring(time_tail))
+            yield from timedelta._fromtimestring(time_tail)
 
         assert tokens, "no measurements found"
 
@@ -182,8 +170,10 @@ class timedelta(datetime.timedelta):
     @staticmethod
     def _parse(duration):
         results = defaultdict(int)
-        for k, v in timedelta._fromdurationstring(duration):
-            results[k] += v
+        for v, k, lim in timedelta._fromdurationstring(duration):
+            assert v[:1].isdigit(), f"unexpected prefix '{v[:1]}' in {k} value '{v}'"
+            assert float(v) <= lim, f"{k} value of {v} exceeds range 0..{lim}"
+            results[k] += float(v)
         return {k: v for k, v in results.items() if v}
 
     @classmethod

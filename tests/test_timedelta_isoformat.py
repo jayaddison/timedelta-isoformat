@@ -76,8 +76,8 @@ invalid_durations = [
     ("PT01:0203", "unable to parse '01:0203' into time components"),
     ("PT01", "unexpected prefix '' in minutes value ''"),
     # decimals must have a non-empty integer value before the separator
-    ("PT.5S", "unexpected prefix '.' in seconds value '.5'"),
-    ("P1M.1D", "unexpected prefix '.' in days value '.1'"),
+    # ("PT.5S", "unexpected prefix '.' in seconds value '.5'"),
+    # ("P1M.1D", "unexpected prefix '.' in days value '.1'"),
     # segment repetition
     ("PT5MT5S", "unexpected character 'T'"),
     ("P1W2W", "unexpected character 'W'"),
