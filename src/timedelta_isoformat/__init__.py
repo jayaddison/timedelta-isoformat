@@ -156,7 +156,7 @@ class timedelta(datetime.timedelta):
 
     @staticmethod
     def _parse(duration):
-        k_prev = None
+        v, k, k_prev = None, None, None
         for v, k, lim in timedelta._fromdurationstring(duration):
             assert v[:1].isdigit(), f"unexpected prefix '{v[:1]}' in {k} value '{v}'"
             assert not lim or v <= lim, f"{k} value of {v} exceeds range 0..{lim}"
