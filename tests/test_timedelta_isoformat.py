@@ -132,7 +132,7 @@ class TimedeltaISOFormat(unittest.TestCase):
     class YearMonthTimedelta(timedelta):
         """Subclass of :py:class:`timedelta_isoformat.timedelta` for year/month tests"""
 
-        def __new__(cls, /, years=None, months=None, **kwargs):
+        def __new__(cls, /, years=0, months=0, **kwargs):
             typ = type(str(cls), (timedelta,), dict(years=years, months=months))
             return typ(**kwargs)
 
