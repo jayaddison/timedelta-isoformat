@@ -136,7 +136,7 @@ class timedelta(datetime.timedelta):
             assert value, f"missing measurement before character '{char}'"
 
             unit, prefix, integer_part, decimal_part = (
-                next(tokens),
+                next(tokens, None),
                 value[:1],
                 value[1:decimal_mark],
                 value[decimal_mark:][1:],
