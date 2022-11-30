@@ -61,8 +61,8 @@ invalid_durations = [
     ("P1WT1H", "cannot mix weeks with other units"),
     ("P0Y1W", "cannot mix weeks with other units"),
     # incorrect quantities
-    ("PT0.0.0S", "unable to parse '0.0.0' as a number"),
-    ("P1.,0D", "unable to parse '1.,0' as a number"),
+    ("PT0.0.0S", "unexpected character '.'"),
+    ("P1.,0D", "unexpected character ','"),
     # date-format durations exceeding calendar limits
     ("P0000-400", "days value of 400 exceeds range 0..366"),
     ("P0000-13-00", "months value of 13 exceeds range 0..12"),

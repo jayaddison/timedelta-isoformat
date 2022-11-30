@@ -2,7 +2,7 @@
 import datetime
 from string import digits
 
-_FIELD_CHARACTERS = frozenset(digits + ",-.:")
+_FIELD_CHARACTERS = frozenset(digits + "-:")
 
 
 class timedelta(datetime.timedelta):
@@ -97,7 +97,7 @@ class timedelta(datetime.timedelta):
         time_tokens = iter(("H", "hours", "M", "minutes", "S", "seconds"))
         week_tokens = iter(("W", "weeks"))
 
-        tokens, value, tail, measurements = None, "", None, {}
+        tokens, value, tail, decimal, measurements = None, "", None, False, {}
         for char in duration:
             if char in _FIELD_CHARACTERS:
                 value += char
@@ -115,6 +115,11 @@ class timedelta(datetime.timedelta):
                 tokens = week_tokens
                 pass
 
+            if char in ",." and decimal is False:
+                value += "."
+                decimal = True
+                continue
+
             # Note: this advances and may exhaust the token iterator
             if char not in tokens:
                 raise ValueError(f"unexpected character '{char}'")
@@ -123,10 +128,10 @@ class timedelta(datetime.timedelta):
             assert value[0].isdigit(), f"value '{value}' does not start with a digit"
 
             try:
-                measurements[next(tokens)] = float(value.replace(",", "."))
+                measurements[next(tokens)] = (float if decimal else int)(value)
             except ValueError as exc:
                 raise ValueError(f"unable to parse '{value}' as a number") from exc
-            value = ""
+            value, decimal = "", False
 
         date_tail, time_tail = (tail, value) if tokens is time_tokens else (value, None)
         if date_tail:
