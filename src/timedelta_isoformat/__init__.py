@@ -102,6 +102,11 @@ class timedelta(datetime.timedelta):
                 value += char
                 continue
 
+            if char in _DECIMAL_CHARACTERS and not decimal:
+                decimal = len(value)
+                value += char
+                continue
+
             if char == "P" and not tokens:
                 tokens = date_tokens
                 continue
@@ -113,11 +118,6 @@ class timedelta(datetime.timedelta):
             if char == "W" and tokens is date_tokens:
                 tokens = week_tokens
                 pass
-
-            if char in _DECIMAL_CHARACTERS and not decimal:
-                decimal = len(value)
-                value += char
-                continue
 
             # Note: this advances and may exhaust the token iterator
             if char not in tokens:
