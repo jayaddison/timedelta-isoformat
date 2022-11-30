@@ -13,6 +13,7 @@ class timedelta(datetime.timedelta):
     @staticmethod
     def _filter(components):
         for value, unit, limit in components:
+            limit = limit or value
             assert value.isdigit(), f"expected a positive integer {unit} component"
             assert value <= limit, f"{unit} value of {value} exceeds range 0..{limit}"
             yield unit, int(value)
@@ -24,23 +25,23 @@ class timedelta(datetime.timedelta):
 
         # YYYY-DDD
         if date_length == 8 and separator_positions == [4]:
-            yield date_string[0:4], "years", "a"
+            yield date_string[0:4], "years", None
             yield date_string[5:8], "days", "366"
 
         # YYYY-MM-DD
         elif date_length == 10 and separator_positions == [4, 7]:
-            yield date_string[0:4], "years", "a"
+            yield date_string[0:4], "years", None
             yield date_string[5:7], "months", "12"
             yield date_string[8:10], "days", "31"
 
         # YYYYDDD
         elif date_length == 7 and separator_positions == []:
-            yield date_string[0:4], "years", "a"
+            yield date_string[0:4], "years", None
             yield date_string[4:7], "days", "366"
 
         # YYYYMMDD
         elif date_length == 8 and separator_positions == []:
-            yield date_string[0:4], "years", "a"
+            yield date_string[0:4], "years", None
             yield date_string[4:6], "months", "12"
             yield date_string[6:8], "days", "31"
 
@@ -70,7 +71,7 @@ class timedelta(datetime.timedelta):
             if time_length == 6:
                 return
             assert time_string[6] == ".", f"unexpected character '{time_string[6]}'"
-            yield time_string[7:13].ljust(6, "0"), "microseconds", "a"
+            yield time_string[7:13].ljust(6, "0"), "microseconds", None
 
         else:
             raise ValueError(f"unable to parse '{time_string}' into time components")
