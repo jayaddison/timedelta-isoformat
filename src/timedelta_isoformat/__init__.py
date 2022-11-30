@@ -97,7 +97,7 @@ class timedelta(datetime.timedelta):
         time_tokens = iter(("H", "hours", "M", "minutes", "S", "seconds"))
         week_tokens = iter(("W", "weeks"))
 
-        tokens, value, tail, decimal_place, measurements = None, "", 0, False, {}
+        tokens, value, tail, decimal_mark, measurements = None, "", 0, False, {}
         for char in duration:
             if char in _FIELD_CHARACTERS:
                 value += char
@@ -115,8 +115,8 @@ class timedelta(datetime.timedelta):
                 tokens = week_tokens
                 pass
 
-            if char in ",." and not decimal_place:
-                decimal_place = len(value)
+            if char in ",." and not decimal_mark:
+                decimal_mark = len(value)
                 value += "."
                 continue
 
@@ -128,10 +128,10 @@ class timedelta(datetime.timedelta):
             assert value[0].isdigit(), f"value '{value}' does not start with a digit"
 
             try:
-                measurements[next(tokens)] = (float if decimal_place else int)(value)
+                measurements[next(tokens)] = (float if decimal_mark else int)(value)
             except ValueError as exc:
                 raise ValueError(f"unable to parse '{value}' as a number") from exc
-            value, decimal_place = "", 0
+            value, decimal_mark = "", 0
 
         date_tail, time_tail = (tail, value) if tokens is time_tokens else (value, None)
         if date_tail:
