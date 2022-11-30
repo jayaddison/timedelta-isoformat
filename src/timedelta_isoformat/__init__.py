@@ -3,6 +3,7 @@ import datetime
 from string import digits
 
 _FIELD_CHARACTERS = frozenset(digits + "-:")
+_DECIMAL_CHARACTERS = frozenset(",.")
 
 
 class timedelta(datetime.timedelta):
@@ -75,7 +76,9 @@ class timedelta(datetime.timedelta):
             yield time_string[6:8], "seconds", 59
             if not decimal_mark:
                 return
-            assert decimal_mark in ",.", f"unexpected character '{decimal_mark}'"
+            assert (
+                decimal_mark in _DECIMAL_CHARACTERS
+            ), f"unexpected character '{decimal_mark}'"
             yield time_string[9:15].ljust(6, "0"), "microseconds", None
 
         # HHMMSS[.ssssss]
@@ -85,7 +88,9 @@ class timedelta(datetime.timedelta):
             yield time_string[4:6], "seconds", 59
             if not decimal_mark:
                 return
-            assert decimal_mark in ",.", f"unexpected character '{decimal_mark}'"
+            assert (
+                decimal_mark in _DECIMAL_CHARACTERS
+            ), f"unexpected character '{decimal_mark}'"
             yield time_string[7:13].ljust(6, "0"), "microseconds", None
 
         else:
@@ -115,7 +120,7 @@ class timedelta(datetime.timedelta):
                 tokens = week_tokens
                 pass
 
-            if char in ",." and not decimal_mark:
+            if char in _DECIMAL_CHARACTERS and not decimal_mark:
                 decimal_mark = len(value)
                 value += "."
                 continue
