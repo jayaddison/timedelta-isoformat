@@ -61,7 +61,7 @@ class timedelta(datetime.timedelta):
             if time_length == 8:
                 return
             assert time_string[8] == ".", f"unexpected character '{time_string[8]}'"
-            yield time_string[9:15].ljust(6, "0"), "microseconds", "a"
+            yield time_string[9:15].ljust(6, "0"), "microseconds", None
 
         # HHMMSS[.ssssss]
         elif time_length >= 6 and separator_positions == []:
