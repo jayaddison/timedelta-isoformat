@@ -28,7 +28,10 @@ class timedelta(datetime.timedelta):
     @staticmethod
     def _filter(components):
         for value, unit, limit in components:
-            assert value.isdigit(), f"expected a positive integer {unit} component"
+            prefix = value[:1]
+            assert (
+                prefix.isdigit()
+            ), f"unexpected prefix '{prefix}' in {unit} value '{value}'"
             value = int(value)
             limit = limit or value
             assert value <= limit, f"{unit} value of {value} exceeds range 0..{limit}"
