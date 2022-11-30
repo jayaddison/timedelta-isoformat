@@ -40,23 +40,23 @@ class timedelta(datetime.timedelta):
 
         # YYYY-DDD
         if date_length == 8 and delimiters == [4]:
-            yield date_string[0:4], "years", 9999
+            yield date_string[0:4], "years", None
             yield date_string[5:8], "days", 366
 
         # YYYY-MM-DD
         elif date_length == 10 and delimiters == [4, 7]:
-            yield date_string[0:4], "years", 9999
+            yield date_string[0:4], "years", None
             yield date_string[5:7], "months", 12
             yield date_string[8:10], "days", 31
 
         # YYYYDDD
         elif date_length == 7 and delimiters == []:
-            yield date_string[0:4], "years", 9999
+            yield date_string[0:4], "years", None
             yield date_string[4:7], "days", 366
 
         # YYYYMMDD
         elif date_length == 8 and delimiters == []:
-            yield date_string[0:4], "years", 9999
+            yield date_string[0:4], "years", None
             yield date_string[4:6], "months", 12
             yield date_string[6:8], "days", 31
 
@@ -78,7 +78,7 @@ class timedelta(datetime.timedelta):
             assert (
                 decimal_mark in _DECIMAL_CHARACTERS
             ), f"unexpected character '{decimal_mark}'"
-            yield time_string[9:15].ljust(6, "0"), "microseconds", 999999
+            yield time_string[9:15].ljust(6, "0"), "microseconds", None
 
         # HHMMSS[.ssssss]
         elif delimiters == []:
@@ -90,7 +90,7 @@ class timedelta(datetime.timedelta):
             assert (
                 decimal_mark in _DECIMAL_CHARACTERS
             ), f"unexpected character '{decimal_mark}'"
-            yield time_string[7:13].ljust(6, "0"), "microseconds", 999999
+            yield time_string[7:13].ljust(6, "0"), "microseconds", None
 
         else:
             raise ValueError(f"unable to parse '{time_string}' into time components")
@@ -137,11 +137,11 @@ class timedelta(datetime.timedelta):
                 carry_unit, carry_factor = _CARRY_DESTINATIONS.get(unit, (None, None))
                 assert carry_unit, f"unable to handle fractional {unit} value '{value}'"
                 carry_measurement = float(f".{value[decimal_mark+1:]}") * carry_factor
-                yield str(carry_measurement), carry_unit, carry_measurement
+                yield str(int(carry_measurement)), carry_unit, None
 
             integer_part = value[:decimal_mark]
             if integer_part:
-                yield integer_part, unit, int(integer_part)
+                yield integer_part, unit, None
 
             value, decimal_mark = "", None
 
@@ -171,8 +171,9 @@ class timedelta(datetime.timedelta):
         results = defaultdict(int)
         for v, k, lim in timedelta._fromdurationstring(duration):
             assert v[:1].isdigit(), f"unexpected prefix '{v[:1]}' in {k} value '{v}'"
-            assert float(v) <= lim, f"{k} value of {v} exceeds range 0..{lim}"
-            results[k] += float(v)
+            v = int(v)
+            assert not lim or v <= lim, f"{k} value of {v} exceeds range 0..{lim}"
+            results[k] += v
         return {k: v for k, v in results.items() if v}
 
     @classmethod
