@@ -140,6 +140,11 @@ class TimedeltaISOFormat(unittest.TestCase):
         """Formatting of timedelta objects with year-or-month attributes"""
         year_month_timedelta = self.YearMonthTimedelta(years=1, months=6, hours=4)
         self.assertEqual("P1Y6MT4H", year_month_timedelta.isoformat())
+        self.assertEqual("P1Y6MT4H", str(year_month_timedelta))
+        self.assertEqual(
+            "timedelta_isoformat.timedelta(years=1, months=6, seconds=14400)",
+            repr(year_month_timedelta),
+        )
 
     class YearMonthUnsupportedTimedelta(timedelta):
         """Subclass of :py:class:`timedelta_isoformat.timedelta` for exception tests"""
