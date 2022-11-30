@@ -96,7 +96,7 @@ class timedelta(datetime.timedelta):
         time_tokens = iter(("H", "hours", "M", "minutes", "S", "seconds"))
         week_tokens = iter(("W", "weeks"))
 
-        tokens, value, tail, decimal = None, "", None, None
+        tokens, value, decimal, tail = None, "", None, None
         for char in duration:
             if char in _FIELD_CHARACTERS:
                 value += char
