@@ -21,6 +21,7 @@ valid_durations = [
     ("P2DT0.5H", timedelta(days=2, minutes=30)),
     ("PT0,01S", timedelta(seconds=0.01)),
     ("PT01:01:01.01", timedelta(hours=1, minutes=1, seconds=1, microseconds=10000)),
+    ("PT131211,10", timedelta(hours=13, minutes=12, seconds=11, microseconds=100000)),
     # date-format durations
     ("P0000000", timedelta()),
     ("P0000000T000000", timedelta()),
@@ -87,7 +88,7 @@ invalid_durations = [
     ("PT01:-2:03", "expected a positive integer minutes component"),
     ("P000000.1", "expected a positive integer days component"),
     ("PT000000--", "unexpected character '-'"),
-    ("PT00:00:00,-", "unexpected character ','"),
+    ("PT00:00:00,-", "expected a positive integer microseconds component"),
     # negative designator-separated values
     ("P-1DT0S", "value '-1' does not start with a digit"),
     ("P0M-2D", "value '-2' does not start with a digit"),
