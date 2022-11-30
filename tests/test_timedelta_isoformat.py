@@ -7,6 +7,7 @@ from timedelta_isoformat import timedelta
 valid_durations = [
     # empty duration
     ("P0D", timedelta()),
+    ("P0Y", timedelta()),
     ("PT0S", timedelta()),
     # designator-format durations
     ("P3D", timedelta(days=3)),

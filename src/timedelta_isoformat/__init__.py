@@ -166,7 +166,8 @@ class timedelta(datetime.timedelta):
             if k != k_prev:
                 yield k, v
             k_prev = k
-        yield k, v
+        if v:
+            yield k, v
 
     @classmethod
     def fromisoformat(cls, duration):
