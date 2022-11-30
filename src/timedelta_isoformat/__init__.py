@@ -116,8 +116,8 @@ class timedelta(datetime.timedelta):
                 pass
 
             if char in ",." and not decimal_place:
+                decimal_place = len(value)
                 value += "."
-                decimal_place = len(value) - 1
                 continue
 
             # Note: this advances and may exhaust the token iterator
