@@ -1,4 +1,5 @@
 """Supplemental ISO8601 duration format support for :py:class:`datetime.timedelta`"""
+from collections import defaultdict
 import datetime
 from string import digits
 
@@ -171,9 +172,10 @@ class timedelta(datetime.timedelta):
 
     @staticmethod
     def _parse(duration):
-        measurements = dict(timedelta._fromdurationstring(duration))
-
-        return {k: v for k, v in measurements.items() if v}
+        results = defaultdict(int)
+        for k, v in timedelta._fromdurationstring(duration):
+            results[k] += v
+        return {k: v for k, v in results.items() if v}
 
     @classmethod
     def fromisoformat(cls, duration):
