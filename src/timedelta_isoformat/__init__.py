@@ -130,11 +130,15 @@ class timedelta(datetime.timedelta):
                 raise ValueError(f"unexpected character '{char}'")
 
             assert value, f"missing measurement before character '{char}'"
-            assert value[0].isdigit(), f"value '{value}' does not start with a digit"
+
+            unit, prefix = next(tokens), next(iter(value))
+            assert (
+                prefix.isdigit()
+            ), f"{unit} value '{value}' does not start with a digit"
 
             measurement_type = float if decimal_mark else int
             try:
-                measurements[next(tokens)] = measurement_type(value.replace(",", "."))
+                measurements[unit] = measurement_type(value.replace(",", "."))
             except ValueError as exc:
                 raise ValueError(f"unable to parse '{value}' as a number") from exc
             value, decimal_mark = "", 0
