@@ -99,12 +99,11 @@ class timedelta(datetime.timedelta):
             raise ValueError(f"unable to parse '{time_string}' into time components")
 
     @staticmethod
-    def _parse(duration):
+    def _fromdurationstring(duration):
         date_tokens = iter(("Y", "years", "M", "months", "D", "days"))
         time_tokens = iter(("H", "hours", "M", "minutes", "S", "seconds"))
         week_tokens = iter(("W", "weeks"))
 
-        measurements = {}
         tokens = None
         value, tail, decimal_mark = "", None, None
         for char in duration:
@@ -145,23 +144,31 @@ class timedelta(datetime.timedelta):
                 prefix.isdigit()
             ), f"unexpected prefix '{prefix}' in {unit} value '{value}'"
 
-            measurements[unit] = int(prefix + integer_part)
+            measurement = int(prefix + integer_part)
             if decimal_mark:
-                measurements[unit] += float(f".{decimal_part}")
+                measurement += float(f".{decimal_part}")
+            yield unit, measurement
             value, decimal_mark = "", None
 
         date_tail, time_tail = (tail, value) if tokens is time_tokens else (value, None)
         if date_tail:
-            measurements |= timedelta._filter(timedelta._fromdatestring(date_tail))
+            yield from timedelta._filter(timedelta._fromdatestring(date_tail))
         if time_tail:
-            measurements |= timedelta._filter(timedelta._fromtimestring(time_tail))
+            yield from timedelta._filter(timedelta._fromtimestring(time_tail))
+
+        yield tokens and next(tokens, None), value
+
+    @staticmethod
+    def _parse(duration):
+        measurements = dict(timedelta._fromdurationstring(duration))
+        last_token, last_value = measurements.popitem()
 
         assert measurements, "no measurements found"
         assert not (
             "weeks" in measurements and len(measurements) > 1
         ), "cannot mix weeks with other units"
         assert not (
-            next(tokens, None) == "H" and not value
+            last_token == "H" and not last_value
         ), "no measurements found in time segment"
 
         return {k: v for k, v in measurements.items() if v}
