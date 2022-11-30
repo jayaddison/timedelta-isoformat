@@ -122,7 +122,7 @@ class timedelta(datetime.timedelta):
 
             if char in _DECIMAL_CHARACTERS and not decimal_mark:
                 decimal_mark = len(value)
-                value += "."
+                value += char
                 continue
 
             # Note: this advances and may exhaust the token iterator
@@ -132,8 +132,9 @@ class timedelta(datetime.timedelta):
             assert value, f"missing measurement before character '{char}'"
             assert value[0].isdigit(), f"value '{value}' does not start with a digit"
 
+            measurement_type = float if decimal_mark else int
             try:
-                measurements[next(tokens)] = (float if decimal_mark else int)(value)
+                measurements[next(tokens)] = measurement_type(value.replace(",", "."))
             except ValueError as exc:
                 raise ValueError(f"unable to parse '{value}' as a number") from exc
             value, decimal_mark = "", 0
