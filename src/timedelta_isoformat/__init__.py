@@ -131,7 +131,7 @@ class timedelta(datetime.timedelta):
 
             assert value, f"missing measurement before character '{char}'"
 
-            unit, prefix = next(tokens), next(iter(value))
+            unit, prefix = next(tokens), value[:1]
             assert (
                 prefix.isdigit()
             ), f"{unit} value '{value}' does not start with a digit"
