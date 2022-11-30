@@ -126,7 +126,6 @@ class timedelta(datetime.timedelta):
             assert value, f"missing measurement before character '{char}'"
 
             unit = next(tokens, None)
-
             if decimal:
                 carry_unit, carry_factor = _CARRY_DESTINATIONS.get(unit, (None, None))
                 assert carry_unit, f"unable to handle fractional {unit} value '{value}'"
@@ -146,12 +145,10 @@ class timedelta(datetime.timedelta):
             yield from timedelta._fromtimestring(time_tail)
 
         assert tokens, "no measurements found"
-
         assert not (
             next(week_tokens, None) is None
             and (next(date_tokens, None) != "Y" or next(time_tokens, None) != "H")
         ), "cannot mix weeks with other units"
-
         expected_token = next(tokens, None)
         assert not (
             expected_token == "H" and not value
