@@ -134,17 +134,16 @@ class timedelta(datetime.timedelta):
 
             assert value, f"missing measurement before character '{char}'"
 
-            unit, prefix, integer_part, decimal_part = (
+            unit, integer_part, decimal_part = (
                 next(tokens, None),
-                value[:1],
-                value[1:decimal_mark],
+                value[:decimal_mark],
                 value[decimal_mark + 1:] if decimal_mark else None,
             )
             assert (
-                prefix.isdigit()
-            ), f"unexpected prefix '{prefix}' in {unit} value '{value}'"
+                value[:1].isdigit()
+            ), f"unexpected prefix '{value[:1]}' in {unit} value '{value}'"
 
-            measurement = int(prefix + integer_part)
+            measurement = int(integer_part)
             if decimal_part:
                 measurement += float(f".{decimal_part}")
             yield unit, measurement
