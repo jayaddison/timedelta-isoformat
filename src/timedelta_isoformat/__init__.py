@@ -138,9 +138,10 @@ class timedelta(datetime.timedelta):
                 :1
             ].isdigit(), f"unexpected prefix '{value[:1]}' in {unit} value '{value}'"
 
-            measurement_type = float if decimal_mark else int
             try:
-                measurements[unit] = measurement_type(value.replace(",", "."))
+                measurements[unit] = int(value[: decimal_mark or len(value)])
+                if decimal_mark:
+                    measurements[unit] += float("." + value[decimal_mark + 1 :])
             except ValueError as exc:
                 raise ValueError(f"unable to parse '{value}' as a number") from exc
             value, decimal_mark = "", 0
