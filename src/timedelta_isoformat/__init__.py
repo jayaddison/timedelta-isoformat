@@ -28,10 +28,9 @@ class timedelta(datetime.timedelta):
     @staticmethod
     def _filter(components):
         for value, unit, limit in components:
-            prefix = value[:1]
-            assert (
-                prefix.isdigit()
-            ), f"unexpected prefix '{prefix}' in {unit} value '{value}'"
+            assert value[
+                :1
+            ].isdigit(), f"unexpected prefix '{value[:1]}' in {unit} value '{value}'"
             value = int(value)
             limit = limit or value
             assert value <= limit, f"{unit} value of {value} exceeds range 0..{limit}"
@@ -134,10 +133,10 @@ class timedelta(datetime.timedelta):
 
             assert value, f"missing measurement before character '{char}'"
 
-            unit, prefix = next(tokens), value[:1]
-            assert (
-                prefix.isdigit()
-            ), f"unexpected prefix '{prefix}' in {unit} value '{value}'"
+            unit = next(tokens)
+            assert value[
+                :1
+            ].isdigit(), f"unexpected prefix '{value[:1]}' in {unit} value '{value}'"
 
             measurement_type = float if decimal_mark else int
             try:
