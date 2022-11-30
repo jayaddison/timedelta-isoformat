@@ -66,16 +66,16 @@ class timedelta(datetime.timedelta):
     @staticmethod
     def _fromtimestring(time_string):
         delimiters = [i for i, c in enumerate(time_string[0:15]) if c == ":"]
-        decimal = time_string[6:7] if delimiters == [] else time_string[8:9]
+        decimal_mark = time_string[6:7] if delimiters == [] else time_string[8:9]
 
         # HH:MM:SS[.ssssss]
         if delimiters == [2, 5]:
             yield time_string[0:2], "hours", 23
             yield time_string[3:5], "minutes", 59
             yield time_string[6:8], "seconds", 59
-            if not decimal:
+            if not decimal_mark:
                 return
-            assert decimal in ",.", f"unexpected character '{decimal}'"
+            assert decimal_mark in ",.", f"unexpected character '{decimal_mark}'"
             yield time_string[9:15].ljust(6, "0"), "microseconds", None
 
         # HHMMSS[.ssssss]
@@ -83,9 +83,9 @@ class timedelta(datetime.timedelta):
             yield time_string[0:2], "hours", 23
             yield time_string[2:4], "minutes", 59
             yield time_string[4:6], "seconds", 59
-            if not decimal:
+            if not decimal_mark:
                 return
-            assert decimal in ",.", f"unexpected character '{decimal}'"
+            assert decimal_mark in ",.", f"unexpected character '{decimal_mark}'"
             yield time_string[7:13].ljust(6, "0"), "microseconds", None
 
         else:
