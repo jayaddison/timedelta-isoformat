@@ -43,23 +43,23 @@ class timedelta(datetime.timedelta):
 
         # YYYY-DDD
         if date_length == 8 and delimiters == [4]:
-            yield date_string[0:4], "years", None
+            yield date_string[0:4], "years", 9999
             yield date_string[5:8], "days", 366
 
         # YYYY-MM-DD
         elif date_length == 10 and delimiters == [4, 7]:
-            yield date_string[0:4], "years", None
+            yield date_string[0:4], "years", 9999
             yield date_string[5:7], "months", 12
             yield date_string[8:10], "days", 31
 
         # YYYYDDD
         elif date_length == 7 and delimiters == []:
-            yield date_string[0:4], "years", None
+            yield date_string[0:4], "years", 9999
             yield date_string[4:7], "days", 366
 
         # YYYYMMDD
         elif date_length == 8 and delimiters == []:
-            yield date_string[0:4], "years", None
+            yield date_string[0:4], "years", 9999
             yield date_string[4:6], "months", 12
             yield date_string[6:8], "days", 31
 
