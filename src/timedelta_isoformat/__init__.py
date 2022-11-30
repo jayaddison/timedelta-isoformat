@@ -11,7 +11,7 @@ class timedelta(datetime.timedelta):
     ISO8601-style parsing and formatting.
     """
 
-    def __new__(cls, *args, years=0, months=0, **kwargs):
+    def __new__(cls, *args, months=0, years=0, **kwargs):
         return type(
             str(cls),
             (datetime.timedelta,),
