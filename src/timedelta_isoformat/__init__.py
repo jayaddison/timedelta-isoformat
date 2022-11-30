@@ -5,6 +5,13 @@ from string import digits
 
 _FIELD_CHARACTERS = frozenset(digits + "-:")
 _DECIMAL_CHARACTERS = frozenset(",.")
+_CARRY_DESTINATIONS = {
+    "weeks": ("days", 7),
+    "days": ("hours", 24),
+    "hours": ("minutes", 60),
+    "minutes": ("seconds", 60),
+    "seconds": ("microseconds", 1000000),
+}
 
 
 class timedelta(datetime.timedelta):
@@ -145,7 +152,9 @@ class timedelta(datetime.timedelta):
 
             measurement = int(integer_part)
             if decimal_part:
-                measurement += float(f".{decimal_part}")
+                carry_unit, carry_limit = _CARRY_DESTINATIONS.get(unit, (None, None))
+                assert carry_unit, f"unable to handle fractional {unit} value '{value}'"
+                yield carry_unit, float(f".{decimal_part}") * carry_limit
             yield unit, measurement
             value, decimal_mark = "", None
 
