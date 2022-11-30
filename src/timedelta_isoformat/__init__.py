@@ -81,7 +81,7 @@ class timedelta(datetime.timedelta):
             assert (
                 decimal_mark in _DECIMAL_CHARACTERS
             ), f"unexpected character '{decimal_mark}'"
-            yield time_string[9:15].ljust(6, "0"), "microseconds", None
+            yield time_string[9:15].ljust(6, "0"), "microseconds", 999999
 
         # HHMMSS[.ssssss]
         elif delimiters == []:
@@ -93,7 +93,7 @@ class timedelta(datetime.timedelta):
             assert (
                 decimal_mark in _DECIMAL_CHARACTERS
             ), f"unexpected character '{decimal_mark}'"
-            yield time_string[7:13].ljust(6, "0"), "microseconds", None
+            yield time_string[7:13].ljust(6, "0"), "microseconds", 999999
 
         else:
             raise ValueError(f"unable to parse '{time_string}' into time components")
