@@ -152,9 +152,9 @@ class timedelta(datetime.timedelta):
 
             measurement = int(integer_part)
             if decimal_part:
-                carry_unit, carry_limit = _CARRY_DESTINATIONS.get(unit, (None, None))
+                carry_unit, carry_factor = _CARRY_DESTINATIONS.get(unit, (None, None))
                 assert carry_unit, f"unable to handle fractional {unit} value '{value}'"
-                yield carry_unit, float(f".{decimal_part}") * carry_limit
+                yield carry_unit, float(f".{decimal_part}") * carry_factor
             yield unit, measurement
             value, decimal_mark = "", None
 
