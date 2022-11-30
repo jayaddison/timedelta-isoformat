@@ -129,12 +129,12 @@ class timedelta(datetime.timedelta):
             if decimal:
                 carry_unit, carry_factor = _CARRY_DESTINATIONS.get(unit, (None, None))
                 assert carry_unit, f"unable to handle fractional {unit} value '{value}'"
-                carry_measurement = float(f".{value[decimal+1:]}") * carry_factor
-                yield str(carry_measurement), carry_unit, None
+                carry_measurement = str(float(f".{value[decimal+1:]}") * carry_factor)
+                yield carry_measurement, carry_unit, None
 
-            integer_part = value[:decimal]
-            if integer_part:
-                yield integer_part, unit, None
+            integer_measurement = value[:decimal]
+            if integer_measurement:
+                yield integer_measurement, unit, None
 
             value, decimal = "", None
 
