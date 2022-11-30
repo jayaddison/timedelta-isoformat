@@ -123,8 +123,6 @@ class timedelta(datetime.timedelta):
             if char not in tokens:
                 raise ValueError(f"unexpected character '{char}'")
 
-            assert value, f"missing measurement before character '{char}'"
-
             unit = next(tokens, None)
             if decimal:
                 carry_unit, carry_factor = _CARRY_DESTINATIONS.get(unit, (None, None))
@@ -132,10 +130,7 @@ class timedelta(datetime.timedelta):
                 carry_measurement = str(float(f".{value[decimal+1:]}") * carry_factor)
                 yield carry_measurement, carry_unit, None
 
-            integer_measurement = value[:decimal]
-            if integer_measurement:
-                yield integer_measurement, unit, None
-
+            yield value[:decimal], unit, None
             value, decimal = "", None
 
         date_tail, time_tail = (tail, value) if tokens is time_tokens else (value, None)
