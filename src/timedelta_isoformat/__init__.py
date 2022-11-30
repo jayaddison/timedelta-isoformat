@@ -4,7 +4,8 @@ from string import digits
 
 _FIELD_CHARACTERS = frozenset(digits + "-:")
 _DECIMAL_CHARACTERS = frozenset(",.")
-_CARRY_DESTINATIONS = {
+
+_CARRY = {
     "weeks": ("days", 7),
     "days": ("hours", 24),
     "hours": ("minutes", 60),
@@ -91,6 +92,12 @@ class timedelta(datetime.timedelta):
             raise ValueError(f"unable to parse '{time_string}' into time components")
 
     @staticmethod
+    def _carry(value, unit):
+        assert unit in _CARRY, f"unable to handle fractional {unit} value '{value}'"
+        carry_unit, carry_factor = _CARRY[unit]
+        yield str(float(f".{value[1:]}") * carry_factor), carry_unit, None
+
+    @staticmethod
     def _fromdurationstring(duration):
         date_tokens = iter(("Y", "years", "M", "months", "D", "days"))
         time_tokens = iter(("H", "hours", "M", "minutes", "S", "seconds"))
@@ -125,10 +132,7 @@ class timedelta(datetime.timedelta):
 
             unit = next(tokens, None)
             if decimal:
-                carry_unit, carry_factor = _CARRY_DESTINATIONS.get(unit, (None, None))
-                assert carry_unit, f"unable to handle fractional {unit} value '{value}'"
-                carry_measurement = str(float(f".{value[decimal+1:]}") * carry_factor)
-                yield carry_measurement, carry_unit, None
+                yield from timedelta._carry(value[decimal:], unit)
 
             yield value[:decimal], unit, None
             value, decimal = "", None
