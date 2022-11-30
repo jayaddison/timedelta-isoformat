@@ -133,15 +133,20 @@ class timedelta(datetime.timedelta):
 
             assert value, f"missing measurement before character '{char}'"
 
-            unit = next(tokens)
-            assert value[
-                :1
-            ].isdigit(), f"unexpected prefix '{value[:1]}' in {unit} value '{value}'"
+            unit, prefix, integer_part, decimal_part = (
+                next(tokens),
+                value[:1],
+                value[1 : (decimal_mark or len(value))],
+                value[(decimal_mark or len(value)) + 1 :],
+            )
+            assert (
+                prefix.isdigit()
+            ), f"unexpected prefix '{prefix}' in {unit} value '{value}'"
 
             try:
-                measurements[unit] = int(value[: decimal_mark or len(value)])
-                if decimal_mark:
-                    measurements[unit] += float("." + value[decimal_mark + 1 :])
+                measurements[unit] = int(prefix + integer_part)
+                if decimal_part:
+                    measurements[unit] += float(f".{decimal_part}")
             except ValueError as exc:
                 raise ValueError(f"unable to parse '{value}' as a number") from exc
             value, decimal_mark = "", 0
