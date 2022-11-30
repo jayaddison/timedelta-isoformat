@@ -32,7 +32,6 @@ class timedelta(datetime.timedelta):
                 :1
             ].isdigit(), f"unexpected prefix '{value[:1]}' in {unit} value '{value}'"
             value = int(value)
-            limit = limit or value
             assert value <= limit, f"{unit} value of {value} exceeds range 0..{limit}"
             yield unit, value
 
