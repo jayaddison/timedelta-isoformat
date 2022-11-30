@@ -143,12 +143,9 @@ class timedelta(datetime.timedelta):
                 prefix.isdigit()
             ), f"unexpected prefix '{prefix}' in {unit} value '{value}'"
 
-            try:
-                measurements[unit] = int(prefix + integer_part)
-                if decimal_mark:
-                    measurements[unit] += float(f".{decimal_part}")
-            except ValueError as exc:
-                raise ValueError(f"unable to parse '{value}' as a number") from exc
+            measurements[unit] = int(prefix + integer_part)
+            if decimal_mark:
+                measurements[unit] += float(f".{decimal_part}")
             value, decimal_mark = "", None
 
         date_tail, time_tail = (tail, value) if tokens is time_tokens else (value, None)
