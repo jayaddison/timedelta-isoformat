@@ -18,8 +18,8 @@ class timedelta(datetime.timedelta):
             dict(
                 __repr__=cls.__repr__,
                 __str__=cls.__str__,
-                _months=int(months),
-                _years=int(years),
+                _months=months,
+                _years=years,
                 fromisoformat=cls.fromisoformat,
                 isoformat=cls.isoformat,
             ),
