@@ -161,10 +161,7 @@ class timedelta(datetime.timedelta):
             "weeks" in measurements and len(measurements) > 1
         ), "cannot mix weeks with other units"
         assert not (
-            tokens is time_tokens
-            and "hours" not in measurements
-            and "minutes" not in measurements
-            and "seconds" not in measurements
+            next(tokens, None) == "H" and not value
         ), "no measurements found in time segment"
 
         return {k: v for k, v in measurements.items() if v}
