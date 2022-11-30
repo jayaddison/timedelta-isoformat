@@ -134,7 +134,7 @@ class timedelta(datetime.timedelta):
             unit, prefix = next(tokens), value[:1]
             assert (
                 prefix.isdigit()
-            ), f"{unit} value '{value}' does not start with a digit"
+            ), f"unexpected prefix '{prefix}' in {unit} value '{value}'"
 
             measurement_type = float if decimal_mark else int
             try:

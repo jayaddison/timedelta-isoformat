@@ -76,8 +76,8 @@ invalid_durations = [
     ("PT01:0203", "unable to parse '01:0203' into time components"),
     ("PT01", "expected a positive integer minutes component"),
     # decimals must have a non-empty integer value before the separator
-    ("PT.5S", "value '.5' does not start with a digit"),
-    ("P1M.1D", "value '.1' does not start with a digit"),
+    ("PT.5S", "unexpected prefix '.' in seconds value '.5'"),
+    ("P1M.1D", "unexpected prefix '.' in days value '.1'"),
     # segment repetition
     ("PT5MT5S", "unexpected character 'T'"),
     ("P1W2W", "unexpected character 'W'"),
@@ -90,9 +90,9 @@ invalid_durations = [
     ("PT000000--", "unexpected character '-'"),
     ("PT00:00:00,-", "expected a positive integer microseconds component"),
     # negative designator-separated values
-    ("P-1DT0S", "value '-1' does not start with a digit"),
-    ("P0M-2D", "value '-2' does not start with a digit"),
-    ("P0DT1M-3S", "value '-3' does not start with a digit"),
+    ("P-1DT0S", "unexpected prefix '-' in days value '-1'"),
+    ("P0M-2D", "unexpected prefix '-' in days value '-2'"),
+    ("P0DT1M-3S", "unexpected prefix '-' in seconds value '-3'"),
 ]
 
 # ambiguous cases
