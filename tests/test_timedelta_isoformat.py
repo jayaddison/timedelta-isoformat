@@ -132,9 +132,9 @@ class TimedeltaISOFormat(unittest.TestCase):
     class YearMonthTimedelta(timedelta):
         """Subclass of :py:class:`timedelta_isoformat.timedelta` for year/month tests"""
 
-        def __new__(cls, /, years=0, months=0, **kwargs):
-            typ = type(str(cls), (timedelta,), dict(years=years, months=months))
-            return typ(**kwargs)
+        def __new__(cls, *args, months=0, years=0, **kwargs):
+            typ = type(str(cls), (timedelta,), dict(months=months, years=years))
+            return typ(*args, **kwargs)
 
     def test_year_month_formatting(self):
         """Formatting of timedelta objects with year-or-month attributes"""
@@ -144,10 +144,13 @@ class TimedeltaISOFormat(unittest.TestCase):
     class YearMonthUnsupportedTimedelta(timedelta):
         """Subclass of :py:class:`timedelta_isoformat.timedelta` for exception tests"""
 
-        def __new__(cls, /, **kwargs):
+        def __new__(cls, *args, **kwargs):
             if "years" in kwargs or "months" in kwargs:
                 raise TypeError
-            return super(**kwargs)
+            # days, seconds, microseconds, milliseconds, minutes, hours, weeks
+            if len(args) > 7:
+                raise TypeError
+            return super(*args)
 
     def test_year_month_support_handling(self):
         """Parsing of duration strings containing zero-value year-or-month components"""
