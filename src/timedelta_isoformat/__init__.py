@@ -98,8 +98,8 @@ class timedelta(datetime.timedelta):
         else:
             raise ValueError(f"unable to parse '{time_string}' into time components")
 
-    @classmethod
-    def _parse(cls, duration):
+    @staticmethod
+    def _parse(duration):
         date_tokens = iter(("Y", "years", "M", "months", "D", "days"))
         time_tokens = iter(("H", "hours", "M", "minutes", "S", "seconds"))
         week_tokens = iter(("W", "weeks"))
