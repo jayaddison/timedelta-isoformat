@@ -10,6 +10,20 @@ class timedelta(datetime.timedelta):
     ISO8601-style parsing and formatting.
     """
 
+    def __repr__(self):
+        fields = {
+            "years": getattr(self, "years", 0),
+            "months": getattr(self, "months", 0),
+            "days": self.days,
+            "seconds": self.seconds,
+            "microseconds": self.microseconds,
+        }
+        arguments = ", ".join(f"{k}={v}" for k, v in fields.items() if v)
+        return f"timedelta_isoformat.timedelta({arguments})"
+
+    def __str__(self):
+        return self.isoformat()
+
     @staticmethod
     def _filter(components):
         for value, unit, limit in components:
