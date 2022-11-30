@@ -13,10 +13,11 @@ class timedelta(datetime.timedelta):
     @staticmethod
     def _filter(components):
         for value, unit, limit in components:
-            limit = limit or value
             assert value.isdigit(), f"expected a positive integer {unit} component"
+            value = int(value)
+            limit = limit or value
             assert value <= limit, f"{unit} value of {value} exceeds range 0..{limit}"
-            yield unit, int(value)
+            yield unit, value
 
     @staticmethod
     def _fromdatestring(date_string):
@@ -26,24 +27,24 @@ class timedelta(datetime.timedelta):
         # YYYY-DDD
         if date_length == 8 and separator_positions == [4]:
             yield date_string[0:4], "years", None
-            yield date_string[5:8], "days", "366"
+            yield date_string[5:8], "days", 366
 
         # YYYY-MM-DD
         elif date_length == 10 and separator_positions == [4, 7]:
             yield date_string[0:4], "years", None
-            yield date_string[5:7], "months", "12"
-            yield date_string[8:10], "days", "31"
+            yield date_string[5:7], "months", 12
+            yield date_string[8:10], "days", 31
 
         # YYYYDDD
         elif date_length == 7 and separator_positions == []:
             yield date_string[0:4], "years", None
-            yield date_string[4:7], "days", "366"
+            yield date_string[4:7], "days", 366
 
         # YYYYMMDD
         elif date_length == 8 and separator_positions == []:
             yield date_string[0:4], "years", None
-            yield date_string[4:6], "months", "12"
-            yield date_string[6:8], "days", "31"
+            yield date_string[4:6], "months", 12
+            yield date_string[6:8], "days", 31
 
         else:
             raise ValueError(f"unable to parse '{date_string}' into date components")
@@ -55,9 +56,9 @@ class timedelta(datetime.timedelta):
 
         # HH:MM:SS[.ssssss]
         if time_length >= 8 and separator_positions == [2, 5]:
-            yield time_string[0:2], "hours", "23"
-            yield time_string[3:5], "minutes", "59"
-            yield time_string[6:8], "seconds", "59"
+            yield time_string[0:2], "hours", 23
+            yield time_string[3:5], "minutes", 59
+            yield time_string[6:8], "seconds", 59
             if time_length == 8:
                 return
             assert time_string[8] == ".", f"unexpected character '{time_string[8]}'"
@@ -65,9 +66,9 @@ class timedelta(datetime.timedelta):
 
         # HHMMSS[.ssssss]
         elif time_length >= 6 and separator_positions == []:
-            yield time_string[0:2], "hours", "23"
-            yield time_string[2:4], "minutes", "59"
-            yield time_string[4:6], "seconds", "59"
+            yield time_string[0:2], "hours", 23
+            yield time_string[2:4], "minutes", 59
+            yield time_string[4:6], "seconds", 59
             if time_length == 6:
                 return
             assert time_string[6] == ".", f"unexpected character '{time_string[6]}'"
