@@ -13,7 +13,6 @@ class timedelta(datetime.timedelta):
     @staticmethod
     def _filter(components):
         for value, unit, limit in components:
-            limit = limit or value
             assert value.isdigit(), f"expected a positive integer {unit} component"
             assert value <= limit, f"{unit} value of {value} exceeds range 0..{limit}"
             yield unit, int(value)
@@ -61,7 +60,7 @@ class timedelta(datetime.timedelta):
             if time_length == 8:
                 return
             assert time_string[8] == ".", f"unexpected character '{time_string[8]}'"
-            yield time_string[9:15].ljust(6, "0"), "microseconds", "a"
+            yield time_string[9:15].ljust(6, "0"), "microseconds", None
 
         # HHMMSS[.ssssss]
         elif time_length >= 6 and separator_positions == []:
