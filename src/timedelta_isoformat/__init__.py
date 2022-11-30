@@ -138,14 +138,14 @@ class timedelta(datetime.timedelta):
                 next(tokens, None),
                 value[:1],
                 value[1:decimal_mark],
-                value[decimal_mark:][1:],
+                value[decimal_mark + 1:] if decimal_mark else None,
             )
             assert (
                 prefix.isdigit()
             ), f"unexpected prefix '{prefix}' in {unit} value '{value}'"
 
             measurement = int(prefix + integer_part)
-            if decimal_mark:
+            if decimal_part:
                 measurement += float(f".{decimal_part}")
             yield unit, measurement
             value, decimal_mark = "", None
