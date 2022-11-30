@@ -104,7 +104,9 @@ class timedelta(datetime.timedelta):
         time_tokens = iter(("H", "hours", "M", "minutes", "S", "seconds"))
         week_tokens = iter(("W", "weeks"))
 
-        tokens, value, tail, decimal_mark, measurements = None, "", None, None, {}
+        measurements = {}
+        tokens = None
+        value, tail, decimal_mark = "", None, None
         for char in duration:
             if char in _FIELD_CHARACTERS:
                 value += char
