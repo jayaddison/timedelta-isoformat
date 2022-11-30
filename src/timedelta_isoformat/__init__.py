@@ -134,13 +134,13 @@ class timedelta(datetime.timedelta):
             unit, integer_part, decimal_part = (
                 next(tokens, None),
                 value[:decimal_mark],
-                value[decimal_mark + 1 :].rstrip("0") if decimal_mark else "",
+                "." + value[decimal_mark:][1:] if decimal_mark else "",
             )
 
             if decimal_part:
                 carry_unit, carry_factor = _CARRY_DESTINATIONS.get(unit, (None, None))
                 assert carry_unit, f"unable to handle fractional {unit} value '{value}'"
-                carry_measurement = float(f".{decimal_part}") * carry_factor
+                carry_measurement = float(decimal_part) * carry_factor
                 yield str(carry_measurement), carry_unit, carry_measurement
             if integer_part:
                 yield integer_part, unit, int(integer_part)
