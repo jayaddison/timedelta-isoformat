@@ -109,7 +109,7 @@ class timedelta(datetime.timedelta):
                 value += char
                 continue
 
-            if char in _DECIMAL_CHARACTERS and not decimal:
+            if char in _DECIMAL_CHARACTERS and decimal is None:
                 decimal = len(value)
                 value += "."
                 continue
@@ -133,7 +133,7 @@ class timedelta(datetime.timedelta):
             unit, integer_part, decimal_part = (
                 next(tokens, None),
                 value[:decimal],
-                value[decimal:].rstrip("0") if decimal else None,
+                value[decimal:].rstrip("0") if decimal is not None else None,
             )
 
             if decimal_part:
