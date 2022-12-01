@@ -11,7 +11,6 @@ _CARRY = {
     "hours": ("seconds", 60 * 60),
     "minutes": ("seconds", 60),
     "seconds": ("microseconds", 1000000),
-    "microseconds": ("microseconds", 1),
 }
 
 
