@@ -89,6 +89,10 @@ _ = [
     ("P1DT00:00:00", "date segment format differs from time segment"),
 ]
 
+format_expectations = [
+    (timedelta(seconds=1, microseconds=500), "PT1.0005S"),
+]
+
 
 class TimedeltaISOFormat(unittest.TestCase):
     """Functional testing for :class:`timedelta_isoformat.timedelta`"""
