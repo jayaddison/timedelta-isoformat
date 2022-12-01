@@ -124,7 +124,7 @@ format_expectations = [
     # concise representations
     (timedelta(minutes=120, hours=2), "PT4H"),
     (timedelta(hours=48), "P2D"),
-    (timedelta(hours=60), "P60H"),
+    (timedelta(hours=60), "PT60H"),
     (timedelta(days=14), "P2W"),
     (timedelta(days=15), "P15D"),
 ]
