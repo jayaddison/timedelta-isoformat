@@ -95,7 +95,7 @@ class timedelta(datetime.timedelta):
     def _carry(decimal_value, unit, value):
         assert unit in _CARRY, f"unable to handle fractional {unit} value '{value}'"
         carry_unit, carry_factor = _CARRY[unit]
-        yield str(int(float(f".{decimal_value}") * carry_factor)), carry_unit, None
+        yield str(int(float(decimal_value) * carry_factor)), carry_unit, None
 
     @staticmethod
     def _fromdurationstring(duration):
@@ -111,7 +111,7 @@ class timedelta(datetime.timedelta):
 
             if char in _DECIMAL_CHARACTERS and not decimal:
                 decimal = len(value)
-                value += char
+                value += "."
                 continue
 
             if char == "P" and not tokens:
@@ -133,7 +133,7 @@ class timedelta(datetime.timedelta):
             unit, integer_part, decimal_part = (
                 next(tokens, None),
                 value[:decimal],
-                value[decimal:][1:].rstrip("0") if decimal else None,
+                value[decimal:].rstrip("0") if decimal else None,
             )
 
             if decimal_part:
