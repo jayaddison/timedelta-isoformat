@@ -110,6 +110,10 @@ _ = [
     ("P1DT00:00:00", "date segment format differs from time segment"),
 ]
 
+format_expectations = [
+    (timedelta(seconds=1, microseconds=500), "PT1.0005S"),
+]
+
 
 class TimedeltaISOFormat(unittest.TestCase):
     """Functional testing for :class:`timedelta_isoformat.timedelta`"""
@@ -175,3 +179,9 @@ class TimedeltaISOFormat(unittest.TestCase):
         """Ensure that the smallest py3.9 datetime.timedelta is formatted correctly"""
         microsecond = timedelta.fromisoformat("PT0.000001S")
         self.assertEqual("PT0.000001S", microsecond.isoformat())
+
+    def test_formatting_precision(self):
+        """Formatting for decimal fields"""
+        for sample_timedelta, expected_format in format_expectations:
+            with self.subTest(sample_timedelta=sample_timedelta):
+                self.assertEqual(expected_format, sample_timedelta.isoformat())
