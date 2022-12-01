@@ -22,7 +22,6 @@ valid_durations = [
     ("P2DT0.5H", timedelta(days=2, minutes=30)),
     ("PT0,01S", timedelta(seconds=0.01)),
     ("PT01:01:01.01", timedelta(hours=1, minutes=1, seconds=1, microseconds=10000)),
-    ("PT131211,10", timedelta(hours=13, minutes=12, seconds=11, microseconds=100000)),
     ("P1.5W", timedelta(days=10, hours=12)),
     ("P1.01D", timedelta(days=1, seconds=864)),
     ("P1.01DT1S", timedelta(days=1, seconds=865)),
@@ -108,6 +107,7 @@ _ = [
     # mixed segment formats
     ("P0000-00-01T5S", "date segment format differs from time segment"),
     ("P1DT00:00:00", "date segment format differs from time segment"),
+    ("PT131211,10", "expected a positive integer microseconds component"),
 ]
 
 
