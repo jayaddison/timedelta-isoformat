@@ -54,7 +54,7 @@ invalid_durations = [
     ("P0Y5MT", "no measurements found in time segment"),
     ("P0000001T", "no measurements found in time segment"),
     # incomplete measurements
-    ("P0YD", "incomplete measurement before character 'D'"),
+    ("P0YD", "missing measurement before character 'D'"),
     # repeated designators
     ("P1DT1H3H1M", "unexpected character 'H'"),
     ("P1D3D", "unexpected character 'D'"),
@@ -69,8 +69,8 @@ invalid_durations = [
     ("P1WT1H", "cannot mix weeks with other units"),
     ("P0Y1W", "cannot mix weeks with other units"),
     # incorrect quantities
-    ("PT0.0.0S", "unexpected character '.'"),
-    ("P1.,0D", "unexpected character ','"),
+    ("PT0.0.0S", "unable to parse '0.0.0' as a number"),
+    ("P1.,0D", "unable to parse '1.,0' as a number"),
     # date-format durations exceeding calendar limits
     ("P0000-400", "days value of 400 exceeds range 0..366"),
     ("P0000-13-00", "months value of 13 exceeds range 0..12"),
@@ -82,10 +82,10 @@ invalid_durations = [
     ("P0000-1-0", "unable to parse '0000-1-0' into date components"),
     ("PT1:2:3", "unable to parse '1:2:3' into time components"),
     ("PT01:0203", "unable to parse '01:0203' into time components"),
-    ("PT01", "unexpected prefix '' in minutes value ''"),
+    ("PT01", "unable to parse '01' into time components"),
     # decimals must have a non-empty integer value before the separator
-    ("PT.5S", "incomplete measurement before character 'S'"),
-    ("P1M.1D", "incomplete measurement before character 'D'"),
+    ("PT.5S", "value '.5' does not start with a digit"),
+    ("P1M.1D", "value '.1' does not start with a digit"),
     # segment repetition
     ("PT5MT5S", "unexpected character 'T'"),
     ("P1W2W", "unexpected character 'W'"),
@@ -93,14 +93,14 @@ invalid_durations = [
     ("P1DT5S2W", "unexpected character 'W'"),
     ("P1W1D", "unexpected character 'D'"),
     # unexpected characters within date/time components
-    ("PT01:-2:03", "unexpected prefix '-' in minutes value '-2'"),
-    ("P000000.1", "unexpected prefix '.' in days value '.1'"),
+    ("PT01:-2:03", "expected a positive integer minutes component"),
+    ("P000000.1", "expected a positive integer days component"),
     ("PT000000--", "unexpected character '-'"),
-    ("PT00:00:00,-", "unexpected prefix '-' in microseconds value '-00000'"),
+    ("PT00:00:00,-", "expected a positive integer microseconds component"),
     # negative designator-separated values
-    ("P-1DT0S", "unexpected prefix '-' in days value '-1'"),
-    ("P0M-2D", "unexpected prefix '-' in days value '-2'"),
-    ("P0DT1M-3S", "unexpected prefix '-' in seconds value '-3'"),
+    ("P-1DT0S", "value '-1' does not start with a digit"),
+    ("P0M-2D", "value '-2' does not start with a digit"),
+    ("P0DT1M-3S", "value '-3' does not start with a digit"),
 ]
 
 # ambiguous cases
