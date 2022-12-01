@@ -133,7 +133,7 @@ class timedelta(datetime.timedelta):
             unit, integer_part, decimal_part = (
                 next(tokens, None),
                 value[:decimal],
-                value[decimal:].rstrip("0") if decimal is not None else None,
+                value[decimal:].rstrip("0") if decimal is not None else "",
             )
 
             if decimal_part:
