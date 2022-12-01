@@ -95,7 +95,12 @@ class timedelta(datetime.timedelta):
     def _carry(decimal_value, unit, value):
         assert unit in _CARRY, f"unable to handle fractional {unit} value '{value}'"
         carry_unit, carry_factor = _CARRY[unit]
-        yield str(int(float(decimal_value) * carry_factor)), carry_unit, None
+        carry_value = float(decimal_value) * carry_factor
+        integer_part = int(carry_value)
+        yield str(integer_part), carry_unit, None
+        if integer_part == carry_value:
+            return
+        yield from timedelta._carry(str(carry_value - integer_part), carry_unit, value)
 
     @staticmethod
     def _fromdurationstring(duration):
