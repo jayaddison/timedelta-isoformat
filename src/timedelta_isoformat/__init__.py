@@ -97,7 +97,7 @@ class timedelta(datetime.timedelta):
             return
         assert unit in _CARRY, f"unable to handle fractional {unit} value '{value}'"
         carry_unit, carry_factor = _CARRY[unit]
-        yield str(float(f".{decimal_value}") * carry_factor), carry_unit, None
+        yield str(int(float(f".{decimal_value}") * carry_factor)), carry_unit, None
 
     @staticmethod
     def _fromdurationstring(duration):
@@ -161,7 +161,7 @@ class timedelta(datetime.timedelta):
         for v, k, limit in timedelta._fromdurationstring(duration):
             assert v[:1].isdigit(), f"unexpected prefix '{v[:1]}' in {k} value '{v}'"
             assert v <= (limit or v), f"{k} value of {v} exceeds range 0..{limit}"
-            v = float(v)
+            v = int(v)
             if not v:
                 continue
             if k != k_prev:
