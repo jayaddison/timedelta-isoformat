@@ -99,7 +99,7 @@ class timedelta(datetime.timedelta):
         carry_unit, carry_factor = _CARRY[unit]
         carry_value = round(amount * carry_factor, 6)
         yield str(int(carry_value)), carry_unit, None
-        yield from timedelta._carry(carry_value % 1, carry_unit, carry_value)
+        yield from timedelta._carry(carry_value % 1, carry_unit, str(carry_value))
 
     @staticmethod
     def _fromdurationstring(duration):
