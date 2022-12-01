@@ -182,5 +182,5 @@ class timedelta(datetime.timedelta):
         result += "T" if hours or minutes or seconds else ""
         result += f"{hours}H" if hours else ""
         result += f"{minutes}M" if minutes else ""
-        result += f"{seconds:.6f}S" if seconds else ""
+        result += f"{seconds:.6f}".rstrip("0") + "S" if seconds else ""
         return result
