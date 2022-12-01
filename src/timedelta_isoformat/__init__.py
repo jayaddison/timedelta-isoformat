@@ -196,7 +196,7 @@ class timedelta(datetime.timedelta):
             measurements = dict(cls._parse(duration))
             return cls(**measurements)
         except (AssertionError, ValueError) as exc:
-            raise _parse_error(exc) from None
+            raise _parse_error(exc) from exc
         except TypeError as exc:
             if measurements.get("years") or measurements.get("months"):
                 raise _parse_error("year and month fields are not supported") from exc
