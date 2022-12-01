@@ -25,6 +25,7 @@ valid_durations = [
     ("PT131211,10", timedelta(hours=13, minutes=12, seconds=11, microseconds=100000)),
     ("P1.5W", timedelta(days=10, hours=12)),
     ("P1.01D", timedelta(days=1, seconds=864)),
+    ("P1.01DT1S", timedelta(days=1, seconds=865)),
     ("P10.0DT12H", timedelta(days=10, hours=12)),
     # date-format durations
     ("P0000000", timedelta()),
