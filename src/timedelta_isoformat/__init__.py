@@ -75,7 +75,7 @@ class timedelta(datetime.timedelta):
             yield time_string[6:8], "seconds", 59
             if not decimal:
                 return
-            assert decimal in ",.", f"unexpected character '{decimal}'"
+            assert decimal == ".", f"unexpected character '{decimal}'"
             yield time_string[9:15].ljust(6, "0"), "microseconds", None
 
         # HHMMSS[.ssssss]
@@ -85,7 +85,7 @@ class timedelta(datetime.timedelta):
             yield time_string[4:6], "seconds", 59
             if not decimal:
                 return
-            assert decimal in ",.", f"unexpected character '{decimal}'"
+            assert decimal == ".", f"unexpected character '{decimal}'"
             yield time_string[7:13].ljust(6, "0"), "microseconds", None
 
         else:
