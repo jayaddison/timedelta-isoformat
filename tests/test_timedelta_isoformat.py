@@ -42,6 +42,10 @@ invalid_durations = [
     ("P1.,0D", "unable to intepret '1.,0' as a numeric value"),
 ]
 
+format_expectations = [
+    (timedelta(seconds=1, microseconds=500), "PT1.0005S"),
+]
+
 
 class TimedeltaISOFormat(unittest.TestCase):
     def test_fromisoformat_valid(self):
