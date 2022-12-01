@@ -92,15 +92,15 @@ class timedelta(datetime.timedelta):
             raise ValueError(f"unable to parse '{time_string}' into time components")
 
     @staticmethod
-    def _carry(decimal_value, unit, value):
+    def _carry(decimal_remainder, unit, value):
         assert unit in _CARRY, f"unable to handle fractional {unit} value '{value}'"
         carry_unit, carry_factor = _CARRY[unit]
-        carry_value = float(decimal_value) * carry_factor
-        integer_part = int(carry_value)
-        yield str(integer_part), carry_unit, None
-        if integer_part == carry_value:
+        carry_value = decimal_remainder * carry_factor
+        divisor, remainder = int(carry_value), carry_value % 1
+        yield str(divisor), carry_unit, None
+        if not remainder:
             return
-        yield from timedelta._carry(str(carry_value - integer_part), carry_unit, value)
+        yield from timedelta._carry(decimal_remainder, carry_unit, value)
 
     @staticmethod
     def _fromdurationstring(duration):
@@ -142,7 +142,7 @@ class timedelta(datetime.timedelta):
             )
 
             if decimal_part:
-                yield from timedelta._carry(decimal_part, unit, value)
+                yield from timedelta._carry(float(decimal_part), unit, value)
 
             if integer_part:
                 yield integer_part, unit, None
