@@ -147,7 +147,7 @@ class timedelta(datetime.timedelta):
             if integer_part:
                 yield integer_part, unit, None
             else:
-                raise ValueError(f"missing measurement before character '{char}'")
+                raise ValueError(f"incomplete measurement before character '{char}'")
 
             value, decimal = "", None
 
