@@ -93,8 +93,6 @@ class timedelta(datetime.timedelta):
 
     @staticmethod
     def _carry(decimal_value, unit, value):
-        if not decimal_value.rstrip("0"):
-            return
         assert unit in _CARRY, f"unable to handle fractional {unit} value '{value}'"
         carry_unit, carry_factor = _CARRY[unit]
         yield str(int(float(f".{decimal_value}") * carry_factor)), carry_unit, None
@@ -132,11 +130,20 @@ class timedelta(datetime.timedelta):
             if char not in tokens:
                 raise ValueError(f"unexpected character '{char}'")
 
-            unit = next(tokens, None)
-            if decimal:
-                yield from timedelta._carry(value[decimal:][1:], unit, value)
+            unit, integer_part, decimal_part = (
+                next(tokens, None),
+                value[:decimal],
+                value[decimal:][1:].rstrip("0") if decimal else None,
+            )
 
-            yield value[:decimal], unit, None
+            if decimal_part:
+                yield from timedelta._carry(decimal_part, unit, value)
+
+            if integer_part:
+                yield integer_part, unit, None
+            else:
+                raise ValueError(f"missing measurement before character '{char}'")
+
             value, decimal = "", None
 
         date_tail, time_tail = (tail, value) if tokens is time_tokens else (value, None)

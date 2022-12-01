@@ -47,7 +47,7 @@ invalid_durations = [
     ("P0Y5MT", "no measurements found in time segment"),
     ("P0000001T", "no measurements found in time segment"),
     # missing measurements
-    ("P0YD", "could not parse duration 'P0YD': unexpected prefix '' in days value ''"),
+    ("P0YD", "missing measurement before character 'D'"),
     # repeated designators
     ("P1DT1H3H1M", "unexpected character 'H'"),
     ("P1D3D", "unexpected character 'D'"),
