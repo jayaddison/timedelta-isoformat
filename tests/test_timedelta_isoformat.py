@@ -52,8 +52,8 @@ invalid_durations = [
     ("P1DT", "no measurements found in time segment"),
     ("P0Y5MT", "no measurements found in time segment"),
     ("P0000001T", "no measurements found in time segment"),
-    # missing measurements
-    ("P0YD", "missing measurement before character 'D'"),
+    # incomplete measurements
+    ("P0YD", "incomplete measurement before character 'D'"),
     # repeated designators
     ("P1DT1H3H1M", "unexpected character 'H'"),
     ("P1D3D", "unexpected character 'D'"),
@@ -83,8 +83,8 @@ invalid_durations = [
     ("PT01:0203", "unable to parse '01:0203' into time components"),
     ("PT01", "unexpected prefix '' in minutes value ''"),
     # decimals must have a non-empty integer value before the separator
-    ("PT.5S", "unexpected prefix '.' in seconds value '.5'"),
-    ("P1M.1D", "unexpected prefix '.' in days value '.1'"),
+    ("PT.5S", "incomplete measurement before character 'S'"),
+    ("P1M.1D", "incomplete measurement before character 'D'"),
     # segment repetition
     ("PT5MT5S", "unexpected character 'T'"),
     ("P1W2W", "unexpected character 'W'"),
