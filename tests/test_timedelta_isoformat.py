@@ -85,6 +85,10 @@ invalid_durations = [
     ("P1W1D", "unexpected character 'D'"),
 ]
 
+format_expectations = [
+    (timedelta(seconds=1, microseconds=500), "PT1.0005S"),
+]
+
 
 class TimedeltaISOFormat(unittest.TestCase):
     """Functional testing for :class:`timedelta_isoformat.timedelta`"""
