@@ -95,7 +95,6 @@ invalid_durations = [
     ("PT01:-2:03", "expected a positive integer minutes component"),
     ("P000000.1", "expected a positive integer days component"),
     ("PT000000--", "unexpected character '-'"),
-    ("PT00:00:00,-", "expected a positive integer microseconds component"),
     # negative designator-separated values
     ("P-1DT0S", "value '-1' does not start with a digit"),
     ("P0M-2D", "value '-2' does not start with a digit"),
@@ -108,6 +107,7 @@ _ = [
     ("P0000-00-01T5S", "date segment format differs from time segment"),
     ("P1DT00:00:00", "date segment format differs from time segment"),
     ("PT131211,10", "expected a positive integer microseconds component"),
+    ("PT00:00:00,-", "expected a positive integer microseconds component"),
 ]
 
 
