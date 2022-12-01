@@ -45,6 +45,8 @@ valid_durations = [
     # matching datetime.timedelta day-to-microsecond carry precision
     ("P0.000001D", timedelta(microseconds=86400)),
     ("P0.00000000001D", timedelta(microseconds=1)),
+    # decimal year-or-month values
+    ("P5.0Y", timedelta(years=5)),
 ]
 
 invalid_durations = [
@@ -106,6 +108,9 @@ invalid_durations = [
     ("P-1DT0S", "unable to parse '-1' as a positive decimal"),
     ("P0M-2D", "unable to parse '-2' as a positive decimal"),
     ("P0DT1M-3S", "unable to parse '-3' as a positive decimal"),
+    # imprecise designated date components
+    ("P1.1Y", "unable to handle fractional years value '1.1'"),
+    ("P0.5M", "unable to handle fractional months value '0.5'"),
 ]
 
 # ambiguous cases
@@ -113,6 +118,7 @@ _ = [
     # mixed segment formats
     ("P0000-00-01T5S", "date segment format differs from time segment"),
     ("P1DT00:00:00", "date segment format differs from time segment"),
+    ("P0.5Y", "unable to handle fractional years value '0.5'"),
 ]
 
 format_expectations = [
