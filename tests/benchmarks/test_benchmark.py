@@ -46,5 +46,5 @@ class TimedeltaISOFormatBenchmark(unittest.TestCase):
 
     def test_isoformat_benchmark(self):
         """Benchmark the isoformat formatting method"""
-        for _, valid_timedelta in valid_durations * 1000:
+        for _, valid_timedelta in valid_durations * 10000:
             valid_timedelta.isoformat()
