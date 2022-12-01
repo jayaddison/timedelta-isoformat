@@ -6,11 +6,12 @@ _FIELD_CHARACTERS = frozenset(digits + "-:")
 _DECIMAL_CHARACTERS = frozenset(",.")
 
 _CARRY = {
-    "weeks": ("days", 7),
-    "days": ("hours", 24),
-    "hours": ("minutes", 60),
+    "weeks": ("seconds", 7 * 24 * 60 * 60),
+    "days": ("seconds", 24 * 60 * 60),
+    "hours": ("seconds", 60 * 60),
     "minutes": ("seconds", 60),
     "seconds": ("microseconds", 1000000),
+    "microseconds": ("microseconds", 1),
 }
 
 
@@ -92,15 +93,16 @@ class timedelta(datetime.timedelta):
             raise ValueError(f"unable to parse '{time_string}' into time components")
 
     @staticmethod
-    def _carry(decimal_remainder, unit, value):
+    def _carry(amount, unit, value):
+        if not amount:
+            return
         assert unit in _CARRY, f"unable to handle fractional {unit} value '{value}'"
         carry_unit, carry_factor = _CARRY[unit]
-        carry_value = decimal_remainder * carry_factor
-        divisor, remainder = int(carry_value), carry_value % 1
-        yield str(divisor), carry_unit, None
-        if not remainder:
-            return
-        yield from timedelta._carry(decimal_remainder, carry_unit, value)
+        carry_value = round(amount * carry_factor, 6)
+        remainder = carry_value % 1
+        yield str(int(carry_value)), carry_unit, None
+        if remainder:
+            yield from timedelta._carry(remainder, carry_unit, carry_value)
 
     @staticmethod
     def _fromdurationstring(duration):
@@ -224,5 +226,5 @@ class timedelta(datetime.timedelta):
         result += "T" if hours or minutes or seconds else ""
         result += f"{hours}H" if hours else ""
         result += f"{minutes}M" if minutes else ""
-        result += f"{seconds}S" if seconds else ""
+        result += f"{seconds:.6f}S" if seconds else ""
         return result

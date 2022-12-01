@@ -24,6 +24,7 @@ valid_durations = [
     ("PT01:01:01.01", timedelta(hours=1, minutes=1, seconds=1, microseconds=10000)),
     ("PT131211,10", timedelta(hours=13, minutes=12, seconds=11, microseconds=100000)),
     ("P1.5W", timedelta(days=10, hours=12)),
+    ("P1.01D", timedelta(days=1, seconds=864)),
     ("P10.0DT12H", timedelta(days=10, hours=12)),
     # date-format durations
     ("P0000000", timedelta()),
@@ -38,6 +39,9 @@ valid_durations = [
     # calendar edge cases
     ("P0000-366", timedelta(days=366)),
     ("PT23:59:59", timedelta(hours=23, minutes=59, seconds=59)),
+    # matching datetime.timedelta day-to-microsecond carry precision
+    ("P0.000001D", timedelta(microseconds=86400)),
+    ("P0.00000000001D", timedelta(microseconds=1)),
 ]
 
 invalid_durations = [
@@ -165,3 +169,7 @@ class TimedeltaISOFormat(unittest.TestCase):
         with self.assertRaises(ValueError) as raised:
             self.YearMonthUnsupportedTimedelta.fromisoformat("P1Y0D")
         self.assertIn("year and month fields are not supported", str(raised.exception))
+
+    def test_minimal_precision(self):
+        microsecond = timedelta.fromisoformat("PT0.000001S")
+        self.assertEqual("PT0.000001S", microsecond.isoformat())
