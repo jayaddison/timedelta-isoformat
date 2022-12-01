@@ -44,6 +44,8 @@ invalid_durations = [
 
 format_expectations = [
     (timedelta(seconds=1, microseconds=500), "PT1.0005S"),
+    (timedelta(seconds=10, microseconds=0), "PT10S"),
+    (timedelta(minutes=10), "PT10M"),
 ]
 
 
