@@ -6,11 +6,11 @@ _FIELD_CHARACTERS = frozenset(digits + "-:")
 _DECIMAL_CHARACTERS = frozenset(",.")
 
 _CARRY = {
-    "weeks": ("seconds", 7 * 24 * 60 * 60),
-    "days": ("seconds", 24 * 60 * 60),
-    "hours": ("seconds", 60 * 60),
-    "minutes": ("seconds", 60),
-    "seconds": ("microseconds", 1000000),
+    "weeks": 7 * 24 * 60 * 60,
+    "days": 24 * 60 * 60,
+    "hours": 60 * 60,
+    "minutes": 60,
+    "seconds": 1000000,
 }
 
 
@@ -96,8 +96,10 @@ class timedelta(datetime.timedelta):
         if not amount.rstrip("0."):
             return
         assert unit in _CARRY, f"unable to handle fractional {unit} value '{value}'"
-        carry_unit, carry_factor = _CARRY[unit]
-        carry_value = f"{float(amount) * carry_factor:.6f}"
+        carry_unit, carry_value = (
+            "microseconds" if unit == "seconds" else "seconds",
+            f"{float(amount) * _CARRY[unit]:.6f}",
+        )
         carry_integer, carry_remainder = carry_value[:-7], carry_value[-7:]
         yield carry_integer, carry_unit, None
         yield from timedelta._carry(carry_remainder, carry_unit, carry_value)
