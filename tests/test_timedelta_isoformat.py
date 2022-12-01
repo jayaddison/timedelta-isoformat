@@ -171,5 +171,6 @@ class TimedeltaISOFormat(unittest.TestCase):
         self.assertIn("year and month fields are not supported", str(raised.exception))
 
     def test_minimal_precision(self):
+        """Ensure that the smallest py3.9 datetime.timedelta is formatted correctly"""
         microsecond = timedelta.fromisoformat("PT0.000001S")
         self.assertEqual("PT0.000001S", microsecond.isoformat())
