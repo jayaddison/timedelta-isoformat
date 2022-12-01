@@ -7,6 +7,7 @@ from timedelta_isoformat import timedelta
 valid_durations = [
     # empty duration
     ("P0D", timedelta()),
+    ("P0Y", timedelta()),
     ("PT0S", timedelta()),
     # designator-format durations
     ("P3D", timedelta(days=3)),
@@ -22,6 +23,10 @@ valid_durations = [
     ("PT0,01S", timedelta(seconds=0.01)),
     ("PT01:01:01.01", timedelta(hours=1, minutes=1, seconds=1, microseconds=10000)),
     ("PT131211,10", timedelta(hours=13, minutes=12, seconds=11, microseconds=100000)),
+    ("P1.5W", timedelta(days=10, hours=12)),
+    ("P1.01D", timedelta(days=1, seconds=864)),
+    ("P1.01DT1S", timedelta(days=1, seconds=865)),
+    ("P10.0DT12H", timedelta(days=10, hours=12)),
     # date-format durations
     ("P0000000", timedelta()),
     ("P0000000T000000", timedelta()),
@@ -35,6 +40,9 @@ valid_durations = [
     # calendar edge cases
     ("P0000-366", timedelta(days=366)),
     ("PT23:59:59", timedelta(hours=23, minutes=59, seconds=59)),
+    # matching datetime.timedelta day-to-microsecond carry precision
+    ("P0.000001D", timedelta(microseconds=86400)),
+    ("P0.00000000001D", timedelta(microseconds=1)),
 ]
 
 invalid_durations = [
@@ -45,8 +53,8 @@ invalid_durations = [
     ("P1DT", "no measurements found in time segment"),
     ("P0Y5MT", "no measurements found in time segment"),
     ("P0000001T", "no measurements found in time segment"),
-    # missing measurements
-    ("P0YD", "missing measurement before character 'D'"),
+    # incomplete measurements
+    ("P0YD", "incomplete measurement before character 'D'"),
     # repeated designators
     ("P1DT1H3H1M", "unexpected character 'H'"),
     ("P1D3D", "unexpected character 'D'"),
@@ -61,8 +69,8 @@ invalid_durations = [
     ("P1WT1H", "cannot mix weeks with other units"),
     ("P0Y1W", "cannot mix weeks with other units"),
     # incorrect quantities
-    ("PT0.0.0S", "unable to parse '0.0.0' as a number"),
-    ("P1.,0D", "unable to parse '1.,0' as a number"),
+    ("PT0.0.0S", "unexpected character '.'"),
+    ("P1.,0D", "unexpected character ','"),
     # date-format durations exceeding calendar limits
     ("P0000-400", "days value of 400 exceeds range 0..366"),
     ("P0000-13-00", "months value of 13 exceeds range 0..12"),
@@ -74,10 +82,10 @@ invalid_durations = [
     ("P0000-1-0", "unable to parse '0000-1-0' into date components"),
     ("PT1:2:3", "unable to parse '1:2:3' into time components"),
     ("PT01:0203", "unable to parse '01:0203' into time components"),
-    ("PT01", "expected a positive integer minutes component"),
+    ("PT01", "unexpected prefix '' in minutes value ''"),
     # decimals must have a non-empty integer value before the separator
-    ("PT.5S", "value '.5' does not start with a digit"),
-    ("P1M.1D", "value '.1' does not start with a digit"),
+    ("PT.5S", "incomplete measurement before character 'S'"),
+    ("P1M.1D", "incomplete measurement before character 'D'"),
     # segment repetition
     ("PT5MT5S", "unexpected character 'T'"),
     ("P1W2W", "unexpected character 'W'"),
@@ -85,14 +93,14 @@ invalid_durations = [
     ("P1DT5S2W", "unexpected character 'W'"),
     ("P1W1D", "unexpected character 'D'"),
     # unexpected characters within date/time components
-    ("PT01:-2:03", "expected a positive integer minutes component"),
-    ("P000000.1", "expected a positive integer days component"),
+    ("PT01:-2:03", "unexpected prefix '-' in minutes value '-2'"),
+    ("P000000.1", "unexpected prefix '.' in days value '.1'"),
     ("PT000000--", "unexpected character '-'"),
-    ("PT00:00:00,-", "expected a positive integer microseconds component"),
+    ("PT00:00:00,-", "unexpected prefix '-' in microseconds value '-00000'"),
     # negative designator-separated values
-    ("P-1DT0S", "value '-1' does not start with a digit"),
-    ("P0M-2D", "value '-2' does not start with a digit"),
-    ("P0DT1M-3S", "value '-3' does not start with a digit"),
+    ("P-1DT0S", "unexpected prefix '-' in days value '-1'"),
+    ("P0M-2D", "unexpected prefix '-' in days value '-2'"),
+    ("P0DT1M-3S", "unexpected prefix '-' in seconds value '-3'"),
 ]
 
 # ambiguous cases
@@ -162,3 +170,8 @@ class TimedeltaISOFormat(unittest.TestCase):
         with self.assertRaises(ValueError) as raised:
             self.YearMonthUnsupportedTimedelta.fromisoformat("P1Y0D")
         self.assertIn("year and month fields are not supported", str(raised.exception))
+
+    def test_minimal_precision(self):
+        """Ensure that the smallest py3.9 datetime.timedelta is formatted correctly"""
+        microsecond = timedelta.fromisoformat("PT0.000001S")
+        self.assertEqual("PT0.000001S", microsecond.isoformat())
