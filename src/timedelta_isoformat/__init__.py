@@ -172,6 +172,9 @@ class timedelta(datetime.timedelta):
         if not self:
             return "P0D"
 
+        if self.days % 7 == 0 and self.seconds == 0 and self.microseconds == 0:
+            return f"P{int(self.days / 7)}W"
+
         minutes, seconds = divmod(self.seconds, 60)
         hours, minutes = divmod(minutes, 60)
         if self.microseconds:
