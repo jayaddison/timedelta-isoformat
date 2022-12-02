@@ -69,8 +69,8 @@ invalid_durations = [
     ("P1WT1H", "cannot mix weeks with other units"),
     ("P0Y1W", "cannot mix weeks with other units"),
     # incorrect quantities
-    ("PT0.0.0S", "unable to parse '0.0.0' as a number"),
-    ("P1.,0D", "unable to parse '1.,0' as a number"),
+    ("PT0.0.0S", "unable to parse '0.0.0' as a positive decimal"),
+    ("P1.,0D", "unable to parse '1.,0' as a positive decimal"),
     # date-format durations exceeding calendar limits
     ("P0000-400", "days value of 400 exceeds range 0..366"),
     ("P0000-13-00", "months value of 13 exceeds range 0..12"),
@@ -82,10 +82,10 @@ invalid_durations = [
     ("P0000-1-0", "unable to parse '0000-1-0' into date components"),
     ("PT1:2:3", "unable to parse '1:2:3' into time components"),
     ("PT01:0203", "unable to parse '01:0203' into time components"),
-    ("PT01", "unexpected prefix '' in minutes value ''"),
+    ("PT01", "unable to parse '' as a positive decimal"),
     # decimals must have a non-empty integer value before the separator
-    ("PT.5S", "unexpected prefix '.' in seconds value '.5'"),
-    ("P1M.1D", "unexpected prefix '.' in days value '.1'"),
+    ("PT.5S", "unable to parse '.5' as a positive decimal"),
+    ("P1M.1D", "unable to parse '.1' as a positive decimal"),
     # segment repetition
     ("PT5MT5S", "unexpected character 'T'"),
     ("P1W2W", "unexpected character 'W'"),
@@ -93,14 +93,14 @@ invalid_durations = [
     ("P1DT5S2W", "unexpected character 'W'"),
     ("P1W1D", "unexpected character 'D'"),
     # unexpected characters within date/time components
-    ("PT01:-2:03", "unexpected prefix '-' in minutes value '-2'"),
-    ("P000000.1", "unexpected prefix '.' in days value '.1'"),
+    ("PT01:-2:03", "unable to parse '-2' as a positive decimal"),
+    ("P000000.1", "unable to parse '.1' as a positive decimal"),
     ("PT000000--", "unexpected character '-'"),
-    ("PT00:00:00,-", "unable to parse '00,-' as a number"),
+    ("PT00:00:00,-", "unable to parse '00,-' as a positive decimal"),
     # negative designator-separated values
-    ("P-1DT0S", "unexpected prefix '-' in days value '-1'"),
-    ("P0M-2D", "unexpected prefix '-' in days value '-2'"),
-    ("P0DT1M-3S", "unexpected prefix '-' in seconds value '-3'"),
+    ("P-1DT0S", "unable to parse '-1' as a positive decimal"),
+    ("P0M-2D", "unable to parse '-2' as a positive decimal"),
+    ("P0DT1M-3S", "unable to parse '-3' as a positive decimal"),
 ]
 
 # ambiguous cases

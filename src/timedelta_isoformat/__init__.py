@@ -28,13 +28,13 @@ class timedelta(datetime.timedelta):
     @staticmethod
     def _field_to_measurement(element):
         value, unit, limit = element
-        assert value[:1].isdigit(), f"unexpected prefix '{value[:1]}' in {unit} value '{value}'"
         try:
-            quantity = float(value.replace(",", "."))
-        except ValueError as exc:
-            raise ValueError(f"unable to parse '{value}' as a number") from exc
-        limit = limit or quantity
-        assert quantity <= limit, f"{unit} value of {value} exceeds range 0..{limit}"
+            assert value[0].isdigit()
+            quantity = float("+" + value.replace(",", "."))
+        except:
+            raise ValueError(f"unable to parse '{value}' as a positive decimal")
+        if limit and quantity > limit:
+            raise ValueError(f"{unit} value of {value} exceeds range 0..{limit}")
         if quantity:
             return unit, quantity
 
