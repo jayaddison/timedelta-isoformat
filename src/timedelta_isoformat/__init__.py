@@ -96,10 +96,8 @@ class timedelta(datetime.timedelta):
         time_tokens = iter(("H", "hours", "M", "minutes", "S", "seconds"))
         week_tokens = iter(("W", "weeks"))
 
-        if not duration.startswith("P"):
-            raise ValueError("durations must begin with the character 'P'")
-        if duration.endswith("T"):
-            raise ValueError("no measurements found in time segment")
+        assert duration.startswith("P"), "durations must begin with the character 'P'"
+        assert not duration.endswith("T"), "no measurements found in time segment"
 
         tokens, value, tail = date_tokens, "", None
         for char in duration[1:]:
