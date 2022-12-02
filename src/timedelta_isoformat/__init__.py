@@ -76,21 +76,21 @@ class timedelta(datetime.timedelta):
         if delimiters == [2, 5]:
             yield time_string[0:2], "hours", "23"
             yield time_string[3:5], "minutes", "59"
-            yield time_string[6:8], "seconds", "59"
             if not decimal:
+                yield time_string[6:8], "seconds", "59"
                 return
             assert decimal in _DECIMAL_CHARACTERS, f"unexpected character '{decimal}'"
-            yield time_string[9:15].ljust(6, "0"), "microseconds", None
+            yield time_string[6:15], "seconds", "59"
 
         # HHMMSS[.ssssss]
         elif delimiters == []:
             yield time_string[0:2], "hours", "23"
             yield time_string[2:4], "minutes", "59"
-            yield time_string[4:6], "seconds", "59"
             if not decimal:
+                yield time_string[4:6], "seconds", "59"
                 return
             assert decimal in _DECIMAL_CHARACTERS, f"unexpected character '{decimal}'"
-            yield time_string[7:13].ljust(6, "0"), "microseconds", None
+            yield time_string[4:13], "seconds", "59"
 
         else:
             raise ValueError(f"unable to parse '{time_string}' into time components")

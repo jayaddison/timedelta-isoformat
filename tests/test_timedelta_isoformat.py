@@ -96,7 +96,7 @@ invalid_durations = [
     ("PT01:-2:03", "unexpected prefix '-' in minutes value '-2'"),
     ("P000000.1", "unexpected prefix '.' in days value '.1'"),
     ("PT000000--", "unexpected character '-'"),
-    ("PT00:00:00,-", "unexpected prefix '-' in microseconds value '-00000'"),
+    ("PT00:00:00,-", "unable to parse '00,-' as a number"),
     # negative designator-separated values
     ("P-1DT0S", "unexpected prefix '-' in days value '-1'"),
     ("P0M-2D", "unexpected prefix '-' in days value '-2'"),
