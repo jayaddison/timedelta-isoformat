@@ -31,7 +31,7 @@ class timedelta(datetime.timedelta):
         try:
             assert value[0].isdigit()
             quantity = float("+" + value.replace(",", "."))
-        except:
+        except (AssertionError, IndexError, ValueError):
             raise ValueError(f"unable to parse '{value}' as a positive decimal")
         if limit and quantity > limit:
             raise ValueError(f"{unit} value of {value} exceeds range 0..{limit}")
