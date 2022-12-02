@@ -1,5 +1,4 @@
 """Supplemental ISO8601 duration format support for :py:class:`datetime.timedelta`"""
-from collections import defaultdict
 import datetime
 from string import digits
 
@@ -134,15 +133,15 @@ class timedelta(datetime.timedelta):
 
     @staticmethod
     def _parse(duration):
-        results = defaultdict(float)
         for v, k, limit in timedelta._fromdurationstring(duration):
             assert v[:1].isdigit(), f"unexpected prefix '{v[:1]}' in {k} value '{v}'"
             assert v <= (limit or v), f"{k} value of {v} exceeds range 0..{limit}"
             try:
-                results[k] += float(v.replace(",", "."))
+                v = float(v.replace(",", "."))
             except ValueError as exc:
                 raise ValueError(f"unable to parse '{v}' as a number") from exc
-        return {k: v for k, v in results.items() if v}
+            if v:
+                yield k, v
 
     @classmethod
     def fromisoformat(cls, duration):
@@ -155,7 +154,7 @@ class timedelta(datetime.timedelta):
             return ValueError(f"could not parse duration '{duration}': {reason}")
 
         try:
-            measurements = cls._parse(duration)
+            measurements = dict(cls._parse(duration))
             return cls(**measurements)
         except (AssertionError, ValueError) as exc:
             raise _parse_error(exc) from exc
