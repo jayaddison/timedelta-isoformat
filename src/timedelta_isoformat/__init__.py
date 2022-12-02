@@ -78,9 +78,6 @@ class timedelta(datetime.timedelta):
             assert decimal in _DECIMAL_SIGNS, f"unexpected character '{decimal}'"
             yield time_string[0:2], "hours", 23
             yield time_string[3:5], "minutes", 59
-            if not decimal:
-                yield time_string[6:8], "seconds", 59
-                return
             yield time_string[6:15], "seconds", 59
 
         # HHMMSS[.ssssss]
@@ -88,9 +85,6 @@ class timedelta(datetime.timedelta):
             assert decimal in _DECIMAL_SIGNS, f"unexpected character '{decimal}'"
             yield time_string[0:2], "hours", 23
             yield time_string[2:4], "minutes", 59
-            if not decimal:
-                yield time_string[4:6], "seconds", 59
-                return
             yield time_string[4:13], "seconds", 59
 
         else:
