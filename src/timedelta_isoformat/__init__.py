@@ -129,11 +129,9 @@ class timedelta(datetime.timedelta):
             return
 
         weeks_parsed = next(week_tokens, None) != "W"
-        dates_parsed = next(date_tokens, None) != "Y"
-        times_parsed = next(time_tokens, None) != "H"
-
-        assert weeks_parsed or (dates_parsed or times_parsed), "no measurements found"
-        assert weeks_parsed != (dates_parsed or times_parsed), "cannot mix weeks with other units"
+        time_parsed = next(time_tokens, None) != "H" or next(date_tokens, None) != "Y"
+        assert weeks_parsed or time_parsed, "no measurements found"
+        assert weeks_parsed != time_parsed, "cannot mix weeks with other units"
 
     @staticmethod
     def _to_measurements(components):
