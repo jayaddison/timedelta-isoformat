@@ -45,24 +45,24 @@ class timedelta(datetime.timedelta):
         # YYYY-DDD
         if date_length == 8 and delimiters == [4]:
             yield date_string[0:4], "years", None
-            yield date_string[5:8], "days", "366"
+            yield date_string[5:8], "days", 366
 
         # YYYY-MM-DD
         elif date_length == 10 and delimiters == [4, 7]:
             yield date_string[0:4], "years", None
-            yield date_string[5:7], "months", "12"
-            yield date_string[8:10], "days", "31"
+            yield date_string[5:7], "months", 12
+            yield date_string[8:10], "days", 31
 
         # YYYYDDD
         elif date_length == 7 and delimiters == []:
             yield date_string[0:4], "years", None
-            yield date_string[4:7], "days", "366"
+            yield date_string[4:7], "days", 366
 
         # YYYYMMDD
         elif date_length == 8 and delimiters == []:
             yield date_string[0:4], "years", None
-            yield date_string[4:6], "months", "12"
-            yield date_string[6:8], "days", "31"
+            yield date_string[4:6], "months", 12
+            yield date_string[6:8], "days", 31
 
         else:
             raise ValueError(f"unable to parse '{date_string}' into date components")
@@ -74,23 +74,23 @@ class timedelta(datetime.timedelta):
 
         # HH:MM:SS[.ssssss]
         if delimiters == [2, 5]:
-            yield time_string[0:2], "hours", "23"
-            yield time_string[3:5], "minutes", "59"
+            yield time_string[0:2], "hours", 23
+            yield time_string[3:5], "minutes", 59
             if not decimal:
-                yield time_string[6:8], "seconds", "59"
+                yield time_string[6:8], "seconds", 59
                 return
             assert decimal in _DECIMAL_CHARACTERS, f"unexpected character '{decimal}'"
-            yield time_string[6:15], "seconds", "59"
+            yield time_string[6:15], "seconds", 59
 
         # HHMMSS[.ssssss]
         elif delimiters == []:
-            yield time_string[0:2], "hours", "23"
-            yield time_string[2:4], "minutes", "59"
+            yield time_string[0:2], "hours", 23
+            yield time_string[2:4], "minutes", 59
             if not decimal:
-                yield time_string[4:6], "seconds", "59"
+                yield time_string[4:6], "seconds", 59
                 return
             assert decimal in _DECIMAL_CHARACTERS, f"unexpected character '{decimal}'"
-            yield time_string[4:13], "seconds", "59"
+            yield time_string[4:13], "seconds", 59
 
         else:
             raise ValueError(f"unable to parse '{time_string}' into time components")
