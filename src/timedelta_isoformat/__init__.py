@@ -26,6 +26,18 @@ class timedelta(datetime.timedelta):
         return self.isoformat()
 
     @staticmethod
+    def _filter(duration):
+        for value, unit, limit in timedelta._fromdurationstring(duration):
+            assert value[:1].isdigit(), f"unexpected prefix '{value[:1]}' in {unit} value '{value}'"
+            assert not limit or value <= limit, f"{unit} value of {value} exceeds range 0..{limit}"
+            try:
+                value = float(value.replace(",", "."))
+            except ValueError as exc:
+                raise ValueError(f"unable to parse '{value}' as a number") from exc
+            if value:
+                yield unit, value
+
+    @staticmethod
     def _fromdatestring(date_string):
         delimiters = [i for i, c in enumerate(date_string[0:10]) if c == "-"]
         date_length = len(date_string)
@@ -130,18 +142,6 @@ class timedelta(datetime.timedelta):
         assert not (
             expected_token == "H" and not value
         ), "no measurements found in time segment"
-
-    @staticmethod
-    def _filter(duration):
-        for value, unit, limit in timedelta._fromdurationstring(duration):
-            assert value[:1].isdigit(), f"unexpected prefix '{value[:1]}' in {unit} value '{value}'"
-            assert not limit or value <= limit, f"{unit} value of {value} exceeds range 0..{limit}"
-            try:
-                value = float(value.replace(",", "."))
-            except ValueError as exc:
-                raise ValueError(f"unable to parse '{value}' as a number") from exc
-            if value:
-                yield unit, value
 
     @classmethod
     def fromisoformat(cls, duration):
