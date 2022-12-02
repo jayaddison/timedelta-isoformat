@@ -128,15 +128,13 @@ class timedelta(datetime.timedelta):
         if time_tail:
             yield from timedelta._fromtimestring(time_tail)
 
+        if next(week_tokens, None) is None:
+            if next(date_tokens, None) != "Y" or next(time_tokens, None) != "H":
+                raise ValueError("cannot mix weeks with other units")
+
         expected_token = next(tokens or date_tokens, None)
-        assert not (expected_token == "Y" and not date_tail), "no measurements found"
-        assert not (
-            next(week_tokens, None) is None
-            and (next(date_tokens, None) != "Y" or next(time_tokens, None) != "H")
-        ), "cannot mix weeks with other units"
-        assert not (
-            expected_token == "H" and not time_tail
-        ), "no measurements found in time segment"
+        assert date_tail or expected_token != "Y", "no measurements found"
+        assert value or expected_token != "H", "no measurements found in time segment"
 
     @staticmethod
     def _to_measurements(components):
