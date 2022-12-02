@@ -133,15 +133,15 @@ class timedelta(datetime.timedelta):
 
     @staticmethod
     def _filter(duration):
-        for v, k, limit in timedelta._fromdurationstring(duration):
-            assert v[:1].isdigit(), f"unexpected prefix '{v[:1]}' in {k} value '{v}'"
-            assert not limit or v <= limit, f"{k} value of {v} exceeds range 0..{limit}"
+        for value, unit, limit in timedelta._fromdurationstring(duration):
+            assert value[:1].isdigit(), f"unexpected prefix '{value[:1]}' in {unit} value '{value}'"
+            assert not limit or value <= limit, f"{unit} value of {value} exceeds range 0..{limit}"
             try:
-                v = float(v.replace(",", "."))
+                value = float(value.replace(",", "."))
             except ValueError as exc:
-                raise ValueError(f"unable to parse '{v}' as a number") from exc
-            if v:
-                yield k, v
+                raise ValueError(f"unable to parse '{value}' as a number") from exc
+            if value:
+                yield unit, value
 
     @classmethod
     def fromisoformat(cls, duration):
