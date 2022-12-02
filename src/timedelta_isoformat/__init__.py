@@ -126,17 +126,17 @@ class timedelta(datetime.timedelta):
         ), "no measurements found in time segment"
 
     @staticmethod
-    def _field_to_measurement(element):
-        value, unit, limit = element
-        try:
-            assert value[0].isdigit()
-            quantity = float("+" + value.replace(",", "."))
-        except (AssertionError, IndexError, ValueError):
-            raise ValueError(f"unable to parse '{value}' as a positive decimal")
-        if limit and quantity > limit:
-            raise ValueError(f"{unit} value of {value} exceeds range 0..{limit}")
-        if quantity:
-            return unit, quantity
+    def _to_measurements(components):
+        for value, unit, limit in components:
+            try:
+                assert value[0].isdigit()
+                quantity = float("+" + value.replace(",", "."))
+            except (AssertionError, IndexError, ValueError):
+                raise ValueError(f"unable to parse '{value}' as a positive decimal")
+            if limit and quantity > limit:
+                raise ValueError(f"{unit} value of {value} exceeds range 0..{limit}")
+            if quantity:
+                yield unit, quantity
 
     @classmethod
     def fromisoformat(cls, duration):
@@ -149,10 +149,7 @@ class timedelta(datetime.timedelta):
             return ValueError(f"could not parse duration '{duration}': {reason}")
 
         try:
-            measurements = dict(filter(None, map(
-                timedelta._field_to_measurement,
-                timedelta._fromdurationstring(duration)
-            )))
+            measurements = dict(cls._to_measurements(cls._fromdurationstring(duration)))
             return cls(**measurements)
         except (AssertionError, ValueError) as exc:
             raise _parse_error(exc) from exc
