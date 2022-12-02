@@ -54,7 +54,7 @@ invalid_durations = [
     ("P0Y5MT", "no measurements found in time segment"),
     ("P0000001T", "no measurements found in time segment"),
     # incomplete measurements
-    ("P0YD", "incomplete measurement before character 'D'"),
+    ("P0YD", "unable to parse '' as a positive decimal"),
     # repeated designators
     ("P1DT1H3H1M", "unexpected character 'H'"),
     ("P1D3D", "unexpected character 'D'"),

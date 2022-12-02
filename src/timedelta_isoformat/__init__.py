@@ -117,7 +117,6 @@ class timedelta(datetime.timedelta):
             if char not in tokens:
                 raise ValueError(f"unexpected character '{char}'")
 
-            assert value, f"incomplete measurement before character '{char}'"
             yield value, next(tokens, None), None
             value = ""
 
