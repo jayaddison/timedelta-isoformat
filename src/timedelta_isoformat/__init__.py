@@ -3,7 +3,7 @@ import datetime
 from string import digits
 
 _FIELD_CHARACTERS = frozenset(digits + ",.-:")
-_DECIMAL_CHARACTERS = frozenset(",.")
+_DECIMAL_SIGNS = frozenset(",.")
 
 
 class timedelta(datetime.timedelta):
@@ -80,7 +80,7 @@ class timedelta(datetime.timedelta):
             if not decimal:
                 yield time_string[6:8], "seconds", 59
                 return
-            assert decimal in _DECIMAL_CHARACTERS, f"unexpected character '{decimal}'"
+            assert decimal in _DECIMAL_SIGNS, f"unexpected character '{decimal}'"
             yield time_string[6:15], "seconds", 59
 
         # HHMMSS[.ssssss]
@@ -90,7 +90,7 @@ class timedelta(datetime.timedelta):
             if not decimal:
                 yield time_string[4:6], "seconds", 59
                 return
-            assert decimal in _DECIMAL_CHARACTERS, f"unexpected character '{decimal}'"
+            assert decimal in _DECIMAL_SIGNS, f"unexpected character '{decimal}'"
             yield time_string[4:13], "seconds", 59
 
         else:
