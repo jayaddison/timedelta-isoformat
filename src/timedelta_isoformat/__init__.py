@@ -112,12 +112,8 @@ class timedelta(datetime.timedelta):
             if char not in tokens:
                 raise ValueError(f"unexpected character '{char}'")
 
-            unit = next(tokens, None)
-            if value:
-                yield value, unit, None
-            else:
-                raise ValueError(f"incomplete measurement before character '{char}'")
-
+            assert value, f"incomplete measurement before character '{char}'"
+            yield value, next(tokens, None), None
             value = ""
 
         date_tail, time_tail = (tail, value) if tokens is time_tokens else (value, None)
