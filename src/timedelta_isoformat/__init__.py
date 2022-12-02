@@ -33,7 +33,8 @@ class timedelta(datetime.timedelta):
                 quantity = float(value.replace(",", "."))
             except ValueError as exc:
                 raise ValueError(f"unable to parse '{value}' as a number") from exc
-            assert not limit or quantity <= limit, f"{unit} value of {value} exceeds range 0..{limit}"
+            limit = limit or quantity
+            assert quantity <= limit, f"{unit} value of {value} exceeds range 0..{limit}"
             if quantity:
                 yield unit, quantity
 
