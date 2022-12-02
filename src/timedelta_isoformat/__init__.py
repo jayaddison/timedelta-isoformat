@@ -132,7 +132,7 @@ class timedelta(datetime.timedelta):
         ), "no measurements found in time segment"
 
     @staticmethod
-    def _parse(duration):
+    def _filter(duration):
         for v, k, limit in timedelta._fromdurationstring(duration):
             assert v[:1].isdigit(), f"unexpected prefix '{v[:1]}' in {k} value '{v}'"
             assert not limit or v <= limit, f"{k} value of {v} exceeds range 0..{limit}"
@@ -154,7 +154,7 @@ class timedelta(datetime.timedelta):
             return ValueError(f"could not parse duration '{duration}': {reason}")
 
         try:
-            measurements = dict(cls._parse(duration))
+            measurements = dict(cls._filter(duration))
             return cls(**measurements)
         except (AssertionError, ValueError) as exc:
             raise _parse_error(exc) from exc
