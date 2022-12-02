@@ -135,7 +135,7 @@ class timedelta(datetime.timedelta):
     def _parse(duration):
         for v, k, limit in timedelta._fromdurationstring(duration):
             assert v[:1].isdigit(), f"unexpected prefix '{v[:1]}' in {k} value '{v}'"
-            assert v <= (limit or v), f"{k} value of {v} exceeds range 0..{limit}"
+            assert not limit or v <= limit, f"{k} value of {v} exceeds range 0..{limit}"
             try:
                 v = float(v.replace(",", "."))
             except ValueError as exc:
