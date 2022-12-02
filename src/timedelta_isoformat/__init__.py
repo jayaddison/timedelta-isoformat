@@ -31,11 +31,11 @@ class timedelta(datetime.timedelta):
             assert value[:1].isdigit(), f"unexpected prefix '{value[:1]}' in {unit} value '{value}'"
             assert not limit or value <= limit, f"{unit} value of {value} exceeds range 0..{limit}"
             try:
-                value = float(value.replace(",", "."))
+                quantity = float(value.replace(",", "."))
             except ValueError as exc:
                 raise ValueError(f"unable to parse '{value}' as a number") from exc
-            if value:
-                yield unit, value
+            if quantity:
+                yield unit, quantity
 
     @staticmethod
     def _fromdatestring(date_string):
