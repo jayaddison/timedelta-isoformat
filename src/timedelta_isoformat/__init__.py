@@ -132,8 +132,8 @@ class timedelta(datetime.timedelta):
                 raise ValueError("cannot mix weeks with other units")
 
         expected_token = next(tokens, None)
-        assert date_tail or expected_token != "Y", "no measurements found"
-        assert value or expected_token != "H", "no measurements found in time segment"
+        assert expected_token != "Y" or date_tail, "no measurements found"
+        assert expected_token != "H" or value, "no measurements found in time segment"
 
     @staticmethod
     def _to_measurements(components):
