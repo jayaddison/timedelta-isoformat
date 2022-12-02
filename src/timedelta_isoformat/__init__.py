@@ -96,14 +96,13 @@ class timedelta(datetime.timedelta):
         time_tokens = iter(("H", "hours", "M", "minutes", "S", "seconds"))
         week_tokens = iter(("W", "weeks"))
 
-        tokens, value, tail = None, "", None
-        for char in duration:
+        if not duration.startswith("P"):
+            raise ValueError("durations must begin with the character 'P'")
+
+        tokens, value, tail = date_tokens, "", None
+        for char in duration[1:]:
             if char in _FIELD_CHARACTERS:
                 value += char
-                continue
-
-            if char == "P" and not tokens:
-                tokens = date_tokens
                 continue
 
             if char == "T" and tokens is not time_tokens:
@@ -132,7 +131,7 @@ class timedelta(datetime.timedelta):
             if next(date_tokens, None) != "Y" or next(time_tokens, None) != "H":
                 raise ValueError("cannot mix weeks with other units")
 
-        expected_token = next(tokens or date_tokens, None)
+        expected_token = next(tokens, None)
         assert date_tail or expected_token != "Y", "no measurements found"
         assert value or expected_token != "H", "no measurements found in time segment"
 
