@@ -26,19 +26,6 @@ class timedelta(datetime.timedelta):
         return self.isoformat()
 
     @staticmethod
-    def _field_to_measurement(element):
-        value, unit, limit = element
-        try:
-            assert value[0].isdigit()
-            quantity = float("+" + value.replace(",", "."))
-        except (AssertionError, IndexError, ValueError):
-            raise ValueError(f"unable to parse '{value}' as a positive decimal")
-        if limit and quantity > limit:
-            raise ValueError(f"{unit} value of {value} exceeds range 0..{limit}")
-        if quantity:
-            return unit, quantity
-
-    @staticmethod
     def _fromdatestring(date_string):
         delimiters = [i for i, c in enumerate(date_string[0:10]) if c == "-"]
         date_length = len(date_string)
@@ -137,6 +124,19 @@ class timedelta(datetime.timedelta):
         assert not (
             expected_token == "H" and not value
         ), "no measurements found in time segment"
+
+    @staticmethod
+    def _field_to_measurement(element):
+        value, unit, limit = element
+        try:
+            assert value[0].isdigit()
+            quantity = float("+" + value.replace(",", "."))
+        except (AssertionError, IndexError, ValueError):
+            raise ValueError(f"unable to parse '{value}' as a positive decimal")
+        if limit and quantity > limit:
+            raise ValueError(f"{unit} value of {value} exceeds range 0..{limit}")
+        if quantity:
+            return unit, quantity
 
     @classmethod
     def fromisoformat(cls, duration):
