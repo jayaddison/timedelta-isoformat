@@ -98,6 +98,8 @@ class timedelta(datetime.timedelta):
 
         if not duration.startswith("P"):
             raise ValueError("durations must begin with the character 'P'")
+        if duration.endswith("T"):
+            raise ValueError("no measurements found in time segment")
 
         tokens, value, tail = date_tokens, "", None
         for char in duration[1:]:
@@ -126,14 +128,15 @@ class timedelta(datetime.timedelta):
             yield from timedelta._fromdatestring(date_tail)
         if time_tail:
             yield from timedelta._fromtimestring(time_tail)
+        if date_tail or time_tail:
+            return
 
-        if next(week_tokens, None) is None:
-            if next(date_tokens, None) != "Y" or next(time_tokens, None) != "H":
-                raise ValueError("cannot mix weeks with other units")
+        weeks_parsed = next(week_tokens, None) != "W"
+        dates_parsed = next(date_tokens, None) != "Y"
+        times_parsed = next(time_tokens, None) != "H"
 
-        expected_token = next(tokens, None)
-        assert expected_token != "Y" or date_tail, "no measurements found"
-        assert expected_token != "H" or value, "no measurements found in time segment"
+        assert weeks_parsed or (dates_parsed or times_parsed), "no measurements found"
+        assert weeks_parsed != (dates_parsed or times_parsed), "cannot mix weeks with other units"
 
     @staticmethod
     def _to_measurements(components):
