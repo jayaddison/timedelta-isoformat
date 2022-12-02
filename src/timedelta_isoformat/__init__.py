@@ -12,6 +12,8 @@ class timedelta(datetime.timedelta):
     """
 
     def __new__(cls, *args, months=0, years=0, **kwargs):
+        assert months % 1 == 0, f"unable to handle fractional months value '{months}'"
+        assert years % 1 == 0, f"unable to handle fractional years value '{years}'"
         return type(
             str(cls),
             (datetime.timedelta,),
