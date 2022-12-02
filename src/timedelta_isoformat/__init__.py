@@ -26,17 +26,17 @@ class timedelta(datetime.timedelta):
         return self.isoformat()
 
     @staticmethod
-    def _filter(duration):
-        for value, unit, limit in timedelta._fromdurationstring(duration):
-            assert value[:1].isdigit(), f"unexpected prefix '{value[:1]}' in {unit} value '{value}'"
-            try:
-                quantity = float(value.replace(",", "."))
-            except ValueError as exc:
-                raise ValueError(f"unable to parse '{value}' as a number") from exc
-            limit = limit or quantity
-            assert quantity <= limit, f"{unit} value of {value} exceeds range 0..{limit}"
-            if quantity:
-                yield unit, quantity
+    def _field_to_measurement(element):
+        value, unit, limit = element
+        assert value[:1].isdigit(), f"unexpected prefix '{value[:1]}' in {unit} value '{value}'"
+        try:
+            quantity = float(value.replace(",", "."))
+        except ValueError as exc:
+            raise ValueError(f"unable to parse '{value}' as a number") from exc
+        limit = limit or quantity
+        assert quantity <= limit, f"{unit} value of {value} exceeds range 0..{limit}"
+        if quantity:
+            return unit, quantity
 
     @staticmethod
     def _fromdatestring(date_string):
@@ -155,7 +155,10 @@ class timedelta(datetime.timedelta):
             return ValueError(f"could not parse duration '{duration}': {reason}")
 
         try:
-            measurements = dict(cls._filter(duration))
+            measurements = dict(filter(None, map(
+                timedelta._field_to_measurement,
+                timedelta._fromdurationstring(duration)
+            )))
             return cls(**measurements)
         except (AssertionError, ValueError) as exc:
             raise _parse_error(exc) from exc
