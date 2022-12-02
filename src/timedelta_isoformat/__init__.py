@@ -3,16 +3,8 @@ from collections import defaultdict
 import datetime
 from string import digits
 
-_FIELD_CHARACTERS = frozenset(digits + "-:")
+_FIELD_CHARACTERS = frozenset(digits + ",.-:")
 _DECIMAL_CHARACTERS = frozenset(",.")
-
-_CARRY = {
-    "weeks": 7 * 24 * 60 * 60,
-    "days": 24 * 60 * 60,
-    "hours": 60 * 60,
-    "minutes": 60,
-    "seconds": 1000000,
-}
 
 
 class timedelta(datetime.timedelta):
@@ -93,33 +85,15 @@ class timedelta(datetime.timedelta):
             raise ValueError(f"unable to parse '{time_string}' into time components")
 
     @staticmethod
-    def _carry(amount, unit, value):
-        if not amount.rstrip("0."):
-            return
-        assert unit in _CARRY, f"unable to handle fractional {unit} value '{value}'"
-        carry_unit, carry_value = (
-            "microseconds" if unit == "seconds" else "seconds",
-            f"{float(amount) * _CARRY[unit]:.6f}",
-        )
-        carry_integer, carry_remainder = carry_value[:-7], carry_value[-7:]
-        yield carry_integer, carry_unit, None
-        yield from timedelta._carry(carry_remainder, carry_unit, carry_value)
-
-    @staticmethod
     def _fromdurationstring(duration):
         date_tokens = iter(("Y", "years", "M", "months", "D", "days"))
         time_tokens = iter(("H", "hours", "M", "minutes", "S", "seconds"))
         week_tokens = iter(("W", "weeks"))
 
-        tokens, value, decimal, tail = None, "", None, None
+        tokens, value, tail = None, "", None
         for char in duration:
             if char in _FIELD_CHARACTERS:
                 value += char
-                continue
-
-            if char in _DECIMAL_CHARACTERS and decimal is None:
-                decimal = len(value)
-                value += "."
                 continue
 
             if char == "P" and not tokens:
@@ -138,21 +112,13 @@ class timedelta(datetime.timedelta):
             if char not in tokens:
                 raise ValueError(f"unexpected character '{char}'")
 
-            unit, integer_part, decimal_part = (
-                next(tokens, None),
-                value[:decimal],
-                value[decimal:] if decimal is not None else "",
-            )
-
-            if decimal_part:
-                yield from timedelta._carry(decimal_part, unit, value)
-
-            if integer_part:
-                yield integer_part, unit, None
+            unit = next(tokens, None)
+            if value:
+                yield value, unit, None
             else:
                 raise ValueError(f"incomplete measurement before character '{char}'")
 
-            value, decimal = "", None
+            value = ""
 
         date_tail, time_tail = (tail, value) if tokens is time_tokens else (value, None)
         if date_tail:
@@ -172,11 +138,14 @@ class timedelta(datetime.timedelta):
 
     @staticmethod
     def _parse(duration):
-        results = defaultdict(int)
+        results = defaultdict(float)
         for v, k, limit in timedelta._fromdurationstring(duration):
             assert v[:1].isdigit(), f"unexpected prefix '{v[:1]}' in {k} value '{v}'"
             assert v <= (limit or v), f"{k} value of {v} exceeds range 0..{limit}"
-            results[k] += int(v)
+            try:
+                results[k] += float(v.replace(",", "."))
+            except ValueError as exc:
+                raise ValueError(f"unable to parse '{v}' as a number") from exc
         return {k: v for k, v in results.items() if v}
 
     @classmethod
