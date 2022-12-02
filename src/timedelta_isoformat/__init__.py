@@ -79,6 +79,19 @@ class timedelta(datetime.timedelta):
 
     @staticmethod
     def _fromdurationstring(duration):
+        """Parsing code for designator-separated ISO-8601 strings, like 'PT1H30M'
+
+        The format of these strings is composed of two segments; date measurements
+        are situated between the 'P' and 'T' characters, and time measurements are
+        situated between the 'T' character and the end-of-string.
+
+        The code sweeps through the input exactly once, expecting to find measurements
+        in order of largest to smallest unit from left-to-right (with the exception of
+        week measurements, which must be the only measurement in the string if present).
+
+        If no unit designator has been found when we reach the end of a segment, then
+        an attempt is made to parse the segment as a fixed-length date or time.
+        """
         date_tokens = iter(("Y", "years", "M", "months", "D", "days"))
         time_tokens = iter(("H", "hours", "M", "minutes", "S", "seconds"))
         week_tokens = iter(("W", "weeks"))
