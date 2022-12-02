@@ -42,24 +42,24 @@ class timedelta(datetime.timedelta):
         # YYYY-DDD
         if date_length == 8 and delimiters == [4]:
             yield date_string[0:4], "years", None
-            yield date_string[5:8], "days", 366
+            yield date_string[5:8], "days", "366"
 
         # YYYY-MM-DD
         elif date_length == 10 and delimiters == [4, 7]:
             yield date_string[0:4], "years", None
-            yield date_string[5:7], "months", 12
-            yield date_string[8:10], "days", 31
+            yield date_string[5:7], "months", "12"
+            yield date_string[8:10], "days", "31"
 
         # YYYYDDD
         elif date_length == 7 and delimiters == []:
             yield date_string[0:4], "years", None
-            yield date_string[4:7], "days", 366
+            yield date_string[4:7], "days", "366"
 
         # YYYYMMDD
         elif date_length == 8 and delimiters == []:
             yield date_string[0:4], "years", None
-            yield date_string[4:6], "months", 12
-            yield date_string[6:8], "days", 31
+            yield date_string[4:6], "months", "12"
+            yield date_string[6:8], "days", "31"
 
         else:
             raise ValueError(f"unable to parse '{date_string}' into date components")
@@ -71,9 +71,9 @@ class timedelta(datetime.timedelta):
 
         # HH:MM:SS[.ssssss]
         if delimiters == [2, 5]:
-            yield time_string[0:2], "hours", 23
-            yield time_string[3:5], "minutes", 59
-            yield time_string[6:8], "seconds", 59
+            yield time_string[0:2], "hours", "23"
+            yield time_string[3:5], "minutes", "59"
+            yield time_string[6:8], "seconds", "59"
             if not decimal:
                 return
             assert decimal in _DECIMAL_CHARACTERS, f"unexpected character '{decimal}'"
@@ -81,9 +81,9 @@ class timedelta(datetime.timedelta):
 
         # HHMMSS[.ssssss]
         elif delimiters == []:
-            yield time_string[0:2], "hours", 23
-            yield time_string[2:4], "minutes", 59
-            yield time_string[4:6], "seconds", 59
+            yield time_string[0:2], "hours", "23"
+            yield time_string[2:4], "minutes", "59"
+            yield time_string[4:6], "seconds", "59"
             if not decimal:
                 return
             assert decimal in _DECIMAL_CHARACTERS, f"unexpected character '{decimal}'"
@@ -175,9 +175,8 @@ class timedelta(datetime.timedelta):
         results = defaultdict(int)
         for v, k, limit in timedelta._fromdurationstring(duration):
             assert v[:1].isdigit(), f"unexpected prefix '{v[:1]}' in {k} value '{v}'"
-            v = int(v)
             assert v <= (limit or v), f"{k} value of {v} exceeds range 0..{limit}"
-            results[k] += v
+            results[k] += int(v)
         return {k: v for k, v in results.items() if v}
 
     @classmethod
