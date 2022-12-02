@@ -29,11 +29,11 @@ class timedelta(datetime.timedelta):
     def _filter(duration):
         for value, unit, limit in timedelta._fromdurationstring(duration):
             assert value[:1].isdigit(), f"unexpected prefix '{value[:1]}' in {unit} value '{value}'"
-            assert not limit or value <= limit, f"{unit} value of {value} exceeds range 0..{limit}"
             try:
                 quantity = float(value.replace(",", "."))
             except ValueError as exc:
                 raise ValueError(f"unable to parse '{value}' as a number") from exc
+            assert not limit or value <= limit, f"{unit} value of {value} exceeds range 0..{limit}"
             if quantity:
                 yield unit, quantity
 
