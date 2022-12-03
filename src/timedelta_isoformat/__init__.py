@@ -64,15 +64,15 @@ class timedelta(datetime.timedelta):
 
         # HH:MM:SS[.ssssss]
         if delimiters == [2, 5]:
-            yield time_string[0:2], "hours", 23
-            yield time_string[3:5], "minutes", 59
-            yield time_string[6:15], "seconds", 59
+            yield time_string[0:2], "hours", 24
+            yield time_string[3:5], "minutes", 60
+            yield time_string[6:15], "seconds", 60
 
         # HHMMSS[.ssssss]
         elif delimiters == []:
-            yield time_string[0:2], "hours", 23
-            yield time_string[2:4], "minutes", 59
-            yield time_string[4:13], "seconds", 59
+            yield time_string[0:2], "hours", 24
+            yield time_string[2:4], "minutes", 60
+            yield time_string[4:13], "seconds", 60
 
         else:
             raise ValueError(f"unable to parse '{time_string}' into time components")
@@ -129,25 +129,35 @@ class timedelta(datetime.timedelta):
         assert duration.startswith("P"), "durations must begin with the character 'P'"
 
         if duration[-1].isupper():
-            yield from timedelta._fromdesignators(duration[1:])
+            components = timedelta._fromdesignators(duration[1:])
+            yield from timedelta._to_measurements(components)
             return
 
         date_segment, _, time_segment = duration[1:].partition("T")
         if date_segment:
-            yield from timedelta._fromdatestring(date_segment)
+            components = timedelta._fromdatestring(date_segment)
+            yield from timedelta._to_measurements(components, inclusive_range=True)
         if time_segment:
-            yield from timedelta._fromtimestring(time_segment)
+            components = timedelta._fromtimestring(time_segment)
+            yield from timedelta._to_measurements(components, inclusive_range=False)
 
     @staticmethod
-    def _to_measurements(components):
+    def _to_measurements(components, inclusive_range=None):
+        within_range = {
+            None: lambda _quantity, _limit: True,
+            True: float.__le__,
+            False: float.__lt__,
+        }[inclusive_range]
+
         for value, unit, limit in components:
             try:
                 assert value[0].isdigit()
                 quantity = float("+" + value.replace(",", "."))
             except (AssertionError, IndexError, ValueError):
                 raise ValueError(f"unable to parse '{value}' as a positive decimal")
-            if limit and quantity > limit:
-                raise ValueError(f"{unit} value of {value} exceeds range 0..{limit}")
+            if not within_range(quantity, limit):
+                bounds = f"[0..{limit}" + ("]" if inclusive_range else ")")
+                raise ValueError(f"{unit} value of {value} exceeds range {bounds}")
             if quantity:
                 yield unit, quantity
 
@@ -162,7 +172,7 @@ class timedelta(datetime.timedelta):
             return ValueError(f"could not parse duration '{duration}': {reason}")
 
         try:
-            measurements = dict(cls._to_measurements(cls._fromdurationstring(duration)))
+            measurements = dict(cls._fromdurationstring(duration))
             return cls(**measurements)
         except (AssertionError, ValueError) as exc:
             raise _parse_error(exc) from exc
