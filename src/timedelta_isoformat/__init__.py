@@ -78,31 +78,7 @@ class timedelta(datetime.timedelta):
             raise ValueError(f"unable to parse '{time_string}' into time components")
 
     @staticmethod
-    def _fromdurationstring(duration):
-        """Parsing code for designator-separated ISO-8601 strings, like 'PT1H30M'
-
-        The format of these strings is composed of two segments; date measurements
-        are situated between the 'P' and 'T' characters, and time measurements are
-        situated between the 'T' character and the end-of-string.
-
-        The code sweeps through the input exactly once, expecting to find measurements
-        in order of largest to smallest unit from left-to-right (with the exception of
-        week measurements, which must be the only measurement in the string if present).
-
-        If no unit designator is found at the end of the duration string, then
-        an attempt is made to parse the segment as a fixed-length date or time.
-        """
-        assert duration.startswith("P"), "durations must begin with the character 'P'"
-        assert not duration.endswith("T"), "no measurements found in time segment"
-
-        if duration[-1] in _FIELD_CHARACTERS:
-            segments = duration[1:].split("T")
-            parsers = timedelta._fromdatestring, timedelta._fromtimestring
-            for segment, parser in zip(segments, parsers):
-                if segment:
-                    yield from parser(segment)
-            return
-
+    def _fromdesignators(duration):
         date_tokens = iter(("Y", "years", "M", "months", "D", "days"))
         time_tokens = iter(("H", "hours", "M", "minutes", "S", "seconds"))
         week_tokens = iter(("W", "weeks"))
@@ -132,6 +108,33 @@ class timedelta(datetime.timedelta):
         time_parsed = next(time_tokens, None) != "H" or next(date_tokens, None) != "Y"
         assert weeks_parsed or time_parsed, "no measurements found"
         assert weeks_parsed != time_parsed, "cannot mix weeks with other units"
+
+    @staticmethod
+    def _fromdurationstring(duration):
+        """Parsing code for designator-separated ISO-8601 strings, like 'PT1H30M'
+
+        The format of these strings is composed of two segments; date measurements
+        are situated between the 'P' and 'T' characters, and time measurements are
+        situated between the 'T' character and the end-of-string.
+
+        The code sweeps through the input exactly once, expecting to find measurements
+        in order of largest to smallest unit from left-to-right (with the exception of
+        week measurements, which must be the only measurement in the string if present).
+
+        If no unit designator is found at the end of the duration string, then
+        an attempt is made to parse the segment as a fixed-length date or time.
+        """
+        assert duration.startswith("P"), "durations must begin with the character 'P'"
+        assert not duration.endswith("T"), "no measurements found in time segment"
+
+        if duration[-1] in _FIELD_CHARACTERS:
+            segments = duration[1:].split("T")
+            parsers = timedelta._fromdatestring, timedelta._fromtimestring
+            for segment, parser in zip(segments, parsers):
+                if segment:
+                    yield from parser(segment)
+        else:
+            yield from timedelta._fromdesignators(duration)
 
     @staticmethod
     def _to_measurements(components):
