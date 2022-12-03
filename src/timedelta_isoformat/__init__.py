@@ -83,14 +83,10 @@ class timedelta(datetime.timedelta):
         time_tokens = iter(("H", "hours", "M", "minutes", "S", "seconds"))
         week_tokens = iter(("W", "weeks"))
 
-        tokens, value = None, ""
-        for char in duration:
+        tokens, value = date_tokens, ""
+        for char in duration[1:]:
             if char in _FIELD_CHARACTERS:
                 value += char
-                continue
-
-            if char == "P" and not tokens:
-                tokens = date_tokens
                 continue
 
             if char == "T" and tokens is not time_tokens:
