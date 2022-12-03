@@ -39,6 +39,7 @@ valid_durations = [
     # calendar edge cases
     ("P0000-366", timedelta(days=366)),
     ("PT23:59:59", timedelta(hours=23, minutes=59, seconds=59)),
+    ("PT23:59:59.9", timedelta(hours=23, minutes=59, seconds=59.9)),
     # matching datetime.timedelta day-to-microsecond carry precision
     ("P0.000001D", timedelta(microseconds=86400)),
     ("P0.00000000001D", timedelta(microseconds=1)),
@@ -72,6 +73,7 @@ invalid_durations = [
     ("PT0.0.0S", "unable to parse '0.0.0' as a positive decimal"),
     ("P1.,0D", "unable to parse '1.,0' as a positive decimal"),
     # date-format durations exceeding calendar limits
+    ("P0000-367", "days value of 367 exceeds range 0..366"),
     ("P0000-400", "days value of 400 exceeds range 0..366"),
     ("P0000-13-00", "months value of 13 exceeds range 0..12"),
     ("PT12:60:00", "minutes value of 60 exceeds range 0..59"),
