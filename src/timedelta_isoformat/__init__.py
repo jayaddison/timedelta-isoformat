@@ -1,9 +1,9 @@
 """Supplemental ISO8601 duration format support for :py:class:`datetime.timedelta`"""
 import datetime
-from string import digits
 
-_FIELD_CHARACTERS = frozenset(digits + ",.-:")
-_DECIMAL_SIGNS = frozenset(",.")
+_DIGITS, _DECIMAL_SIGNS = frozenset("0123456789"), frozenset(",.")
+_DATE_SEPARATORS, _TIME_SEPARATORS = frozenset("-"), frozenset(":")
+_FORMAT = _DIGITS | _DECIMAL_SIGNS | _DATE_SEPARATORS | _TIME_SEPARATORS
 
 
 class timedelta(datetime.timedelta):
@@ -91,7 +91,7 @@ class timedelta(datetime.timedelta):
 
         tokens, value = date_tokens, ""
         for char in duration:
-            if char in _FIELD_CHARACTERS:
+            if char in _FORMAT:
                 value += char
                 continue
 
