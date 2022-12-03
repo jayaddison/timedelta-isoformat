@@ -106,8 +106,7 @@ class timedelta(datetime.timedelta):
                 continue
 
             if char == "T" and tokens is not time_tokens:
-                if value:
-                    yield from timedelta._fromdatestring(value)
+                yield from timedelta._fromdatestring(value) if value else ()
                 value, tokens = "", time_tokens
                 continue
 
