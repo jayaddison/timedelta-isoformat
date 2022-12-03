@@ -11,12 +11,19 @@ class timedelta(datetime.timedelta):
     """
 
     @staticmethod
-    def _filter(components):
+    def _filter(components, inclusive_range=None):
+        within_range = {
+            None: lambda _quantity, _limit: True,
+            True: str.__le__,
+            False: str.__lt__,
+        }[inclusive_range]
+
         for quantity, unit, limit in components:
             if not quantity.isdigit():
                 raise ValueError(f"expected a positive integer within {unit} component")
-            if quantity > limit:
-                raise ValueError(f"{unit} value of {quantity} exceeds range 0..{limit}")
+            if not within_range(quantity, limit):
+                bounds = f"[0..{limit}" + ("]" if inclusive_range else ")")
+                raise ValueError(f"{unit} value of {quantity} exceeds range {bounds}")
             yield unit, int(quantity)
 
     @staticmethod
@@ -56,9 +63,9 @@ class timedelta(datetime.timedelta):
 
         # HH:MM:SS[.ssssss]
         if time_length >= 8 and separator_positions == [2, 5]:
-            yield time_string[0:2], "hours", "23"
-            yield time_string[3:5], "minutes", "59"
-            yield time_string[6:8], "seconds", "59"
+            yield time_string[0:2], "hours", "24"
+            yield time_string[3:5], "minutes", "60"
+            yield time_string[6:8], "seconds", "60"
             if time_length == 8:
                 return
             if time_string[8] != ".":
@@ -67,9 +74,9 @@ class timedelta(datetime.timedelta):
 
         # HHMMSS[.ssssss]
         elif time_length >= 6 and separator_positions == []:
-            yield time_string[0:2], "hours", "23"
-            yield time_string[2:4], "minutes", "59"
-            yield time_string[4:6], "seconds", "59"
+            yield time_string[0:2], "hours", "24"
+            yield time_string[2:4], "minutes", "60"
+            yield time_string[4:6], "seconds", "60"
             if time_length == 6:
                 return
             if time_string[6] != ".":
@@ -130,9 +137,11 @@ class timedelta(datetime.timedelta):
         date_tail, time_tail = (tail, value) if stream is time else (value, None)
         try:
             if date_tail:
-                measurements |= cls._filter(cls._fromdatestring(date_tail))
+                components = cls._fromdatestring(date_tail)
+                measurements |= cls._filter(components, inclusive_range=True)
             if time_tail:
-                measurements |= cls._filter(cls._fromtimestring(time_tail))
+                components = cls._fromtimestring(time_tail)
+                measurements |= cls._filter(components, inclusive_range=False)
         except ValueError as exc:
             raise _parse_error(exc) from None
 
@@ -150,6 +159,8 @@ class timedelta(datetime.timedelta):
 
         try:
             return cls(**{k: v for k, v in measurements.items() if v})
+        except (AssertionError, ValueError) as exc:
+            raise _parse_error(exc) from exc
         except TypeError as exc:
             if measurements.get("years") or measurements.get("months"):
                 raise _parse_error("year and month fields are not supported") from exc
