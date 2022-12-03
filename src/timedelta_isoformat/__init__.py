@@ -79,7 +79,7 @@ class timedelta(datetime.timedelta):
 
     @staticmethod
     def _fromdesignators(duration):
-        """Parser for designator-separated ISO-8601 strings, like 'PT1H30M'
+        """Parser for designator-separated ISO-8601 duration strings, like 'PT1H30M'
 
         The code sweeps through the input exactly once, expecting to find measurements
         in order of largest to smallest unit from left-to-right (with the exception of
@@ -117,7 +117,7 @@ class timedelta(datetime.timedelta):
 
     @staticmethod
     def _fromdurationstring(duration):
-        """Selects and runs an approprate parser for ISO-8601 strings
+        """Selects and runs an approprate parser for ISO-8601 duration strings
 
         The format of these strings is composed of two segments; date measurements
         are situated between the 'P' and 'T' characters, and time measurements are
