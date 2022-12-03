@@ -3,6 +3,7 @@ import datetime
 from string import digits
 
 _FIELD_CHARACTERS = frozenset(digits + ",.-:")
+_DECIMAL_SIGNS = frozenset(",.")
 
 
 class timedelta(datetime.timedelta):
@@ -57,6 +58,9 @@ class timedelta(datetime.timedelta):
     @staticmethod
     def _fromtimestring(time_string):
         delimiters = [i for i, c in enumerate(time_string[0:15]) if c == ":"]
+        decimal = time_string[6:7] if delimiters == [] else time_string[8:9]
+        if decimal and decimal not in _DECIMAL_SIGNS:
+            raise ValueError(f"unexpected character '{decimal}'")
 
         # HH:MM:SS[.ssssss]
         if delimiters == [2, 5]:

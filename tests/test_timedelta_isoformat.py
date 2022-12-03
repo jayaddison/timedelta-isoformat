@@ -96,7 +96,7 @@ invalid_durations = [
     # unexpected characters within date/time components
     ("PT01:-2:03", "unable to parse '-2' as a positive decimal"),
     ("P000000.1", "unable to parse '.1' as a positive decimal"),
-    ("PT000000--", "unable to parse '00--' as a positive decimal"),
+    ("PT000000--", "unexpected character '-'"),
     ("PT00:00:00,-", "unable to parse '00,-' as a positive decimal"),
     # negative designator-separated values
     ("P-1DT0S", "unable to parse '-1' as a positive decimal"),
