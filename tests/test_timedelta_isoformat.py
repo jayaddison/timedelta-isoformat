@@ -83,6 +83,7 @@ invalid_durations = [
     ("PT1:2:3", "unable to parse '1:2:3' into time components"),
     ("PT01:0203", "unable to parse '01:0203' into time components"),
     ("PT01", "unable to parse '' as a positive decimal"),
+    ("PT01:02:3.4", "unexpected character '4'"),
     # decimals must have a non-empty integer value before the separator
     ("PT.5S", "unable to parse '.5' as a positive decimal"),
     ("P1M.1D", "unable to parse '.1' as a positive decimal"),
