@@ -64,15 +64,15 @@ class timedelta(datetime.timedelta):
 
         # HH:MM:SS[.ssssss]
         if delimiters == [2, 5]:
-            yield time_string[0:2], "hours", 23
-            yield time_string[3:5], "minutes", 59
-            yield time_string[6:15], "seconds", 59
+            yield time_string[0:2], "hours", 24
+            yield time_string[3:5], "minutes", 60
+            yield time_string[6:15], "seconds", 60
 
         # HHMMSS[.ssssss]
         elif delimiters == []:
-            yield time_string[0:2], "hours", 23
-            yield time_string[2:4], "minutes", 59
-            yield time_string[4:13], "seconds", 59
+            yield time_string[0:2], "hours", 24
+            yield time_string[2:4], "minutes", 60
+            yield time_string[4:13], "seconds", 60
 
         else:
             raise ValueError(f"unable to parse '{time_string}' into time components")
@@ -124,6 +124,7 @@ class timedelta(datetime.timedelta):
         if date_tail:
             yield from timedelta._fromdatestring(date_tail)
         if time_tail:
+            yield "0", "hours", 0
             yield from timedelta._fromtimestring(time_tail)
         if date_tail or time_tail:
             return
@@ -134,17 +135,26 @@ class timedelta(datetime.timedelta):
         assert weeks_parsed != time_parsed, "cannot mix weeks with other units"
 
     @staticmethod
-    def _to_measurements(components):
+    def _to_measurements(components, inclusive_range=True):
+        within_range = {
+            None: lambda _quantity, _limit: True,
+            True: float.__le__,
+            False: float.__lt__,
+        }
+
         for value, unit, limit in components:
             try:
                 assert value[0].isdigit()
                 quantity = float("+" + value.replace(",", "."))
             except (AssertionError, IndexError, ValueError):
                 raise ValueError(f"unable to parse '{value}' as a positive decimal")
-            if limit and quantity > limit:
-                raise ValueError(f"{unit} value of {value} exceeds range 0..{limit}")
+            if not within_range[inclusive_range](quantity, limit):
+                bounds = f"[0..{limit}" + ("]" if inclusive_range else ")")
+                raise ValueError(f"{unit} value of {value} exceeds range {bounds}")
             if quantity:
                 yield unit, quantity
+            if unit == "hours" and limit is not None:
+                inclusive_range = False
 
     @classmethod
     def fromisoformat(cls, duration):
