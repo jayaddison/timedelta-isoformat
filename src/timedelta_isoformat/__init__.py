@@ -132,7 +132,7 @@ class timedelta(datetime.timedelta):
             yield from timedelta._fromdesignators(duration[1:])
             return
 
-        date_segment, _T, time_segment = duration[1:].partition("T")
+        date_segment, _, time_segment = duration[1:].partition("T")
         if date_segment:
             yield from timedelta._fromdatestring(date_segment)
         if time_segment:
