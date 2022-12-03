@@ -99,14 +99,16 @@ class timedelta(datetime.timedelta):
         assert duration.startswith("P"), "durations must begin with the character 'P'"
         assert not duration.endswith("T"), "no measurements found in time segment"
 
-        tokens, value, tail = date_tokens, "", None
+        tokens, value = date_tokens, ""
         for char in duration[1:]:
             if char in _FIELD_CHARACTERS:
                 value += char
                 continue
 
             if char == "T" and tokens is not time_tokens:
-                value, tail, tokens = "", value, time_tokens
+                if value:
+                    yield from timedelta._fromdatestring(value)
+                value, tokens = "", time_tokens
                 continue
 
             if char == "W" and tokens is date_tokens:
@@ -120,12 +122,12 @@ class timedelta(datetime.timedelta):
             yield value, next(tokens, None), None
             value = ""
 
-        date_tail, time_tail = (tail, value) if tokens is time_tokens else (value, None)
-        if date_tail:
-            yield from timedelta._fromdatestring(date_tail)
-        if time_tail:
-            yield from timedelta._fromtimestring(time_tail)
-        if date_tail or time_tail:
+        if value:
+            yield from (
+                timedelta._fromtimestring
+                if tokens is time_tokens
+                else timedelta._fromdatestring
+            )(value)
             return
 
         weeks_parsed = next(week_tokens, None) != "W"
