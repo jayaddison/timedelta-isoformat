@@ -25,10 +25,17 @@ class timedelta(datetime.timedelta):
     """
 
     @staticmethod
-    def _filter(components):
+    def _filter(components, inclusive_range=None):
+        within_range = {
+            None: lambda _quantity, _limit: True,
+            True: float.__le__,
+            False: float.__lt__,
+        }[inclusive_range]
+
         for quantity, unit, limit in components:
-            if limit and quantity > limit:
-                raise ValueError(f"{unit} value of {quantity} exceeds range 0..{limit}")
+            if limit and not within_range(float(quantity), limit):
+                bounds = f"[0..{limit}" + ("]" if inclusive_range else ")")
+                raise ValueError(f"{unit} value of {quantity} exceeds range {bounds}")
             yield unit, quantity
 
     @staticmethod
@@ -80,17 +87,17 @@ class timedelta(datetime.timedelta):
         # HH:MM:SS[.ssssss]
         if separator_positions == [2, 5]:
             seconds_type = float if time_string[8:9] == "." else int
-            yield int(time_string[0:2]), "hours", 23
-            yield int(time_string[3:5]), "minutes", 59
-            yield seconds_type(time_string[6:]), "seconds", 59
+            yield int(time_string[0:2]), "hours", 24
+            yield int(time_string[3:5]), "minutes", 60
+            yield seconds_type(time_string[6:]), "seconds", 60
             found = True
 
         # HHMMSS[.ssssss]
         if separator_positions == []:
             seconds_type = float if time_string[6:7] == "." else int
-            yield int(time_string[0:2]), "hours", 23
-            yield int(time_string[2:4]), "minutes", 59
-            yield seconds_type(time_string[4:]), "seconds", 59
+            yield int(time_string[0:2]), "hours", 24
+            yield int(time_string[2:4]), "minutes", 60
+            yield seconds_type(time_string[4:]), "seconds", 60
             found = True
 
         if not found:
@@ -157,7 +164,12 @@ class timedelta(datetime.timedelta):
                     time_designators: cls._fromtimestring,
                     week_designators: lambda _: [],
                 }[designators]
-                measurements.update(cls._filter(segment_parser(value)))
+                inclusive_range = {
+                    date_designators: True,
+                    time_designators: False,
+                    week_designators: True,
+                }[designators]
+                measurements.update(cls._filter(segment_parser(value), inclusive_range))
 
         if not measurements:
             raise _parse_error("no measurements found")
