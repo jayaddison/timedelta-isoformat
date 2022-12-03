@@ -25,12 +25,15 @@ class timedelta(datetime.timedelta):
         return self.isoformat()
 
     @staticmethod
-    def _filter(components):
+    def _filter(components, inclusive_range=True):
         for value, unit, limit in components:
             assert value.isdigit(), f"expected a positive integer {unit} component"
             value = int(value)
             limit = limit or value
-            assert value <= limit, f"{unit} value of {value} exceeds range 0..{limit}"
+            bounds = f"[0..{limit}" + ("]" if inclusive_range else ")")
+            error_msg = f"{unit} value of {value} exceeds range {bounds}"
+            assert value < limit or inclusive_range, error_msg
+            assert value <= limit, error_msg
             yield unit, value
 
     @staticmethod
@@ -70,23 +73,23 @@ class timedelta(datetime.timedelta):
 
         # HH:MM:SS[.ssssss]
         if delimiters == [2, 5]:
-            yield time_string[0:2], "hours", 23
-            yield time_string[3:5], "minutes", 59
-            yield time_string[6:8], "seconds", 59
+            yield time_string[0:2], "hours", 24
+            yield time_string[3:5], "minutes", 60
+            yield time_string[6:8], "seconds", 60
             if not decimal:
                 return
             assert decimal == ".", f"unexpected character '{decimal}'"
-            yield time_string[9:15].ljust(6, "0"), "microseconds", None
+            yield time_string[9:15].ljust(6, "0"), "microseconds", 999999
 
         # HHMMSS[.ssssss]
         elif delimiters == []:
-            yield time_string[0:2], "hours", 23
-            yield time_string[2:4], "minutes", 59
-            yield time_string[4:6], "seconds", 59
+            yield time_string[0:2], "hours", 24
+            yield time_string[2:4], "minutes", 60
+            yield time_string[4:6], "seconds", 60
             if not decimal:
                 return
             assert decimal == ".", f"unexpected character '{decimal}'"
-            yield time_string[7:13].ljust(6, "0"), "microseconds", None
+            yield time_string[7:13].ljust(6, "0"), "microseconds", 999999
 
         else:
             raise ValueError(f"unable to parse '{time_string}' into time components")
@@ -130,9 +133,11 @@ class timedelta(datetime.timedelta):
 
         date_tail, time_tail = (tail, value) if tokens is time_tokens else (value, None)
         if date_tail:
-            measurements |= timedelta._filter(timedelta._fromdatestring(date_tail))
+            components = timedelta._fromdatestring(date_tail)
+            measurements |= timedelta._filter(components)
         if time_tail:
-            measurements |= timedelta._filter(timedelta._fromtimestring(time_tail))
+            components = timedelta._fromtimestring(time_tail)
+            measurements |= timedelta._filter(components, inclusive_range=False)
 
         assert measurements, "no measurements found"
         assert not (
