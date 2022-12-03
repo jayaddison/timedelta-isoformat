@@ -47,7 +47,12 @@ valid_durations = [
 invalid_durations = [
     # incomplete strings
     ("", "durations must begin with the character 'P'"),
+    ("T", "durations must begin with the character 'P'"),
     ("P", "no measurements found"),
+    ("PT", "no measurements found"),
+    ("PPT", "unexpected character 'P'"),
+    ("PTT", "unexpected character 'T'"),
+    ("PTP", "unexpected character 'P'"),
     # incomplete measurements
     ("P0YD", "unable to parse '' as a positive decimal"),
     # repeated designators
