@@ -71,23 +71,23 @@ class timedelta(datetime.timedelta):
 
         # HH:MM:SS[.ssssss]
         if delimiters == [2, 5]:
-            yield time_string[0:2], "hours", 23
-            yield time_string[3:5], "minutes", 59
-            yield time_string[6:8], "seconds", 59
+            yield time_string[0:2], "hours", 24
+            yield time_string[3:5], "minutes", 60
+            yield time_string[6:8], "seconds", 60
             if not decimal:
                 return
             assert decimal in _DECIMAL_CHARACTERS, f"unexpected character '{decimal}'"
-            yield time_string[9:15].ljust(6, "0"), "microseconds", None
+            yield time_string[9:15].ljust(6, "0"), "microseconds", 999999
 
         # HHMMSS[.ssssss]
         elif delimiters == []:
-            yield time_string[0:2], "hours", 23
-            yield time_string[2:4], "minutes", 59
-            yield time_string[4:6], "seconds", 59
+            yield time_string[0:2], "hours", 24
+            yield time_string[2:4], "minutes", 60
+            yield time_string[4:6], "seconds", 60
             if not decimal:
                 return
             assert decimal in _DECIMAL_CHARACTERS, f"unexpected character '{decimal}'"
-            yield time_string[7:13].ljust(6, "0"), "microseconds", None
+            yield time_string[7:13].ljust(6, "0"), "microseconds", 999999
 
         else:
             raise ValueError(f"unable to parse '{time_string}' into time components")
@@ -158,6 +158,7 @@ class timedelta(datetime.timedelta):
         if date_tail:
             yield from timedelta._fromdatestring(date_tail)
         if time_tail:
+            yield "0", "hours", 0
             yield from timedelta._fromtimestring(time_tail)
 
         expected_token = next(tokens or date_tokens, None)
@@ -171,13 +172,18 @@ class timedelta(datetime.timedelta):
         ), "no measurements found in time segment"
 
     @staticmethod
-    def _parse(duration):
+    def _parse(duration, inclusive_range=True):
         results = defaultdict(int)
         for v, k, limit in timedelta._fromdurationstring(duration):
             assert v[:1].isdigit(), f"unexpected prefix '{v[:1]}' in {k} value '{v}'"
             v = int(v)
-            assert v <= (limit or v), f"{k} value of {v} exceeds range 0..{limit}"
+            bounds = f"[0..{limit or v}" + ("]" if inclusive_range else ")")
+            error_msg = f"{k} value of {v} exceeds range {bounds}"
+            assert v < (limit or v) or inclusive_range, error_msg
+            assert v <= (limit or v), error_msg
             results[k] += v
+            if k == "hours" and limit is not None:
+                inclusive_range = False
         return {k: v for k, v in results.items() if v}
 
     @classmethod
