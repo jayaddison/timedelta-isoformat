@@ -84,7 +84,7 @@ class timedelta(datetime.timedelta):
         week_tokens = iter(("W", "weeks"))
 
         tokens, value = date_tokens, ""
-        for char in duration[1:]:
+        for char in duration:
             if char in _FIELD_CHARACTERS:
                 value += char
                 continue
@@ -127,14 +127,16 @@ class timedelta(datetime.timedelta):
         assert duration.startswith("P"), "durations must begin with the character 'P'"
         assert not duration.endswith("T"), "no measurements found in time segment"
 
-        if duration[-1] in _FIELD_CHARACTERS:
-            parsers = iter((timedelta._fromdatestring, None, timedelta._fromtimestring))
-            for segment in duration[1:].partition("T"):
-                parser = next(parsers, None)
-                if segment and parser:
-                    yield from parser(segment)
-        else:
-            yield from timedelta._fromdesignators(duration)
+        if duration[-1].isupper():
+            yield from timedelta._fromdesignators(duration[1:])
+            return
+
+        date_parser, time_parser = timedelta._fromdatestring, timedelta._fromtimestring
+        date_segment, _T, time_segment = duration[1:].partition("T")
+        if date_segment:
+            yield from date_parser(date_segment)
+        if time_segment:
+            yield from time_parser(time_segment)
 
     @staticmethod
     def _to_measurements(components):
