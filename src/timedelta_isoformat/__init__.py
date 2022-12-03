@@ -125,7 +125,6 @@ class timedelta(datetime.timedelta):
         an attempt is made to parse the segment as a fixed-length date or time.
         """
         assert duration.startswith("P"), "durations must begin with the character 'P'"
-        assert not duration.endswith("T"), "no measurements found in time segment"
 
         if duration[-1].isupper():
             yield from timedelta._fromdesignators(duration[1:])

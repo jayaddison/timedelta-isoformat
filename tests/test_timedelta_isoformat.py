@@ -48,10 +48,6 @@ invalid_durations = [
     # incomplete strings
     ("", "durations must begin with the character 'P'"),
     ("P", "no measurements found"),
-    ("P0DT", "no measurements found in time segment"),
-    ("P1DT", "no measurements found in time segment"),
-    ("P0Y5MT", "no measurements found in time segment"),
-    ("P0000001T", "no measurements found in time segment"),
     # incomplete measurements
     ("P0YD", "unable to parse '' as a positive decimal"),
     # repeated designators
