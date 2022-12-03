@@ -89,7 +89,7 @@ class timedelta(datetime.timedelta):
         in order of largest to smallest unit from left-to-right (with the exception of
         week measurements, which must be the only measurement in the string if present).
 
-        If no unit designator has been found when we reach the end of a segment, then
+        If no unit designator is found at the end of the duration string, then
         an attempt is made to parse the segment as a fixed-length date or time.
         """
         date_tokens = iter(("Y", "years", "M", "months", "D", "days"))
@@ -99,6 +99,14 @@ class timedelta(datetime.timedelta):
         assert duration.startswith("P"), "durations must begin with the character 'P'"
         assert not duration.endswith("T"), "no measurements found in time segment"
 
+        if duration[-1] in _FIELD_CHARACTERS:
+            segments = duration[1:].split("T")
+            parsers = timedelta._fromdatestring, timedelta._fromtimestring
+            for segment, parser in zip(segments, parsers):
+                if segment:
+                    yield from parser(segment)
+            return
+
         tokens, value = date_tokens, ""
         for char in duration[1:]:
             if char in _FIELD_CHARACTERS:
@@ -106,7 +114,6 @@ class timedelta(datetime.timedelta):
                 continue
 
             if char == "T" and tokens is not time_tokens:
-                yield from timedelta._fromdatestring(value) if value else ()
                 tokens, value = time_tokens, ""
                 continue
 
@@ -120,14 +127,6 @@ class timedelta(datetime.timedelta):
 
             yield value, next(tokens, None), None
             value = ""
-
-        if value:
-            yield from (
-                timedelta._fromtimestring
-                if tokens is time_tokens
-                else timedelta._fromdatestring
-            )(value)
-            return
 
         weeks_parsed = next(week_tokens, None) != "W"
         time_parsed = next(time_tokens, None) != "H" or next(date_tokens, None) != "Y"
