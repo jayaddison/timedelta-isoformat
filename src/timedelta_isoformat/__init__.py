@@ -92,10 +92,6 @@ class timedelta(datetime.timedelta):
         If no unit designator is found at the end of the duration string, then
         an attempt is made to parse the segment as a fixed-length date or time.
         """
-        date_tokens = iter(("Y", "years", "M", "months", "D", "days"))
-        time_tokens = iter(("H", "hours", "M", "minutes", "S", "seconds"))
-        week_tokens = iter(("W", "weeks"))
-
         assert duration.startswith("P"), "durations must begin with the character 'P'"
         assert not duration.endswith("T"), "no measurements found in time segment"
 
@@ -106,6 +102,10 @@ class timedelta(datetime.timedelta):
                 if segment:
                     yield from parser(segment)
             return
+
+        date_tokens = iter(("Y", "years", "M", "months", "D", "days"))
+        time_tokens = iter(("H", "hours", "M", "minutes", "S", "seconds"))
+        week_tokens = iter(("W", "weeks"))
 
         tokens, value = date_tokens, ""
         for char in duration[1:]:
