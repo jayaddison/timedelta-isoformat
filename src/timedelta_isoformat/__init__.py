@@ -128,10 +128,10 @@ class timedelta(datetime.timedelta):
         assert not duration.endswith("T"), "no measurements found in time segment"
 
         if duration[-1] in _FIELD_CHARACTERS:
-            segments = duration[1:].split("T")
-            parsers = timedelta._fromdatestring, timedelta._fromtimestring
-            for segment, parser in zip(segments, parsers):
-                if segment:
+            parsers = iter((timedelta._fromdatestring, None, timedelta._fromtimestring))
+            for segment in duration[1:].partition("T"):
+                parser = next(parsers, None)
+                if segment and parser:
                     yield from parser(segment)
         else:
             yield from timedelta._fromdesignators(duration)
