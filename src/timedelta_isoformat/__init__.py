@@ -8,10 +8,17 @@ class timedelta(datetime.timedelta):
     """
 
     @staticmethod
-    def _filter(components):
+    def _filter(components, inclusive_range=None):
+        within_range = {
+            None: lambda _quantity, _limit: True,
+            True: float.__le__,
+            False: float.__lt__,
+        }[inclusive_range]
+
         for quantity, unit, limit in components:
-            if limit and quantity > limit:
-                raise ValueError(f"{unit} value of {quantity} exceeds range 0..{limit}")
+            if limit and not within_range(float(quantity), limit):
+                bounds = f"[0..{limit}" + ("]" if inclusive_range else ")")
+                raise ValueError(f"{unit} value of {quantity} exceeds range {bounds}")
             yield unit, quantity
 
     @staticmethod
@@ -51,16 +58,16 @@ class timedelta(datetime.timedelta):
         # HH:MM:SS[.ssssss]
         if separator_positions == [2, 5]:
             seconds_type = float if time_string[8:9] == "." else int
-            yield int(time_string[0:2]), "hours", 23
-            yield int(time_string[3:5]), "minutes", 59
-            yield seconds_type(time_string[6:]), "seconds", 59
+            yield int(time_string[0:2]), "hours", 24
+            yield int(time_string[3:5]), "minutes", 60
+            yield seconds_type(time_string[6:]), "seconds", 60
 
         # HHMMSS[.ssssss]
         elif separator_positions == []:
             seconds_type = float if time_string[6:7] == "." else int
-            yield int(time_string[0:2]), "hours", 23
-            yield int(time_string[2:4]), "minutes", 59
-            yield seconds_type(time_string[4:]), "seconds", 59
+            yield int(time_string[0:2]), "hours", 24
+            yield int(time_string[2:4]), "minutes", 60
+            yield seconds_type(time_string[4:]), "seconds", 60
 
         else:
             raise ValueError(f"unable to parse '{time_string}' into time components")
@@ -91,7 +98,8 @@ class timedelta(datetime.timedelta):
 
             if char == "T" and stream is not time:
                 if value:
-                    measurements.update(cls._filter(cls._fromdatestring(value)))
+                    components = cls._fromdatestring(value)
+                    measurements.update(cls._filter(components, inclusive_range=False))
                     value = ""
                 stream = time
                 continue
@@ -120,7 +128,12 @@ class timedelta(datetime.timedelta):
                 date: cls._fromdatestring,
                 time: cls._fromtimestring,
             }
-            measurements.update(cls._filter(segment_parsers[stream](value)))
+            inclusive_ranges = {
+                date: True,
+                time: False,
+            }
+            components = segment_parsers[stream](value)
+            measurements.update(cls._filter(components, inclusive_ranges[stream]))
 
         if not measurements:
             raise _parse_error("no measurements found")
