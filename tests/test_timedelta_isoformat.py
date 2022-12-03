@@ -3,7 +3,6 @@ import unittest
 
 from timedelta_isoformat import timedelta
 
-
 valid_durations = [
     # empty duration
     ("P0D", timedelta()),
