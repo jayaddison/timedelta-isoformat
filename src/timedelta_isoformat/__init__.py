@@ -11,6 +11,31 @@ class timedelta(datetime.timedelta):
     ISO8601-style parsing and formatting.
     """
 
+    def __new__(cls, *args, **kwargs):
+        positive_args, negative_args, positive_kwargs, negative_kwargs = (
+            (arg >= 0 and arg for arg in args),
+            (arg <= 0 and arg for arg in args),
+            {kw: arg >= 0 and arg for kw, arg in kwargs.items()},
+            {kw: arg <= 0 and arg for kw, arg in kwargs.items()},
+        )
+        positive_distance = datetime.timedelta(*positive_args, **positive_kwargs)
+        negative_distance = datetime.timedelta(*negative_args, **negative_kwargs)
+        distance = abs(positive_distance) - abs(negative_distance)
+        return type(
+            str(cls),
+            (datetime.timedelta,),
+            dict(
+                __repr__=cls.__repr__,
+                __str__=cls.__str__,
+                fromisoformat=cls.fromisoformat,
+                isoformat=cls.isoformat,
+            ),
+        )(
+            days=distance.days,
+            seconds=distance.seconds,
+            microseconds=distance.microseconds,
+        )
+
     def __repr__(self) -> str:
         return f"timedelta_isoformat.{super().__repr__()}"
 
