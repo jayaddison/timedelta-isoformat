@@ -12,6 +12,16 @@ magnitude_expectations = [
     ({"hours": -12, "minutes": 780}, timedelta(hours=1)),
 ]
 
+summation_expectations = [
+    (timedelta(hours=2), timedelta(hours=-2), timedelta()),
+    (timedelta(hours=4), timedelta(hours=-2), timedelta(hours=2)),
+]
+
+subtraction_expectations = [
+    (timedelta(days=5), timedelta(hours=24), timedelta(days=4)),
+    (timedelta(seconds=-1), timedelta(seconds=-1), timedelta(seconds=-2)),
+]
+
 
 class TimedeltaAlgebra(unittest.TestCase):
     """Instance creation testing for :class:`timedelta_isoformat.timedelta`"""
@@ -22,3 +32,15 @@ class TimedeltaAlgebra(unittest.TestCase):
             with self.subTest(constructor_arguments=kwargs):
                 constructed_timedelta = abs(timedelta(**kwargs))
                 self.assertEqual(constructed_timedelta, expected_timedelta)
+
+    def test_instance_summation(self):
+        """Check the results of addition of duration pairs"""
+        for a, b, result in summation_expectations:
+            with self.subTest(a=a, b=b):
+                self.assertEqual(a + b, result)
+
+    def test_instance_subtraction(self):
+        """Check the results of subtraction of duration pairs"""
+        for a, b, result in subtraction_expectations:
+            with self.subTest(a=a, b=b):
+                self.assertEqual(a - b, result)
