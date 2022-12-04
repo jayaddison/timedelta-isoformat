@@ -19,7 +19,7 @@ summation_expectations = [
 
 subtraction_expectations = [
     (timedelta(days=5), timedelta(hours=24), timedelta(days=4)),
-    (timedelta(seconds=-1), timedelta(seconds=-1), timedelta(seconds=-2)),
+    (timedelta(seconds=-1), timedelta(seconds=-1), timedelta(seconds=0)),
 ]
 
 
