@@ -9,14 +9,8 @@ class timedelta(datetime.timedelta):
 
     @staticmethod
     def _filter(components, inclusive_range=None):
-        within_range = {
-            None: lambda _quantity, _limit: True,
-            True: float.__le__,
-            False: float.__lt__,
-        }[inclusive_range]
-
         for quantity, unit, limit in components:
-            if limit and not within_range(float(quantity), limit):
+            if limit and (quantity > limit if inclusive_range else quantity >= limit):
                 bounds = f"[0..{limit}" + ("]" if inclusive_range else ")")
                 raise ValueError(f"{unit} value of {quantity} exceeds range {bounds}")
             yield unit, quantity
