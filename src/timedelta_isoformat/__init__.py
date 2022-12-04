@@ -135,22 +135,18 @@ class timedelta(datetime.timedelta):
         assert weeks_parsed != time_parsed, "cannot mix weeks with other units"
 
     @staticmethod
-    def _to_measurements(components, inclusive_range=True):
-        within_range = {
-            None: lambda _quantity, _limit: True,
-            True: float.__le__,
-            False: float.__lt__,
-        }
-
+    def _to_measurements(components, inclusive_range=None):
         for value, unit, limit in components:
             try:
                 assert value[0].isdigit()
                 quantity = float("+" + value.replace(",", "."))
             except (AssertionError, IndexError, ValueError):
                 raise ValueError(f"unable to parse '{value}' as a positive decimal")
-            if not within_range[inclusive_range](quantity, limit):
+            if limit:
                 bounds = f"[0..{limit}" + ("]" if inclusive_range else ")")
-                raise ValueError(f"{unit} value of {value} exceeds range {bounds}")
+                error_msg = f"{unit} value of {value} exceeds range {bounds}"
+                assert quantity < limit or inclusive_range, error_msg
+                assert quantity <= limit, error_msg
             if quantity:
                 yield unit, quantity
             if unit == "hours" and limit is not None:
