@@ -33,7 +33,7 @@ class timedelta(datetime.timedelta):
             bounds = f"[0..{limit}" + ("]" if inclusive_range else ")")
             error_msg = f"{unit} value of {value} exceeds range {bounds}"
             assert value <= limit if inclusive_range else value < limit, error_msg
-            yield unit, value
+            yield unit, float(value)
 
     @staticmethod
     def _fromdatestring(date_string):
