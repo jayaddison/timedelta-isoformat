@@ -179,8 +179,7 @@ class timedelta(datetime.timedelta):
             v = int(v)
             bounds = f"[0..{limit or v}" + ("]" if inclusive_range else ")")
             error_msg = f"{k} value of {v} exceeds range {bounds}"
-            assert v < (limit or v) or inclusive_range, error_msg
-            assert v <= (limit or v), error_msg
+            assert v <= (limit or v) if inclusive_range else v < (limit or v), error_msg
             results[k] += v
             if k == "hours" and limit is not None:
                 inclusive_range = False
