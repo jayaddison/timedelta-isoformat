@@ -11,7 +11,7 @@ class timedelta(datetime.timedelta):
     """
 
     @staticmethod
-    def _filter(components, inclusive_range=None):
+    def _filter(components, inclusive_range=True):
         for quantity, unit, limit in components:
             if not quantity.isdigit():
                 raise ValueError(f"expected a positive integer within {unit} component")
