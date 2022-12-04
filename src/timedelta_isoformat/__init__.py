@@ -31,7 +31,7 @@ class timedelta(datetime.timedelta):
             error_msg = f"{unit} value of {value} exceeds range {bounds}"
             assert value.isdigit(), f"expected a positive integer {unit} component"
             assert value <= limit if inclusive_range else value < limit, error_msg
-            yield unit, int(value)
+            yield unit, float(value)
 
     @staticmethod
     def _fromdatestring(date_string):
