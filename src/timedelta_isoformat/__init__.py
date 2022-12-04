@@ -13,8 +13,8 @@ class timedelta(datetime.timedelta):
 
     def __new__(cls, *args, **kwargs):
         positive_args, negative_args, positive_kwargs, negative_kwargs = (
-            (arg >= 0 and arg for arg in args),
-            (arg <= 0 and arg for arg in args),
+            [arg >= 0 and arg for arg in args],
+            [arg <= 0 and arg for arg in args],
             {kw: arg >= 0 and arg for kw, arg in kwargs.items()},
             {kw: arg <= 0 and arg for kw, arg in kwargs.items()},
         )
