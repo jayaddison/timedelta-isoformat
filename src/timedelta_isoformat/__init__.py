@@ -176,7 +176,7 @@ class timedelta(datetime.timedelta):
         results = defaultdict(int)
         for v, k, limit in timedelta._fromdurationstring(duration):
             assert v[:1].isdigit(), f"unexpected prefix '{v[:1]}' in {k} value '{v}'"
-            v = int(v)
+            v = float(v)
             bounds = f"[0..{limit or v}" + ("]" if inclusive_range else ")")
             error_msg = f"{k} value of {v} exceeds range {bounds}"
             assert v <= (limit or v) if inclusive_range else v < (limit or v), error_msg
