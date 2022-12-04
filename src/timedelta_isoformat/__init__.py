@@ -18,7 +18,7 @@ class timedelta(datetime.timedelta):
             if quantity > limit if inclusive_range else quantity >= limit:
                 bounds = f"[0..{limit}" + ("]" if inclusive_range else ")")
                 raise ValueError(f"{unit} value of {quantity} exceeds range {bounds}")
-            yield unit, int(quantity)
+            yield unit, float(quantity)
 
     @staticmethod
     def _fromdatestring(date_string):
