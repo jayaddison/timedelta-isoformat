@@ -30,8 +30,7 @@ class timedelta(datetime.timedelta):
             bounds = f"[0..{limit}" + ("]" if inclusive_range else ")")
             error_msg = f"{unit} value of {value} exceeds range {bounds}"
             assert value.isdigit(), f"expected a positive integer {unit} component"
-            assert value < limit or inclusive_range, error_msg
-            assert value <= limit, error_msg
+            assert value <= limit if inclusive_range else value < limit, error_msg
             yield unit, int(value)
 
     @staticmethod
