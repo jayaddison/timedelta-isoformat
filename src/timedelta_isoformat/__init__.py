@@ -13,10 +13,10 @@ class timedelta(datetime.timedelta):
 
     def __new__(cls, *args, **kwargs):
         positive_args, negative_args, positive_kwargs, negative_kwargs = (
-            [arg >= 0 and arg for arg in args],
-            [arg <= 0 and arg for arg in args],
-            {kw: arg >= 0 and arg for kw, arg in kwargs.items()},
-            {kw: arg <= 0 and arg for kw, arg in kwargs.items()},
+            [arg if arg >= 0 else 0 for arg in args],
+            [arg if arg <= 0 else 0 for arg in args],
+            {kw: arg if arg >= 0 else 0 for kw, arg in kwargs.items()},
+            {kw: arg if arg <= 0 else 0 for kw, arg in kwargs.items()},
         )
         positive_distance = datetime.timedelta(*positive_args, **positive_kwargs)
         negative_distance = datetime.timedelta(*negative_args, **negative_kwargs)
