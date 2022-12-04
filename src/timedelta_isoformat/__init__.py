@@ -28,7 +28,7 @@ class timedelta(datetime.timedelta):
     def _filter(components, inclusive_range=True):
         for value, unit, limit in components:
             assert value.isdigit(), f"expected a positive integer {unit} component"
-            value = int(value)
+            value = float(value)
             limit = limit or value
             bounds = f"[0..{limit}" + ("]" if inclusive_range else ")")
             error_msg = f"{unit} value of {value} exceeds range {bounds}"
