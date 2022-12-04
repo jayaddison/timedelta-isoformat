@@ -181,8 +181,8 @@ class timedelta(datetime.timedelta):
         days = self.days
         seconds = self.seconds
 
-        minutes, seconds = int(seconds / 60), self.seconds % 60
-        hours, minutes = int(minutes / 60), minutes % 60
+        minutes, seconds = divmod(seconds, 60)
+        hours, minutes = divmod(minutes, 60)
         if self.microseconds:
             seconds += self.microseconds / 10 ** 6
 
