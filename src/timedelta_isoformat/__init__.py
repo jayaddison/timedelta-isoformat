@@ -12,16 +12,10 @@ class timedelta(datetime.timedelta):
 
     @staticmethod
     def _filter(components, inclusive_range=None):
-        within_range = {
-            None: lambda _quantity, _limit: True,
-            True: str.__le__,
-            False: str.__lt__,
-        }[inclusive_range]
-
         for quantity, unit, limit in components:
             if not quantity.isdigit():
                 raise ValueError(f"expected a positive integer within {unit} component")
-            if not within_range(quantity, limit):
+            if quantity > limit if inclusive_range else quantity >= limit:
                 bounds = f"[0..{limit}" + ("]" if inclusive_range else ")")
                 raise ValueError(f"{unit} value of {quantity} exceeds range {bounds}")
             yield unit, int(quantity)
