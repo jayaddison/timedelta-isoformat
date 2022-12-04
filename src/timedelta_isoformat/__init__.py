@@ -32,8 +32,7 @@ class timedelta(datetime.timedelta):
             limit = limit or value
             bounds = f"[0..{limit}" + ("]" if inclusive_range else ")")
             error_msg = f"{unit} value of {value} exceeds range {bounds}"
-            assert value < limit or inclusive_range, error_msg
-            assert value <= limit, error_msg
+            assert value <= limit if inclusive_range else value < limit, error_msg
             yield unit, value
 
     @staticmethod
