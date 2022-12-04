@@ -149,7 +149,7 @@ class timedelta(datetime.timedelta):
                 quantity = float("+" + value.replace(",", "."))
             except (AssertionError, IndexError, ValueError):
                 raise ValueError(f"unable to parse '{value}' as a positive decimal")
-            if limit and quantity >= limit + inclusive_range:
+            if limit and (quantity > limit if inclusive_range else quantity >= limit):
                 bounds = f"[0..{limit}" + ("]" if inclusive_range else ")")
                 raise ValueError(f"{unit} value of {value} exceeds range {bounds}")
             if quantity:
