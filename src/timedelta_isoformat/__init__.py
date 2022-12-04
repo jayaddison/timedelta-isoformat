@@ -135,7 +135,7 @@ class timedelta(datetime.timedelta):
         assert weeks_parsed != time_parsed, "cannot mix weeks with other units"
 
     @staticmethod
-    def _to_measurements(components, inclusive_range=None):
+    def _to_measurements(components, inclusive_range=True):
         for value, unit, limit in components:
             try:
                 assert value[0].isdigit()
