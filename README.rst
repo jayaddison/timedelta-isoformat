@@ -35,3 +35,4 @@ Some of the significant design decisions made within this library are:
 * Values in parsed duration strings must be zero-or-greater (``PT1H`` is considered valid; ``P-2D`` is not)
 * Empty time segments at the end of duration strings are allowed (``P1DT`` is considered valid)
 * Measurement limits are checked within date/time segments (``PT20:59:01`` is within limits; ``PT20:60:01`` is not)
+* Measurement values are parsed into floating-point values (at the time of writing, precise procedural algorithms to parse base-ten strings into integers are not practical -- or not widely known)
