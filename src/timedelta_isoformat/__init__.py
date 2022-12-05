@@ -59,8 +59,7 @@ class timedelta(datetime.timedelta):
         if self.microseconds:
             seconds += self.microseconds / 1_000_000  # type: ignore
 
-        result = "P"
-        result += f"{self.days}D" if self.days else ""
+        result = f"P{self.days}D" if self.days else "P"
         if hours or minutes or seconds:
             result += "T"
             result += f"{hours}H" if hours else ""
