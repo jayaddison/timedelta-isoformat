@@ -190,22 +190,10 @@ class TimedeltaISOFormat(unittest.TestCase):
             repr(year_month_timedelta),
         )
 
-    class YearMonthUnsupportedTimedelta(timedelta):
-        """Subclass of :py:class:`timedelta_isoformat.timedelta` for exception tests"""
-
-        def __new__(cls, *args, **kwargs):
-            if "years" in kwargs or "months" in kwargs:
-                raise TypeError
-            # days, seconds, microseconds, milliseconds, minutes, hours, weeks
-            if len(args) > 7:
-                raise TypeError
-            return super(*args)
-
     def test_year_month_support_handling(self):
         """Parsing of duration strings containing zero-value year-or-month components"""
-        with self.assertRaises(ValueError) as raised:
-            self.YearMonthUnsupportedTimedelta.fromisoformat("P1Y0D")
-        self.assertIn("year and month fields are not supported", str(raised.exception))
+        with self.assertRaises(TypeError):
+            timedelta.fromisoformat("P1Y0D")
 
     def test_minimal_precision(self):
         """Ensure that the smallest py3.9 datetime.timedelta is formatted correctly"""

@@ -150,19 +150,10 @@ class timedelta(datetime.timedelta):
 
         :raises: `ValueError` with an explanatory message when parsing fails
         """
-
-        def _parse_error(reason):
-            return ValueError(f"could not parse duration '{duration}': {reason}")
-
         try:
-            measurements = dict(cls._fromdurationstring(duration))
-            return cls(**measurements)
+            return cls(**dict(cls._fromdurationstring(duration)))
         except (AssertionError, ValueError) as exc:
-            raise _parse_error(exc) from exc
-        except TypeError as exc:
-            if measurements.get("years") or measurements.get("months"):
-                raise _parse_error("year and month fields are not supported") from exc
-            raise exc
+            raise ValueError(f"could not parse duration '{duration}': {exc}")
 
     def isoformat(self):
         """Produce an ISO8601-style representation of this :py:class:`timedelta`"""
