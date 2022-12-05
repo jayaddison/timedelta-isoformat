@@ -174,7 +174,7 @@ class TimedeltaISOFormat(unittest.TestCase):
             return f"YearMonthTimedelta({arguments})"
 
         def isoformat(self):
-            duration = super(self.__class__, self).isoformat().lstrip("P")
+            duration = timedelta.isoformat(self).lstrip("P")
             years_and_months = "P"
             years_and_months += f"{self.years}Y" if self.years else ""
             years_and_months += f"{self.months}M" if self.months else ""
@@ -185,7 +185,6 @@ class TimedeltaISOFormat(unittest.TestCase):
         """Formatting of timedelta objects with year-or-month attributes"""
         year_month_timedelta = self.YearMonthTimedelta(years=1, months=6, hours=4)
         self.assertEqual("P1Y6MT4H", year_month_timedelta.isoformat())
-        self.assertEqual("P1Y6MT4H", str(year_month_timedelta))
         self.assertEqual(
             "YearMonthTimedelta(years=1, months=6, seconds=14400)",
             repr(year_month_timedelta),

@@ -20,9 +20,6 @@ class timedelta(datetime.timedelta):
         arguments = ", ".join(f"{k}={v}" for k, v in fields.items() if v)
         return f"timedelta_isoformat.timedelta({arguments})"
 
-    def __str__(self):
-        return self.isoformat()
-
     @staticmethod
     def _fromdatestring(date_string):
         delimiters = [i for i, c in enumerate(date_string[0:10]) if c == "-"]
