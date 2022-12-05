@@ -194,8 +194,9 @@ class timedelta(datetime.timedelta):
         result += f"{years}Y" if years else ""
         result += f"{months}M" if months else ""
         result += f"{days}D" if days else ""
-        result += "T" if hours or minutes or seconds else ""
-        result += f"{hours}H" if hours else ""
-        result += f"{minutes}M" if minutes else ""
-        result += f"{seconds:.6f}".rstrip("0").rstrip(".") + "S" if seconds else ""
+        if hours or minutes or seconds:
+            result += "T"
+            result += f"{hours}H" if hours else ""
+            result += f"{minutes}M" if minutes else ""
+            result += f"{seconds:.6f}".rstrip("0").rstrip(".") + "S" if seconds else ""
         return result
