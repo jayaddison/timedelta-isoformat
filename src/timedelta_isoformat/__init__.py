@@ -70,16 +70,15 @@ class timedelta(datetime.timedelta):
         if not self:
             return "P0D"
 
-        years, months, days = 0, 0, self.days
-        hours, minutes, seconds = 0, 0, self.seconds
+        days = self.days
+        seconds = self.seconds
+
         minutes, seconds = divmod(seconds, 60)
         hours, minutes = divmod(minutes, 60)
         if self.microseconds:
             seconds += self.microseconds / 1_000_000  # type: ignore
 
         result = "P"
-        result += f"{years}Y" if years else ""
-        result += f"{months}M" if months else ""
         result += f"{days}D" if days else ""
         if hours or minutes or seconds:
             result += "T"
