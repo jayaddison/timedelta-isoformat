@@ -175,12 +175,23 @@ class timedelta(datetime.timedelta):
         if self.days % 7 == 0 and self.seconds == 0 and self.microseconds == 0:
             return f"P{int(self.days / 7)}W"
 
+        days = self.days
         minutes, seconds = divmod(self.seconds, 60)
         hours, minutes = divmod(minutes, 60)
         if self.microseconds:
             seconds += self.microseconds / 1_000_000  # type: ignore
 
-        result = f"P{self.days}D" if self.days else "P"
+        if hours and days:
+            hours += days * 24
+            days %= 1
+        if minutes and hours:
+            minutes += hours * 60
+            hours %= 1
+        if seconds and minutes:
+            seconds += minutes * 60
+            minutes %= 1
+
+        result = f"P{days}D" if days else "P"
         if hours or minutes or seconds:
             result += "T"
             result += f"{hours}H" if hours else ""
