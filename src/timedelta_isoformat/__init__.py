@@ -12,13 +12,7 @@ class timedelta(datetime.timedelta):
     """
 
     def __repr__(self):
-        fields = {
-            "days": self.days,
-            "seconds": self.seconds,
-            "microseconds": self.microseconds,
-        }
-        arguments = ", ".join(f"{k}={v}" for k, v in fields.items() if v)
-        return f"timedelta_isoformat.timedelta({arguments})"
+        return f"timedelta_isoformat.{super().__repr__()}"
 
     @staticmethod
     def _fromdatestring(date_string):
