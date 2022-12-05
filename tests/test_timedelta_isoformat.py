@@ -153,8 +153,32 @@ class TimedeltaISOFormat(unittest.TestCase):
         """Subclass of :py:class:`timedelta_isoformat.timedelta` for year/month tests"""
 
         def __new__(cls, *args, months=0, years=0, **kwargs):
-            typ = type(str(cls), (timedelta,), dict(months=months, years=years))
+            attribs = dict(
+                __repr__=cls.__repr__,
+                isoformat=cls.isoformat,
+                months=months,
+                years=years,
+            )
+            typ = type(str(cls), (timedelta,), attribs)
             return typ(*args, **kwargs)
+
+        def __repr__(self):
+            fields = {
+                "years": getattr(self, "years", 0),
+                "months": getattr(self, "months", 0),
+                "days": self.days,
+                "seconds": self.seconds,
+                "microseconds": self.microseconds,
+            }
+            arguments = ", ".join(f"{k}={v}" for k, v in fields.items() if v)
+            return f"YearMonthTimedelta({arguments})"
+
+        def isoformat(self):
+            duration = super(self.__class__, self).isoformat().lstrip("P")
+            years_and_months = "P"
+            years_and_months += f"{self.years}Y" if self.years else ""
+            years_and_months += f"{self.months}M" if self.months else ""
+            return f"{years_and_months}{duration}"
 
     def test_year_month_formatting(self):
         """Formatting of timedelta objects with year-or-month attributes"""
@@ -162,7 +186,7 @@ class TimedeltaISOFormat(unittest.TestCase):
         self.assertEqual("P1Y6MT4H", year_month_timedelta.isoformat())
         self.assertEqual("P1Y6MT4H", str(year_month_timedelta))
         self.assertEqual(
-            "timedelta_isoformat.timedelta(years=1, months=6, seconds=14400)",
+            "YearMonthTimedelta(years=1, months=6, seconds=14400)",
             repr(year_month_timedelta),
         )
 

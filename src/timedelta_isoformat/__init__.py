@@ -13,8 +13,6 @@ class timedelta(datetime.timedelta):
 
     def __repr__(self):
         fields = {
-            "years": getattr(self, "years", 0),
-            "months": getattr(self, "months", 0),
             "days": self.days,
             "seconds": self.seconds,
             "microseconds": self.microseconds,
@@ -180,8 +178,6 @@ class timedelta(datetime.timedelta):
         if not self:
             return "P0D"
 
-        years = getattr(self, "years", 0)
-        months = getattr(self, "months", 0)
         days = self.days
         seconds = self.seconds
 
@@ -191,8 +187,6 @@ class timedelta(datetime.timedelta):
             seconds += self.microseconds / 10 ** 6
 
         result = "P"
-        result += f"{years}Y" if years else ""
-        result += f"{months}M" if months else ""
         result += f"{days}D" if days else ""
         if hours or minutes or seconds:
             result += "T"
