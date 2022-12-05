@@ -13,6 +13,7 @@ valid_durations = [
     ("P3DT1H", timedelta(days=3, hours=1)),
     ("P0DT1H20M", timedelta(hours=1, minutes=20)),
     ("P0Y0DT1H20M", timedelta(hours=1, minutes=20)),
+    ("P1Y5M3D", timedelta(years=1, months=5, days=3)),
     # week durations
     ("P1W", timedelta(days=7)),
     ("P3W", timedelta(days=21)),
@@ -33,6 +34,7 @@ valid_durations = [
     ("P00000004", timedelta(days=4)),
     ("P0000-00-05", timedelta(days=5)),
     ("P0000-00-00T01:02:03", timedelta(hours=1, minutes=2, seconds=3)),
+    ("P2000-06-15T00:00:30", timedelta(years=2000, months=6, days=15, seconds=30)),
     ("PT040506", timedelta(hours=4, minutes=5, seconds=6)),
     ("PT04:05:06", timedelta(hours=4, minutes=5, seconds=6)),
     ("PT00:00:00.001", timedelta(microseconds=1000)),
@@ -183,7 +185,7 @@ class TimedeltaISOFormat(unittest.TestCase):
     @unittest.skip("not currently supported")
     def test_year_month_formatting(self):
         """Formatting of timedelta objects with year-or-month attributes"""
-        year_month_timedelta = self.YearMonthTimedelta(years=1, months=6, hours=4)
+        year_month_timedelta = timedelta(years=1, months=6, hours=4)
         self.assertEqual("P1Y6MT4H", year_month_timedelta.isoformat())
         self.assertEqual(
             "YearMonthTimedelta(years=1, months=6, seconds=14400)",

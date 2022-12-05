@@ -11,8 +11,33 @@ class timedelta(datetime.timedelta):
     ISO8601-style parsing and formatting.
     """
 
+    def __new__(cls, *args, years=0, months=0, **kwargs):
+        return type(
+            str(cls),
+            (datetime.timedelta,),
+            dict(
+                __repr__=cls.__repr__,
+                __str__=cls.__str__,
+                _months=int(months),
+                _years=int(years),
+                fromisoformat=cls.fromisoformat,
+                isoformat=cls.isoformat,
+            ),
+        )(*args, **kwargs)
+
     def __repr__(self):
-        return f"timedelta_isoformat.{super().__repr__()}"
+        fields = {
+            "years": self._years,
+            "months": self._months,
+            "days": self.days,
+            "seconds": self.seconds,
+            "microseconds": self.microseconds,
+        }
+        arguments = ", ".join(f"{k}={v}" for k, v in fields.items() if v)
+        return f"timedelta_isoformat.timedelta({arguments})"
+
+    def __str__(self):
+        return self.isoformat()
 
     @staticmethod
     def _fromdatestring(date_string):
@@ -169,12 +194,20 @@ class timedelta(datetime.timedelta):
         if not self:
             return "P0D"
 
-        minutes, seconds = divmod(self.seconds, 60)
+        years = self._years
+        months = self._months
+        days = self.days
+        seconds = self.seconds
+
+        minutes, seconds = divmod(seconds, 60)
         hours, minutes = divmod(minutes, 60)
         if self.microseconds:
             seconds += self.microseconds / 10 ** 6
 
-        result = f"P{self.days}D" if self.days else "P"
+        result = "P"
+        result += f"{years}Y" if years else ""
+        result += f"{months}M" if months else ""
+        result += f"{days}D" if days else ""
         if hours or minutes or seconds:
             result += "T"
             result += f"{hours}H" if hours else ""
