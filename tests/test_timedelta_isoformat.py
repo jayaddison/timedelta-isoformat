@@ -127,6 +127,12 @@ format_expectations = [
     (timedelta(seconds=5400), "PT90M"),
     (timedelta(hours=20, minutes=5), "PT1205M"),
     (timedelta(days=1.5, minutes=4000), "PT6160M"),
+    (timedelta(hours=12, minutes=30, seconds=59), "PT45059S"),
+    (timedelta(hours=12, minutes=30, seconds=60), "PT751M"),
+    (timedelta(hours=12, minutes=31), "PT751M"),
+    (timedelta(days=12, hours=31, seconds=500), "PT1148900S"),
+    (timedelta(days=12, hours=32), "PT320H"),
+    (timedelta(seconds=86400), "P1D"),
 ]
 
 
