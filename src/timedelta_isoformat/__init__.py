@@ -169,16 +169,13 @@ class timedelta(datetime.timedelta):
         if not self:
             return "P0D"
 
-        days = self.days
-        seconds = self.seconds
-
-        minutes, seconds = divmod(seconds, 60)
+        minutes, seconds = divmod(self.seconds, 60)
         hours, minutes = divmod(minutes, 60)
         if self.microseconds:
             seconds += self.microseconds / 10 ** 6
 
         result = "P"
-        result += f"{days}D" if days else ""
+        result += f"{self.days}D" if self.days else ""
         if hours or minutes or seconds:
             result += "T"
             result += f"{hours}H" if hours else ""
