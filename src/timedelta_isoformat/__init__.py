@@ -136,8 +136,9 @@ class timedelta(datetime.timedelta):
             try:
                 assert value[0].isdigit()
                 quantity = float("+" + value.replace(",", "."))
-            except (AssertionError, IndexError, ValueError):
-                raise ValueError(f"unable to parse '{value}' as a positive decimal")
+            except (AssertionError, IndexError, ValueError) as exc:
+                msg = f"unable to parse '{value}' as a positive decimal"
+                raise ValueError(msg) from exc
             if limit and (quantity > limit if inclusive_range else quantity >= limit):
                 bounds = f"[0..{limit}" + ("]" if inclusive_range else ")")
                 raise ValueError(f"{unit} value of {value} exceeds range {bounds}")
@@ -153,7 +154,7 @@ class timedelta(datetime.timedelta):
         try:
             return cls(**dict(cls._fromdurationstring(duration)))
         except (AssertionError, ValueError) as exc:
-            raise ValueError(f"could not parse duration '{duration}': {exc}")
+            raise ValueError(f"could not parse duration '{duration}': {exc}") from exc
 
     def isoformat(self):
         """Produce an ISO8601-style representation of this :py:class:`timedelta`"""
