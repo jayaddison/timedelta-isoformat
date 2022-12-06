@@ -55,7 +55,7 @@ class timedelta(datetime.timedelta):
             "microseconds": self.microseconds,
         }
         arguments = ", ".join(f"{k}={v}" for k, v in fields.items() if v)
-        return f"timedelta_isoformat.timedelta({arguments})"
+        return ("" if self.positive else "-") + f"timedelta_isoformat.timedelta({arguments})"
 
     def __str__(self) -> str:
         return ("" if self.positive else "-") + self.isoformat()
