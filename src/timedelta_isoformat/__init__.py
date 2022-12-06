@@ -44,7 +44,7 @@ class timedelta(datetime.timedelta):
         )
 
     def __repr__(self):
-        return f"timedelta_isoformat.{super().__repr__()}"
+        return ("" if self.positive else "-") + f"timedelta_isoformat.timedelta({arguments})"
 
     def __str__(self):
         return ("" if self.positive else "-") + self.isoformat()
