@@ -106,7 +106,7 @@ class timedelta(datetime.timedelta):
 
     @staticmethod
     def _fromdurationstring(duration):
-        """Selects and runs an approprate parser for ISO-8601 duration strings
+        """Selects and runs an appropriate parser for ISO-8601 duration strings
 
         The format of these strings is composed of two segments; date measurements
         are situated between the 'P' and 'T' characters, and time measurements are
