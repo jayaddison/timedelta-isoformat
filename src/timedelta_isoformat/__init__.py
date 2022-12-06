@@ -14,30 +14,58 @@ class timedelta(datetime.timedelta):
     def __new__(cls, *args, **kwargs):
         positive_args, negative_args, positive_kwargs, negative_kwargs = (
             [arg if arg >= 0 else 0 for arg in args],
-            [arg if arg <= 0 else 0 for arg in args],
+            [-arg if arg <= 0 else 0 for arg in args],
             {kw: arg if arg >= 0 else 0 for kw, arg in kwargs.items()},
-            {kw: arg if arg <= 0 else 0 for kw, arg in kwargs.items()},
+            {kw: -arg if arg <= 0 else 0 for kw, arg in kwargs.items()},
         )
         positive_distance = datetime.timedelta(*positive_args, **positive_kwargs)
         negative_distance = datetime.timedelta(*negative_args, **negative_kwargs)
-        distance = abs(positive_distance) - abs(negative_distance)
+        distance = positive_distance - negative_distance if positive_distance > negative_distance else negative_distance - positive_distance
         return type(
             str(cls),
             (datetime.timedelta,),
             dict(
                 __repr__=cls.__repr__,
                 __str__=cls.__str__,
+                __to_base__=cls.__to_base__,
+                __eq__=cls.__eq__,
+                __add__=cls.__add__,
+                __radd__=cls.__radd__,
+                __sub__=cls.__sub__,
+                __rsub__=cls.__rsub__,
                 fromisoformat=cls.fromisoformat,
                 isoformat=cls.isoformat,
+                positive=positive_distance > negative_distance,
             ),
         )(
-            days=distance.days,
-            seconds=distance.seconds,
-            microseconds=distance.microseconds,
+            days=abs(distance.days),
+            seconds=abs(distance.seconds),
+            microseconds=abs(distance.microseconds),
         )
 
     def __repr__(self) -> str:
         return f"timedelta_isoformat.{super().__repr__()}"
+
+    def __str__(self):
+        return ("" if self.positive else "-") + self.isoformat()
+
+    def __to_base__(self):
+        return (1 if self.positive else -1) * datetime.timedelta(days=self.days, seconds=self.seconds, microseconds=self.microseconds)
+
+    def __eq__(self, other):
+        return self.__to_base__() == other
+
+    def __add__(self, other):
+        return self.__to_base__() + other
+
+    def __radd__(self, other):
+        return other + self.__to_base__()
+
+    def __rsub__(self, other):
+        return other - self.__to_base__()
+
+    def __sub__(self, other):
+        return self.__to_base__() - other
 
     @staticmethod
     def _from_date(segment: str) -> Iterable[Tuple[str, str, Optional[int]]]:
