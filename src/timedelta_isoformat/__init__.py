@@ -156,7 +156,7 @@ class timedelta(datetime.timedelta):
         :raises: `ValueError` with an explanatory message when parsing fails
         """
         try:
-            return cls(**dict(cls._fromdurationstring(duration)))  # type: ignore
+            return cls(**dict(cls._fromdurationstring(duration)))
         except (AssertionError, ValueError) as exc:
             raise ValueError(f"could not parse duration '{duration}': {exc}") from exc
 
