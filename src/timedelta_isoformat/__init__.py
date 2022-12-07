@@ -2,8 +2,7 @@
 import datetime
 
 _DIGITS, _DECIMAL_SIGNS = frozenset("0123456789"), frozenset(",.")
-_DATE_SEPARATORS, _TIME_SEPARATORS = frozenset("-"), frozenset(":")
-_FORMAT = _DIGITS | _DECIMAL_SIGNS | _DATE_SEPARATORS | _TIME_SEPARATORS
+_FORMAT = _DIGITS | _DECIMAL_SIGNS
 
 
 class timedelta(datetime.timedelta):
