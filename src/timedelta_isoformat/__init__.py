@@ -30,12 +30,12 @@ class timedelta(datetime.timedelta):
             yield date_string[8:10], "days", 31
 
         # YYYYDDD
-        elif date_length == 7 and delimiters == []:
+        elif date_length == 7 and not delimiters:
             yield date_string[0:4], "years", None
             yield date_string[4:7], "days", 366
 
         # YYYYMMDD
-        elif date_length == 8 and delimiters == []:
+        elif date_length == 8 and not delimiters:
             yield date_string[0:4], "years", None
             yield date_string[4:6], "months", 12
             yield date_string[6:8], "days", 31
@@ -46,7 +46,7 @@ class timedelta(datetime.timedelta):
     @staticmethod
     def _fromtimestring(time_string):
         delimiters = [i for i, c in enumerate(time_string[0:15]) if c == ":"]
-        decimal = time_string[6:7] if delimiters == [] else time_string[8:9]
+        decimal = time_string[8:9] if delimiters else time_string[6:7]
         if decimal and decimal not in _DECIMAL_SIGNS:
             raise ValueError(f"unexpected character '{decimal}'")
 
@@ -57,7 +57,7 @@ class timedelta(datetime.timedelta):
             yield time_string[6:15], "seconds", 60
 
         # HHMMSS[.ssssss]
-        elif delimiters == []:
+        elif not delimiters:
             yield time_string[0:2], "hours", 24
             yield time_string[2:4], "minutes", 60
             yield time_string[4:13], "seconds", 60
