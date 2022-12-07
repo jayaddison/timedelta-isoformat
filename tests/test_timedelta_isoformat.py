@@ -1,4 +1,5 @@
 """Test coverage for :py:module:`timedelta_isoformat`"""
+from typing import Union
 import unittest
 
 from timedelta_isoformat import timedelta
@@ -126,14 +127,14 @@ format_expectations = [
 class TimedeltaISOFormat(unittest.TestCase):
     """Functional testing for :class:`timedelta_isoformat.timedelta`"""
 
-    def test_fromisoformat_valid(self):
+    def test_fromisoformat_valid(self) -> None:
         """Parsing cases that should all succeed"""
         for duration_string, expected_timedelta in valid_durations:
             with self.subTest(duration_string=duration_string):
                 parsed_timedelta = timedelta.fromisoformat(duration_string)
                 self.assertEqual(parsed_timedelta, expected_timedelta)
 
-    def test_fromisoformat_invalid(self):
+    def test_fromisoformat_invalid(self) -> None:
         """Parsing cases that should all fail"""
         for duration_string, expected_reason in invalid_durations:
             with self.subTest(duration_string=duration_string):
@@ -141,7 +142,7 @@ class TimedeltaISOFormat(unittest.TestCase):
                     timedelta.fromisoformat(duration_string)
                 self.assertIn(expected_reason, str(context.exception))
 
-    def test_roundtrip_valid(self):
+    def test_roundtrip_valid(self) -> None:
         """Round-trip from valid duration to string and back maintains the same value"""
         for _, valid_timedelta in valid_durations:
             with self.subTest(valid_timedelta=valid_timedelta):
@@ -152,7 +153,13 @@ class TimedeltaISOFormat(unittest.TestCase):
     class YearMonthTimedelta(timedelta):
         """Subclass of :py:class:`timedelta_isoformat.timedelta` for year/month tests"""
 
-        def __new__(cls, *args, months=0, years=0, **kwargs):
+        def __new__(
+            cls,
+            *args: Union[float, int],
+            months: Union[float, int],
+            years: Union[float, int],
+            **kwargs: Union[float, int],
+        ) -> "TimedeltaISOFormat.YearMonthTimedelta":
             attribs = dict(
                 __repr__=cls.__repr__,
                 isoformat=cls.isoformat,
@@ -160,9 +167,9 @@ class TimedeltaISOFormat(unittest.TestCase):
                 years=years,
             )
             typ = type(str(cls), (timedelta,), attribs)
-            return typ(*args, **kwargs)
+            return typ(*args, **kwargs)  # type: ignore
 
-        def __repr__(self):
+        def __repr__(self) -> str:
             fields = {
                 "years": getattr(self, "years", 0),
                 "months": getattr(self, "months", 0),
@@ -173,15 +180,15 @@ class TimedeltaISOFormat(unittest.TestCase):
             arguments = ", ".join(f"{k}={v}" for k, v in fields.items() if v)
             return f"YearMonthTimedelta({arguments})"
 
-        def isoformat(self):
+        def isoformat(self) -> str:
             duration = timedelta.isoformat(self).lstrip("P")
             years_and_months = "P"
-            years_and_months += f"{self.years}Y" if self.years else ""
-            years_and_months += f"{self.months}M" if self.months else ""
+            years_and_months += f"{self.years}Y" if self.years else ""  # type: ignore
+            years_and_months += f"{self.months}M" if self.months else ""  # type: ignore
             return f"{years_and_months}{duration}"
 
     @unittest.skip("not currently supported")
-    def test_year_month_formatting(self):
+    def test_year_month_formatting(self) -> None:
         """Formatting of timedelta objects with year-or-month attributes"""
         year_month_timedelta = self.YearMonthTimedelta(hours=4, months=6, years=1)
         self.assertEqual("P1Y6MT4H", year_month_timedelta.isoformat())
@@ -190,17 +197,17 @@ class TimedeltaISOFormat(unittest.TestCase):
             repr(year_month_timedelta),
         )
 
-    def test_year_month_support_handling(self):
+    def test_year_month_support_handling(self) -> None:
         """Parsing of duration strings containing zero-value year-or-month components"""
         with self.assertRaises(TypeError):
             timedelta.fromisoformat("P1Y0D")
 
-    def test_minimal_precision(self):
+    def test_minimal_precision(self) -> None:
         """Ensure that the smallest py3.9 datetime.timedelta is formatted correctly"""
         microsecond = timedelta.fromisoformat("PT0.000001S")
         self.assertEqual("PT0.000001S", microsecond.isoformat())
 
-    def test_formatting_precision(self):
+    def test_formatting_precision(self) -> None:
         """Formatting for decimal fields"""
         for sample_timedelta, expected_format in format_expectations:
             with self.subTest(sample_timedelta=sample_timedelta):

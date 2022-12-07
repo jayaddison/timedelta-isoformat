@@ -1,5 +1,6 @@
 """Supplemental ISO8601 duration format support for :py:class:`datetime.timedelta`"""
 import datetime
+from typing import Iterable, Optional, Tuple, Type
 
 _DIGITS, _DECIMAL_SIGNS = frozenset("0123456789"), frozenset(",.")
 _FORMAT = _DIGITS | _DECIMAL_SIGNS
@@ -10,11 +11,11 @@ class timedelta(datetime.timedelta):
     ISO8601-style parsing and formatting.
     """
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"timedelta_isoformat.{super().__repr__()}"
 
     @staticmethod
-    def _fromdatestring(date_string):
+    def _fromdatestring(date_string: str) -> Iterable[Tuple[str, str, Optional[int]]]:
         delimiters = [i for i, c in enumerate(date_string[0:10]) if c == "-"]
         date_length = len(date_string)
 
@@ -44,7 +45,7 @@ class timedelta(datetime.timedelta):
             raise ValueError(f"unable to parse '{date_string}' into date components")
 
     @staticmethod
-    def _fromtimestring(time_string):
+    def _fromtimestring(time_string: str) -> Iterable[Tuple[str, str, Optional[int]]]:
         delimiters = [i for i, c in enumerate(time_string[0:15]) if c == ":"]
         decimal = time_string[8:9] if delimiters else time_string[6:7]
         if decimal and decimal not in _DECIMAL_SIGNS:
@@ -66,7 +67,7 @@ class timedelta(datetime.timedelta):
             raise ValueError(f"unable to parse '{time_string}' into time components")
 
     @staticmethod
-    def _fromdesignators(duration):
+    def _fromdesignators(duration: str) -> Iterable[Tuple[str, str, Optional[int]]]:
         """Parser for designator-separated ISO-8601 duration strings
 
         The code sweeps through the input exactly once, expecting to find measurements
@@ -107,7 +108,7 @@ class timedelta(datetime.timedelta):
         assert weeks_parsed != time_parsed, "cannot mix weeks with other units"
 
     @staticmethod
-    def _fromdurationstring(duration):
+    def _fromdurationstring(duration: str) -> Iterable[Tuple[str, float]]:
         """Selects and runs an appropriate parser for ISO-8601 duration strings
 
         The format of these strings is composed of two segments; date measurements
@@ -133,7 +134,10 @@ class timedelta(datetime.timedelta):
             yield from timedelta._to_measurements(components, inclusive_range=False)
 
     @staticmethod
-    def _to_measurements(components, inclusive_range=True):
+    def _to_measurements(
+        components: Iterable[Tuple[str, str, Optional[int]]],
+        inclusive_range: bool = True,
+    ) -> Iterable[Tuple[str, float]]:
         for value, unit, limit in components:
             try:
                 assert value[0].isdigit()
@@ -149,17 +153,17 @@ class timedelta(datetime.timedelta):
             yield unit, quantity
 
     @classmethod
-    def fromisoformat(cls, duration):
+    def fromisoformat(cls: Type["timedelta"], duration: str) -> "timedelta":
         """Parses an input string and returns a :py:class:`timedelta` result
 
         :raises: `ValueError` with an explanatory message when parsing fails
         """
         try:
-            return cls(**dict(cls._fromdurationstring(duration)))
+            return cls(**dict(cls._fromdurationstring(duration)))  # type: ignore
         except (AssertionError, ValueError) as exc:
             raise ValueError(f"could not parse duration '{duration}': {exc}") from exc
 
-    def isoformat(self):
+    def isoformat(self) -> str:
         """Produce an ISO8601-style representation of this :py:class:`timedelta`"""
         if not self:
             return "P0D"
@@ -167,7 +171,7 @@ class timedelta(datetime.timedelta):
         minutes, seconds = divmod(self.seconds, 60)
         hours, minutes = divmod(minutes, 60)
         if self.microseconds:
-            seconds += self.microseconds / 10 ** 6
+            seconds += self.microseconds / 10 ** 6  # type: ignore
 
         result = f"P{self.days}D" if self.days else "P"
         if hours or minutes or seconds:

@@ -38,12 +38,12 @@ valid_durations = [
 class TimedeltaISOFormatBenchmark(unittest.TestCase):
     """Benchmark testing for :class:`timedelta_isoformat.timedelta`"""
 
-    def test_fromisoformat_benchmark(self):
+    def test_fromisoformat_benchmark(self) -> None:
         """Benchmark the fromisoformat parser method"""
         for duration_string, _ in valid_durations * 5000:
             timedelta.fromisoformat(duration_string)
 
-    def test_isoformat_benchmark(self):
+    def test_isoformat_benchmark(self) -> None:
         """Benchmark the isoformat formatting method"""
         for _, valid_timedelta in valid_durations * 10000:
             valid_timedelta.isoformat()
