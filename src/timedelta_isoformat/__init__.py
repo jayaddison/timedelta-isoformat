@@ -58,6 +58,8 @@ class timedelta(datetime.timedelta):
         return (1 if self.positive else -1) * datetime.timedelta(days=self.days, seconds=self.seconds, microseconds=self.microseconds)
 
     def __eq__(self, other):
+        if not isinstance(other, datetime.timedelta):
+            return NotImplemented
         return self.__to_base__() == other
 
     def __add__(self, other):
