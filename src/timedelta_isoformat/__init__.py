@@ -70,7 +70,7 @@ class timedelta(datetime.timedelta):
         """Parser for designator-separated ISO-8601 duration strings
 
         The code sweeps through the input exactly once, expecting to find measurements
-        in order of largest to smallest unit from left-to-right (with the exception of
+        in order of largest-to-smallest unit from left-to-right (with the exception of
         week measurements, which must be the only measurement in the string if present).
         """
         date_tokens = iter(("Y", "years", "M", "months", "D", "days"))
