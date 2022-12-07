@@ -1,6 +1,6 @@
 """Supplemental ISO8601 duration format support for :py:class:`datetime.timedelta`"""
 import datetime
-from typing import Iterable, Optional, Tuple, Type
+from typing import Any, Iterable, Optional, Tuple, Type, Union
 
 _DIGITS, _DECIMAL_SIGNS = frozenset("0123456789"), frozenset(",.")
 _FORMAT = _DIGITS | _DECIMAL_SIGNS
@@ -11,17 +11,17 @@ class timedelta(datetime.timedelta):
     ISO8601-style parsing and formatting.
     """
 
-    def __new__(cls, *args, **kwargs):
+    def __new__(cls, *args: Union[float, int], **kwargs: Union[float, int]) -> "timedelta":
         positive_args, negative_args, positive_kwargs, negative_kwargs = (
             [arg if arg >= 0 else 0 for arg in args],
             [-arg if arg <= 0 else 0 for arg in args],
             {kw: arg if arg >= 0 else 0 for kw, arg in kwargs.items()},
             {kw: -arg if arg <= 0 else 0 for kw, arg in kwargs.items()},
         )
-        positive_distance = datetime.timedelta(*positive_args, **positive_kwargs)
-        negative_distance = datetime.timedelta(*negative_args, **negative_kwargs)
+        positive_distance = datetime.timedelta(*positive_args, **positive_kwargs)  # type: ignore
+        negative_distance = datetime.timedelta(*negative_args, **negative_kwargs)  # type: ignore
         distance = positive_distance - negative_distance if positive_distance > negative_distance else negative_distance - positive_distance
-        return type(
+        return type(  # type: ignore
             str(cls),
             (datetime.timedelta,),
             dict(
@@ -51,27 +51,27 @@ class timedelta(datetime.timedelta):
     def __repr__(self) -> str:
         return ("" if self.positive else "-") + f"timedelta_isoformat.{super().__repr__()}"
 
-    def __str__(self):
+    def __str__(self) -> str:
         return ("" if self.positive else "-") + self.isoformat()
 
-    def __to_base__(self):
+    def __to_base__(self) -> datetime.timedelta:
         return (1 if self.positive else -1) * datetime.timedelta(days=self.days, seconds=self.seconds, microseconds=self.microseconds)
 
-    def __eq__(self, other):
+    def __eq__(self, other: Any) -> bool:
         if not isinstance(other, datetime.timedelta):
             return NotImplemented
         return self.__to_base__() == other
 
-    def __add__(self, other):
+    def __add__(self, other: datetime.timedelta) -> datetime.timedelta:
         return self.__to_base__() + other
 
-    def __radd__(self, other):
+    def __radd__(self, other: datetime.timedelta) -> datetime.timedelta:
         return other + self.__to_base__()
 
-    def __rsub__(self, other):
+    def __rsub__(self, other: datetime.timedelta) -> datetime.timedelta:
         return other - self.__to_base__()
 
-    def __sub__(self, other):
+    def __sub__(self, other: datetime.timedelta) -> datetime.timedelta:
         return self.__to_base__() - other
 
     @staticmethod

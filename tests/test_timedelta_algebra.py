@@ -26,20 +26,20 @@ subtraction_expectations = [
 class TimedeltaAlgebra(unittest.TestCase):
     """Instance creation testing for :class:`timedelta_isoformat.timedelta`"""
 
-    def test_instance_magnitude(self):
+    def test_instance_magnitude(self) -> None:
         """Verify the duration length of constructed timedeltas"""
         for kwargs, expected_timedelta in magnitude_expectations:
             with self.subTest(constructor_arguments=kwargs):
                 constructed_timedelta = abs(timedelta(**kwargs))
                 self.assertEqual(constructed_timedelta, expected_timedelta)
 
-    def test_instance_summation(self):
+    def test_instance_summation(self) -> None:
         """Check the results of addition of duration pairs"""
         for a, b, result in summation_expectations:
             with self.subTest(a=a, b=b):
                 self.assertEqual(a + b, result)
 
-    def test_instance_subtraction(self):
+    def test_instance_subtraction(self) -> None:
         """Check the results of subtraction of duration pairs"""
         for a, b, result in subtraction_expectations:
             with self.subTest(a=a, b=b):
