@@ -95,7 +95,10 @@ class timedelta(datetime.timedelta):
             if char not in tokens:
                 raise ValueError(f"unexpected character '{char}'")
 
-            yield value, next(tokens, None), None
+            try:
+                yield value, next(tokens), None
+            except StopIteration:
+                return
             value = ""
 
         weeks_parsed = next(week_tokens, None) != "W"
