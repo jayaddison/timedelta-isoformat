@@ -33,15 +33,20 @@ class timedelta(datetime.timedelta):
                 __radd__=cls.__radd__,
                 __sub__=cls.__sub__,
                 __rsub__=cls.__rsub__,
+                _positive=positive_distance > negative_distance,
                 fromisoformat=cls.fromisoformat,
                 isoformat=cls.isoformat,
-                positive=positive_distance > negative_distance,
+                positive=cls.positive,
             ),
         )(
             days=abs(distance.days),
             seconds=abs(distance.seconds),
             microseconds=abs(distance.microseconds),
         )
+
+    @property
+    def positive(self) -> bool:
+        return self._positive  # type: ignore
 
     def __repr__(self) -> str:
         return ("" if self.positive else "-") + f"timedelta_isoformat.{super().__repr__()}"
