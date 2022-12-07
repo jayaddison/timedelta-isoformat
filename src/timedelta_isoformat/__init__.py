@@ -138,11 +138,12 @@ class timedelta(datetime.timedelta):
             except (AssertionError, IndexError, ValueError) as exc:
                 msg = f"unable to parse '{value}' as a positive decimal"
                 raise ValueError(msg) from exc
+            if not quantity:
+                continue
             if limit and (quantity > limit if inclusive_range else quantity >= limit):
                 bounds = f"[0..{limit}" + ("]" if inclusive_range else ")")
                 raise ValueError(f"{unit} value of {value} exceeds range {bounds}")
-            if quantity:
-                yield unit, quantity
+            yield unit, quantity
 
     @classmethod
     def fromisoformat(cls, duration):
