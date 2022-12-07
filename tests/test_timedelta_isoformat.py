@@ -183,7 +183,7 @@ class TimedeltaISOFormat(unittest.TestCase):
     @unittest.skip("not currently supported")
     def test_year_month_formatting(self):
         """Formatting of timedelta objects with year-or-month attributes"""
-        year_month_timedelta = self.YearMonthTimedelta(years=1, months=6, hours=4)
+        year_month_timedelta = self.YearMonthTimedelta(hours=4, months=6, years=1)
         self.assertEqual("P1Y6MT4H", year_month_timedelta.isoformat())
         self.assertEqual(
             "YearMonthTimedelta(years=1, months=6, seconds=14400)",
