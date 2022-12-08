@@ -49,7 +49,7 @@ class timedelta(datetime.timedelta):
         return self._positive  # type: ignore
 
     def __repr__(self) -> str:
-        return ("" if self.positive else "-") + f"timedelta_isoformat.{super().__repr__()}"
+        return f"timedelta_isoformat.{super().__repr__()}"
 
     def __str__(self) -> str:
         return ("" if self.positive else "-") + self.isoformat()
