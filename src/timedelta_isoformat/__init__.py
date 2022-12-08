@@ -168,7 +168,7 @@ class timedelta(datetime.timedelta):
         minutes, seconds = divmod(self.seconds, 60)
         hours, minutes = divmod(minutes, 60)
         if self.microseconds:
-            seconds += self.microseconds / 10 ** 6  # type: ignore
+            seconds += self.microseconds / 1_000_000  # type: ignore
 
         result = f"P{self.days}D" if self.days else "P"
         if hours or minutes or seconds:
