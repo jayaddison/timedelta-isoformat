@@ -33,6 +33,7 @@ class timedelta(datetime.timedelta):
                 __radd__=cls.__radd__,
                 __sub__=cls.__sub__,
                 __rsub__=cls.__rsub__,
+                __neg__=cls.__neg__,
                 _positive=positive_distance > negative_distance,
                 fromisoformat=cls.fromisoformat,
                 isoformat=cls.isoformat,
@@ -67,6 +68,9 @@ class timedelta(datetime.timedelta):
         if not isinstance(other, datetime.timedelta):
             return NotImplemented
         return self.__to_base__() == other
+
+    def __neg__(self) -> datetime.timedelta:
+        return -1 * self.__to_base__()
 
     def __add__(self, other: datetime.timedelta) -> datetime.timedelta:
         return self.__to_base__() + other
