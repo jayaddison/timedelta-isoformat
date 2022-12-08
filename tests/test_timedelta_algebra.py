@@ -22,6 +22,12 @@ subtraction_expectations = [
     (timedelta(seconds=-1), timedelta(seconds=-1), timedelta(seconds=0)),
 ]
 
+negation_timedeltas = [
+    timedelta(days=1, hours=1, seconds=1),
+    timedelta(days=5, seconds=-2),
+    timedelta(days=-5, seconds=2),
+]
+
 
 class TimedeltaAlgebra(unittest.TestCase):
     """Instance creation testing for :class:`timedelta_isoformat.timedelta`"""
@@ -44,3 +50,9 @@ class TimedeltaAlgebra(unittest.TestCase):
         for a, b, result in subtraction_expectations:
             with self.subTest(a=a, b=b):
                 self.assertEqual(a - b, result)
+
+    def test_instance_negation(self) -> None:
+        """Check the results of subtraction of duration pairs"""
+        for t in negation_timedeltas:
+            with self.subTest(t=t):
+                self.assertEqual(t, -(-t))
