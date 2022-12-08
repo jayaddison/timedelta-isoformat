@@ -49,7 +49,13 @@ class timedelta(datetime.timedelta):
         return self._positive  # type: ignore
 
     def __repr__(self) -> str:
-        return f"timedelta_isoformat.{super().__repr__()}"
+        fields = {
+            "days": self.days,
+            "seconds": self.seconds,
+            "microseconds": self.microseconds,
+        }
+        arguments = ", ".join(f"{k}={v}" for k, v in fields.items() if v)
+        return f"timedelta_isoformat.timedelta({arguments})"
 
     def __str__(self) -> str:
         return ("" if self.positive else "-") + self.isoformat()
