@@ -123,6 +123,7 @@ format_expectations = [
     (timedelta(days=1.5, minutes=4000), "P4DT6H40M"),
     (timedelta(days=1), "P1D"),
     (timedelta(hours=5, seconds=-2), "PT4H59M58S"),
+    (timedelta(hours=-5, seconds=2), "PT4H59M58S"),
 ]
 
 
