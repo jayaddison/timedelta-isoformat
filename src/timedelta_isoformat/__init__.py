@@ -75,7 +75,7 @@ class timedelta(datetime.timedelta):
         minutes, seconds = divmod(seconds, 60)
         hours, minutes = divmod(minutes, 60)
         if self.microseconds:
-            seconds += self.microseconds / 10 ** 6
+            seconds += self.microseconds / 1_000_000  # type: ignore
 
         result = "P"
         result += f"{years}Y" if years else ""
