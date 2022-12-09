@@ -30,6 +30,7 @@ class timedelta(datetime.timedelta):
 
             if char == "W":
                 designators = week_designators
+                pass
 
             # Note: this advances and may exhaust the iterator
             if char not in designators:
