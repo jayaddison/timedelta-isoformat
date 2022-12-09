@@ -6,11 +6,11 @@ _NUMERIC_CHARACTERS = frozenset(digits + ",.")
 
 class timedelta(datetime.timedelta):
     @classmethod
-    def fromisoformat(cls, duration_string):
+    def fromisoformat(cls, duration):
         def _parse_error(reason):
-            return ValueError(f"could not parse duration '{duration_string}': {reason}")
+            return ValueError(f"could not parse duration '{duration}': {reason}")
 
-        if not duration_string.startswith("P"):
+        if not duration.startswith("P"):
             raise _parse_error("durations must begin with the character 'P'")
 
         date_designators = iter(("Y", "years", "M", "months", "D", "days"))
@@ -18,7 +18,7 @@ class timedelta(datetime.timedelta):
         week_designators = iter(("W", "weeks"))
 
         designators, value, measurements = date_designators, "", {}
-        for char in duration_string[1:]:
+        for char in duration[1:]:
             if char in _NUMERIC_CHARACTERS:
                 value += char
                 continue
