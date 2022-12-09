@@ -11,4 +11,4 @@ name = "timedelta-isoformat"
 readme = "README.rst"
 requires-python = ">= 3.7"
 urls = { Homepage = "https://pypi.org/project/timedelta-isoformat/", Source = "https://github.com/jayaddison/timedelta-isoformat.git/" }
-version = "0.0.7"
+version = "0.0.8"
