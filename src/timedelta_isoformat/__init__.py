@@ -10,8 +10,7 @@ class timedelta(datetime.timedelta):
         def _parse_error(reason):
             return ValueError(f"could not parse duration '{duration_string}': {reason}")
 
-        input_stream = iter(duration_string)
-        if next(input_stream, None) != "P":
+        if not duration_string.startswith("P"):
             raise _parse_error("durations must begin with the character 'P'")
 
         date_designators = iter(("Y", "years", "M", "months", "D", "days"))
@@ -19,7 +18,7 @@ class timedelta(datetime.timedelta):
         week_designators = iter(("W", "weeks"))
 
         designators, value, measurements = date_designators, "", {}
-        while char := next(input_stream, None):
+        for char in duration_string[1:]:
             if char in _NUMERIC_CHARACTERS:
                 value += char
                 continue
