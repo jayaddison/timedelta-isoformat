@@ -13,32 +13,32 @@ class timedelta(datetime.timedelta):
         if not duration.startswith("P"):
             raise _parse_error("durations must begin with the character 'P'")
 
-        date_designators = iter(("Y", "years", "M", "months", "D", "days"))
-        time_designators = iter(("H", "hours", "M", "minutes", "S", "seconds"))
-        week_designators = iter(("W", "weeks"))
+        date_tokens = iter(("Y", "years", "M", "months", "D", "days"))
+        time_tokens = iter(("H", "hours", "M", "minutes", "S", "seconds"))
+        week_tokens = iter(("W", "weeks"))
 
-        designators, value, measurements = date_designators, "", {}
+        tokens, value, measurements = date_tokens, "", {}
         for char in duration[1:]:
             if char in _FORMAT:
                 value += char
                 continue
 
             if char == "T":
-                designators = time_designators
+                tokens = time_tokens
                 continue
 
             if char == "W":
-                designators = week_designators
+                tokens = week_tokens
                 pass
 
             # Note: this advances and may exhaust the iterator
-            if char not in designators:
+            if char not in tokens:
                 raise _parse_error(f"unexpected character '{char}'")
 
             if not value:
                 raise _parse_error(f"missing measurement before character '{char}'")
 
-            unit = next(designators)
+            unit = next(tokens)
             try:
                 measurements[unit] = float(value.replace(",", "."))
             except ValueError:
