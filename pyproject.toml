@@ -9,7 +9,7 @@ description = "Supplemental ISO8601 duration format support for datetime.timedel
 license = { text = "AGPL-3.0-or-later" }
 name = "timedelta-isoformat"
 readme = "README.rst"
-requires-python = ">= 3.9"
+requires-python = ">= 3.10"
 urls = { Homepage = "https://pypi.org/project/timedelta-isoformat/", Source = "https://github.com/jayaddison/timedelta-isoformat.git/" }
 version = "0.5.1.7"
 

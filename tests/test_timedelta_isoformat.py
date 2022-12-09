@@ -22,7 +22,7 @@ valid_durations = [
     ("P2DT0.5H", timedelta(days=2, minutes=30)),
     ("PT0,01S", timedelta(seconds=0.01)),
     ("PT01:01:01.01", timedelta(hours=1, minutes=1, seconds=1, microseconds=10000)),
-    ("PT131211,10", timedelta(hours=13, minutes=12, seconds=11, microseconds=100000)),
+    ("PT131211.10", timedelta(hours=13, minutes=12, seconds=11, microseconds=100000)),
     ("P1.5W", timedelta(days=10, hours=12)),
     ("P1.01D", timedelta(days=1, seconds=864)),
     ("P1.01DT1S", timedelta(days=1, seconds=865)),
@@ -82,11 +82,11 @@ invalid_durations = [
     ("PT15:25:60", "seconds value of 60 exceeds range [0..60)"),
     ("PT24:00:00", "hours value of 24 exceeds range [0..24)"),
     # invalid date-format style durations
-    ("P0000-1-0", "unable to parse '0000-1-0' into date components"),
+    ("P0000-1-0", "unable to parse '1-0' as a positive decimal"),
     ("PT1:2:3", "unable to parse '1:2:3' into time components"),
     ("PT01:0203", "unable to parse '01:0203' into time components"),
-    ("PT01", "unable to parse '' as a positive decimal"),
-    ("PT01:02:3.4", "unexpected character '4'"),
+    ("PT01", "unable to parse '01' into time components"),
+    ("PT01:02:3.4", "unable to parse '01:02:3.4' into time components"),
     # decimals must have a non-empty integer value before the separator
     ("PT.5S", "unable to parse '.5' as a positive decimal"),
     ("P1M.1D", "unable to parse '.1' as a positive decimal"),
@@ -99,8 +99,8 @@ invalid_durations = [
     # unexpected characters within date/time components
     ("PT01:-2:03", "unable to parse '-2' as a positive decimal"),
     ("P000000.1", "unable to parse '.1' as a positive decimal"),
-    ("PT000000--", "unexpected character '-'"),
-    ("PT00:00:00,-", "unable to parse '00,-' as a positive decimal"),
+    ("PT000000--", "unable to parse '000000--' into time components"),
+    ("PT00:00:00,-", "unable to parse '00:00:00,-' into time components"),
     # negative designator-separated values
     ("P-1DT0S", "unexpected character '-'"),
     ("P0M-2D", "unexpected character '-'"),

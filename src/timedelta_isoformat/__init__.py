@@ -16,55 +16,63 @@ class timedelta(datetime.timedelta):
 
     @staticmethod
     def _from_date(segment: str) -> Iterable[Tuple[str, str, Optional[int]]]:
-        delimiters = [i for i, c in enumerate(segment[0:10]) if c == "-"]
-        date_length = len(segment)
+        match list(segment):
 
-        # YYYY-DDD
-        if date_length == 8 and delimiters == [4]:
-            yield segment[0:4], "years", None
-            yield segment[5:8], "days", 366
+            # YYYY-DDD
+            case _, _, _, _, "-", _, _, _:
+                yield segment[0:4], "years", None
+                yield segment[5:8], "days", 366
 
-        # YYYY-MM-DD
-        elif date_length == 10 and delimiters == [4, 7]:
-            yield segment[0:4], "years", None
-            yield segment[5:7], "months", 12
-            yield segment[8:10], "days", 31
+            # YYYY-MM-DD
+            case _, _, _, _, "-", _, _, "-", _, _:
+                yield segment[0:4], "years", None
+                yield segment[5:7], "months", 12
+                yield segment[8:10], "days", 31
 
-        # YYYYDDD
-        elif date_length == 7 and not delimiters:
-            yield segment[0:4], "years", None
-            yield segment[4:7], "days", 366
+            # YYYYDDD
+            case _, _, _, _, _, _, _:
+                yield segment[0:4], "years", None
+                yield segment[4:7], "days", 366
 
-        # YYYYMMDD
-        elif date_length == 8 and not delimiters:
-            yield segment[0:4], "years", None
-            yield segment[4:6], "months", 12
-            yield segment[6:8], "days", 31
+            # YYYYMMDD
+            case _, _, _, _, _, _, _, _:
+                yield segment[0:4], "years", None
+                yield segment[4:6], "months", 12
+                yield segment[6:8], "days", 31
 
-        else:
-            raise ValueError(f"unable to parse '{segment}' into date components")
+            case _:
+                ValueError(f"unable to parse '{segment}' into date components")
 
     @staticmethod
     def _from_time(segment: str) -> Iterable[Tuple[str, str, Optional[int]]]:
-        delimiters = [i for i, c in enumerate(segment[0:15]) if c == ":"]
-        decimal = segment[8:9] if delimiters else segment[6:7]
-        if decimal and decimal not in _DECIMAL_SIGNS:
-            raise ValueError(f"unexpected character '{decimal}'")
+        match list(segment):
 
-        # HH:MM:SS[.ssssss]
-        if delimiters == [2, 5]:
-            yield segment[0:2], "hours", 24
-            yield segment[3:5], "minutes", 60
-            yield segment[6:15], "seconds", 60
+            # HH:MM:SS[.ssssss]
+            case _, _, ":", _, _, ":", _, _, ".", *_:
+                yield segment[0:2], "hours", 24
+                yield segment[3:5], "minutes", 60
+                yield segment[6:15], "seconds", 60
 
-        # HHMMSS[.ssssss]
-        elif not delimiters:
-            yield segment[0:2], "hours", 24
-            yield segment[2:4], "minutes", 60
-            yield segment[4:13], "seconds", 60
+            # HH:MM:SS
+            case _, _, ":", _, _, ":", _, _:
+                yield segment[0:2], "hours", 24
+                yield segment[3:5], "minutes", 60
+                yield segment[6:8], "seconds", 60
 
-        else:
-            raise ValueError(f"unable to parse '{segment}' into time components")
+            # HHMMSS[.ssssss]
+            case _, _, _, _, _, _, ".", *_:
+                yield segment[0:2], "hours", 24
+                yield segment[2:4], "minutes", 60
+                yield segment[4:13], "seconds", 60
+
+            # HHMMSS
+            case _, _, _, _, _, _:
+                yield segment[0:2], "hours", 24
+                yield segment[2:4], "minutes", 60
+                yield segment[4:6], "seconds", 60
+
+            case _:
+                raise ValueError(f"unable to parse '{segment}' into time components")
 
     @staticmethod
     def _from_designators(duration: str) -> Iterable[Tuple[str, str, Optional[int]]]:
