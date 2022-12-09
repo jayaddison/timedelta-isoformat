@@ -39,10 +39,10 @@ class timedelta(datetime.timedelta):
                 raise _parse_error(f"missing measurement before character '{char}'")
 
             try:
-                quantity = float(value.replace(",", "."))
+                unit, quantity = next(designators), float(value.replace(",", "."))
             except ValueError:
                 raise _parse_error(f"unable to intepret '{value}' as a numeric value")
-            value, measurements[next(designators)] = "", quantity
+            value, measurements[unit] = "", quantity
 
         if not measurements:
             raise _parse_error("no measurements found")
