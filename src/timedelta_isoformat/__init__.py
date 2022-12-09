@@ -1,7 +1,7 @@
 import datetime
 from string import digits
 
-_NUMERIC_CHARACTERS = frozenset(digits + ",.")
+_FORMAT = frozenset(digits + ",.")
 
 
 class timedelta(datetime.timedelta):
@@ -19,7 +19,7 @@ class timedelta(datetime.timedelta):
 
         designators, value, measurements = date_designators, "", {}
         for char in duration[1:]:
-            if char in _NUMERIC_CHARACTERS:
+            if char in _FORMAT:
                 value += char
                 continue
 
