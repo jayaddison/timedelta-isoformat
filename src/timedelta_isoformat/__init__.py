@@ -42,7 +42,7 @@ class timedelta(datetime.timedelta):
                 unit, quantity = next(designators), float(value.replace(",", "."))
             except ValueError:
                 raise _parse_error(f"unable to intepret '{value}' as a numeric value")
-            value, measurements[unit] = "", quantity
+            measurements[unit], value = quantity, ""
 
         if not measurements:
             raise _parse_error("no measurements found")
