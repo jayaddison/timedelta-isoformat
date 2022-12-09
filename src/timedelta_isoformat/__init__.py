@@ -1,7 +1,6 @@
 import datetime
-from string import digits
 
-_FORMAT = frozenset(digits + ",.")
+_FORMAT = frozenset("0123456789" + ",.")
 
 
 class timedelta(datetime.timedelta):
