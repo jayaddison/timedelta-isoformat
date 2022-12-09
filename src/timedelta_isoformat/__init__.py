@@ -133,15 +133,15 @@ class timedelta(datetime.timedelta):
         date_segment, _, time_segment = duration[1:].partition("T")
         if date_segment:
             components = timedelta._from_date(date_segment)
-            yield from timedelta._to_measurements(components, inclusive_range=True)
+            yield from timedelta._to_measurements(components, inclusive_limit=True)
         if time_segment:
             components = timedelta._from_time(time_segment)
-            yield from timedelta._to_measurements(components, inclusive_range=False)
+            yield from timedelta._to_measurements(components, inclusive_limit=False)
 
     @staticmethod
     def _to_measurements(
         components: Iterable[Tuple[str, str, Optional[int]]],
-        inclusive_range: bool = True,
+        inclusive_limit: bool = True,
     ) -> Iterable[Tuple[str, float]]:
         for value, unit, limit in components:
             try:
@@ -152,8 +152,8 @@ class timedelta(datetime.timedelta):
                 raise ValueError(msg) from exc
             if quantity:
                 yield unit, quantity
-            if limit and (quantity > limit if inclusive_range else quantity >= limit):
-                bounds = f"[0..{limit}" + ("]" if inclusive_range else ")")
+            if limit and (quantity > limit if inclusive_limit else quantity >= limit):
+                bounds = f"[0..{limit}" + ("]" if inclusive_limit else ")")
                 raise ValueError(f"{unit} value of {value} exceeds range {bounds}")
 
     @classmethod
