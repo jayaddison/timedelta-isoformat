@@ -16,7 +16,7 @@ class timedelta(datetime.timedelta):
 
     @staticmethod
     def _from_date(segment: str) -> Iterable[Tuple[str, str, Optional[int]]]:
-        match list(segment):
+        match tuple(segment):
 
             # YYYY-DDD
             case _, _, _, _, "-", _, _, _:
@@ -45,7 +45,7 @@ class timedelta(datetime.timedelta):
 
     @staticmethod
     def _from_time(segment: str) -> Iterable[Tuple[str, str, Optional[int]]]:
-        match list(segment):
+        match tuple(segment):
 
             # HH:MM:SS[.ssssss]
             case _, _, ":", _, _, ":", _, _, ".", *_:
