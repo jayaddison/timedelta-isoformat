@@ -15,7 +15,7 @@ class timedelta(datetime.timedelta):
         return f"timedelta_isoformat.{super().__repr__()}"
 
     @staticmethod
-    def _fromdatestring(date_string: str) -> Iterable[Tuple[str, str, Optional[int]]]:
+    def _fromdate(date_string: str) -> Iterable[Tuple[str, str, Optional[int]]]:
         delimiters = [i for i, c in enumerate(date_string[0:10]) if c == "-"]
         date_length = len(date_string)
 
@@ -45,7 +45,7 @@ class timedelta(datetime.timedelta):
             raise ValueError(f"unable to parse '{date_string}' into date components")
 
     @staticmethod
-    def _fromtimestring(time_string: str) -> Iterable[Tuple[str, str, Optional[int]]]:
+    def _fromtime(time_string: str) -> Iterable[Tuple[str, str, Optional[int]]]:
         delimiters = [i for i, c in enumerate(time_string[0:15]) if c == ":"]
         decimal = time_string[8:9] if delimiters else time_string[6:7]
         if decimal and decimal not in _DECIMAL_SIGNS:
@@ -105,7 +105,7 @@ class timedelta(datetime.timedelta):
         assert weeks_parsed != time_parsed, "cannot mix weeks with other units"
 
     @staticmethod
-    def _fromdurationstring(duration: str) -> Iterable[Tuple[str, float]]:
+    def _fromduration(duration: str) -> Iterable[Tuple[str, float]]:
         """Selects and runs an appropriate parser for ISO-8601 duration strings
 
         The format of these strings is composed of two segments; date measurements
@@ -124,10 +124,10 @@ class timedelta(datetime.timedelta):
 
         date_segment, _, time_segment = duration[1:].partition("T")
         if date_segment:
-            components = timedelta._fromdatestring(date_segment)
+            components = timedelta._fromdate(date_segment)
             yield from timedelta._to_measurements(components, inclusive_range=True)
         if time_segment:
-            components = timedelta._fromtimestring(time_segment)
+            components = timedelta._fromtime(time_segment)
             yield from timedelta._to_measurements(components, inclusive_range=False)
 
     @staticmethod
@@ -156,7 +156,7 @@ class timedelta(datetime.timedelta):
         :raises: `ValueError` with an explanatory message when parsing fails
         """
         try:
-            return cls(**dict(cls._fromdurationstring(duration)))
+            return cls(**dict(cls._fromduration(duration)))
         except (AssertionError, ValueError) as exc:
             raise ValueError(f"could not parse duration '{duration}': {exc}") from exc
 
