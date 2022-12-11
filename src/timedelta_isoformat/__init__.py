@@ -11,14 +11,14 @@ class timedelta(datetime.timedelta):
     ISO8601-style parsing and formatting.
     """
 
-    Component: TypeAlias = Tuple[str, str, int | None]
-    Measurement: TypeAlias = Tuple[str, float]
+    Components: TypeAlias = Iterable[Tuple[str, str, int | None]]
+    Measurements: TypeAlias = Iterable[Tuple[str, float]]
 
     def __repr__(self) -> str:
         return f"timedelta_isoformat.{super().__repr__()}"
 
     @staticmethod
-    def _from_date(segment: str) -> Iterable[Component]:
+    def _from_date(segment: str) -> Components:
         match tuple(segment):
 
             # YYYY-DDD
@@ -47,7 +47,7 @@ class timedelta(datetime.timedelta):
                 ValueError(f"unable to parse '{segment}' into date components")
 
     @staticmethod
-    def _from_time(segment: str) -> Iterable[Component]:
+    def _from_time(segment: str) -> Components:
         match tuple(segment):
 
             # HH:MM:SS[.ssssss]
@@ -78,7 +78,7 @@ class timedelta(datetime.timedelta):
                 raise ValueError(f"unable to parse '{segment}' into time components")
 
     @staticmethod
-    def _from_designators(duration: str) -> Iterable[Component]:
+    def _from_designators(duration: str) -> Components:
         """Parser for designator-separated ISO-8601 duration strings
 
         The code sweeps through the input exactly once, expecting to find measurements
@@ -116,7 +116,7 @@ class timedelta(datetime.timedelta):
         assert weeks_parsed != time_parsed, "cannot mix weeks with other units"
 
     @staticmethod
-    def _from_duration(duration: str) -> Iterable[Measurement]:
+    def _from_duration(duration: str) -> Measurements:
         """Selects and runs an appropriate parser for ISO-8601 duration strings
 
         The format of these strings is composed of two segments; date measurements
@@ -143,9 +143,9 @@ class timedelta(datetime.timedelta):
 
     @staticmethod
     def _to_measurements(
-        components: Iterable[Component],
+        components: Components,
         inclusive_limit: bool = True,
-    ) -> Iterable[Measurement]:
+    ) -> Measurements:
         for value, unit, limit in components:
             try:
                 assert value[0].isdigit()
