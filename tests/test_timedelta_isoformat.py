@@ -105,6 +105,13 @@ invalid_durations = [
     ("P-1DT0S", "unexpected character '-'"),
     ("P0M-2D", "unexpected character '-'"),
     ("P0DT1M-3S", "unexpected character '-'"),
+    # positive designator-separated values
+    ("P+1DT0S", "unexpected character '+'"),
+    ("P0M+2D", "unexpected character '+'"),
+    ("P0DT1M+3S", "unexpected character '+'"),
+    # scientific notation in designated values
+    ("P1.0e+1D", "unexpected character 'e'"),
+    ("P10.0E-1D", "unexpected character 'E'"),
 ]
 
 # ambiguous cases
