@@ -44,7 +44,7 @@ class timedelta(datetime.timedelta):
                 yield segment[6:8], "days", 31
 
             case _:
-                ValueError(f"unable to parse '{segment}' into date components")
+                raise ValueError(f"unable to parse '{segment}' into date components")
 
     @staticmethod
     def _from_time(segment: str) -> Components:
