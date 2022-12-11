@@ -142,10 +142,7 @@ class timedelta(datetime.timedelta):
             yield from timedelta._to_measurements(components, inclusive_limit=False)
 
     @staticmethod
-    def _to_measurements(
-        components: Components,
-        inclusive_limit: bool = True,
-    ) -> Measurements:
+    def _to_measurements(components: Components, inclusive_limit: bool) -> Measurements:
         for value, unit, limit in components:
             try:
                 assert value[0].isdigit()
