@@ -1,6 +1,6 @@
 """Supplemental ISO8601 duration format support for :py:class:`datetime.timedelta`"""
 import datetime
-from typing import Iterable, Optional, Tuple, Type
+from typing import Iterable, Tuple, Type
 
 _DIGITS, _DECIMAL_SIGNS = frozenset("0123456789"), frozenset(",.")
 _FORMAT = _DIGITS | _DECIMAL_SIGNS
@@ -15,7 +15,7 @@ class timedelta(datetime.timedelta):
         return f"timedelta_isoformat.{super().__repr__()}"
 
     @staticmethod
-    def _from_date(segment: str) -> Iterable[Tuple[str, str, Optional[int]]]:
+    def _from_date(segment: str) -> Iterable[Tuple[str, str, int | None]]:
         match tuple(segment):
 
             # YYYY-DDD
@@ -44,7 +44,7 @@ class timedelta(datetime.timedelta):
                 ValueError(f"unable to parse '{segment}' into date components")
 
     @staticmethod
-    def _from_time(segment: str) -> Iterable[Tuple[str, str, Optional[int]]]:
+    def _from_time(segment: str) -> Iterable[Tuple[str, str, int | None]]:
         match tuple(segment):
 
             # HH:MM:SS[.ssssss]
@@ -75,7 +75,7 @@ class timedelta(datetime.timedelta):
                 raise ValueError(f"unable to parse '{segment}' into time components")
 
     @staticmethod
-    def _from_designators(duration: str) -> Iterable[Tuple[str, str, Optional[int]]]:
+    def _from_designators(duration: str) -> Iterable[Tuple[str, str, int | None]]:
         """Parser for designator-separated ISO-8601 duration strings
 
         The code sweeps through the input exactly once, expecting to find measurements
@@ -140,7 +140,7 @@ class timedelta(datetime.timedelta):
 
     @staticmethod
     def _to_measurements(
-        components: Iterable[Tuple[str, str, Optional[int]]],
+        components: Iterable[Tuple[str, str, int | None]],
         inclusive_limit: bool = True,
     ) -> Iterable[Tuple[str, float]]:
         for value, unit, limit in components:

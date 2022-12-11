@@ -1,5 +1,4 @@
 """Test coverage for :py:module:`timedelta_isoformat`"""
-from typing import Union
 import unittest
 
 from timedelta_isoformat import timedelta
@@ -155,10 +154,10 @@ class TimedeltaISOFormat(unittest.TestCase):
 
         def __new__(
             cls,
-            *args: Union[float, int],
-            months: Union[float, int],
-            years: Union[float, int],
-            **kwargs: Union[float, int],
+            *args: float | int,
+            months: float | int,
+            years: float | int,
+            **kwargs: float | int,
         ) -> "TimedeltaISOFormat.YearMonthTimedelta":
             attribs = dict(
                 __repr__=cls.__repr__,
