@@ -1,6 +1,6 @@
 """Supplemental ISO8601 duration format support for :py:class:`datetime.timedelta`"""
 import datetime
-from typing import Iterable, Tuple, Type
+from typing import Iterable, Tuple
 
 _DIGITS, _DECIMAL_SIGNS = frozenset("0123456789"), frozenset(",.")
 _FORMAT = _DIGITS | _DECIMAL_SIGNS
@@ -157,7 +157,7 @@ class timedelta(datetime.timedelta):
                 raise ValueError(f"{unit} value of {value} exceeds range {bounds}")
 
     @classmethod
-    def fromisoformat(cls: Type["timedelta"], duration: str) -> "timedelta":
+    def fromisoformat(cls, duration: str) -> "timedelta":
         """Parses an input string and returns a :py:class:`timedelta` result
 
         :raises: `ValueError` with an explanatory message when parsing fails
