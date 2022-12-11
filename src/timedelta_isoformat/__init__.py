@@ -1,6 +1,6 @@
 """Supplemental ISO8601 duration format support for :py:class:`datetime.timedelta`"""
 import datetime
-from typing import Iterable, Tuple
+from typing import Iterable, Tuple, TypeAlias
 
 _DIGITS, _DECIMAL_SIGNS = frozenset("0123456789"), frozenset(",.")
 _FORMAT = _DIGITS | _DECIMAL_SIGNS
@@ -11,11 +11,14 @@ class timedelta(datetime.timedelta):
     ISO8601-style parsing and formatting.
     """
 
+    Component: TypeAlias = Tuple[str, str, int | None]
+    Measurement: TypeAlias = Tuple[str, float]
+
     def __repr__(self) -> str:
         return f"timedelta_isoformat.{super().__repr__()}"
 
     @staticmethod
-    def _from_date(segment: str) -> Iterable[Tuple[str, str, int | None]]:
+    def _from_date(segment: str) -> Iterable[Component]:
         match tuple(segment):
 
             # YYYY-DDD
@@ -44,7 +47,7 @@ class timedelta(datetime.timedelta):
                 ValueError(f"unable to parse '{segment}' into date components")
 
     @staticmethod
-    def _from_time(segment: str) -> Iterable[Tuple[str, str, int | None]]:
+    def _from_time(segment: str) -> Iterable[Component]:
         match tuple(segment):
 
             # HH:MM:SS[.ssssss]
@@ -75,7 +78,7 @@ class timedelta(datetime.timedelta):
                 raise ValueError(f"unable to parse '{segment}' into time components")
 
     @staticmethod
-    def _from_designators(duration: str) -> Iterable[Tuple[str, str, int | None]]:
+    def _from_designators(duration: str) -> Iterable[Component]:
         """Parser for designator-separated ISO-8601 duration strings
 
         The code sweeps through the input exactly once, expecting to find measurements
@@ -113,7 +116,7 @@ class timedelta(datetime.timedelta):
         assert weeks_parsed != time_parsed, "cannot mix weeks with other units"
 
     @staticmethod
-    def _from_duration(duration: str) -> Iterable[Tuple[str, float]]:
+    def _from_duration(duration: str) -> Iterable[Measurement]:
         """Selects and runs an appropriate parser for ISO-8601 duration strings
 
         The format of these strings is composed of two segments; date measurements
@@ -140,9 +143,9 @@ class timedelta(datetime.timedelta):
 
     @staticmethod
     def _to_measurements(
-        components: Iterable[Tuple[str, str, int | None]],
+        components: Iterable[Component],
         inclusive_limit: bool = True,
-    ) -> Iterable[Tuple[str, float]]:
+    ) -> Iterable[Measurement]:
         for value, unit, limit in components:
             try:
                 assert value[0].isdigit()
