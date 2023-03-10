@@ -115,8 +115,8 @@ class timedelta(datetime.timedelta):
         assert weeks_parsed or time_parsed, "no measurements found"
         assert weeks_parsed != time_parsed, "cannot mix weeks with other units"
 
-    @staticmethod
-    def _from_duration(duration: str) -> Measurements:
+    @classmethod
+    def _from_duration(cls, duration: str) -> Measurements:
         """Selects and runs an appropriate parser for ISO-8601 duration strings
 
         The format of these strings is composed of two segments; date measurements
@@ -129,17 +129,17 @@ class timedelta(datetime.timedelta):
         assert duration.startswith("P"), "durations must begin with the character 'P'"
 
         if duration[-1].isupper():
-            components = timedelta._from_designators(duration[1:])
-            yield from timedelta._to_measurements(components, inclusive_limit=True)
+            components = cls._from_designators(duration[1:])
+            yield from cls._to_measurements(components, inclusive_limit=True)
             return
 
         date_segment, _, time_segment = duration[1:].partition("T")
         if date_segment:
-            components = timedelta._from_date(date_segment)
-            yield from timedelta._to_measurements(components, inclusive_limit=True)
+            components = cls._from_date(date_segment)
+            yield from cls._to_measurements(components, inclusive_limit=True)
         if time_segment:
-            components = timedelta._from_time(time_segment)
-            yield from timedelta._to_measurements(components, inclusive_limit=False)
+            components = cls._from_time(time_segment)
+            yield from cls._to_measurements(components, inclusive_limit=False)
 
     @staticmethod
     def _to_measurements(components: Components, inclusive_limit: bool) -> Measurements:
