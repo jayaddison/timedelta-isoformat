@@ -149,6 +149,12 @@ class TimedeltaISOFormat(unittest.TestCase):
                     timedelta.fromisoformat(duration_string)
                 self.assertIn(expected_reason, str(context.exception))
 
+    def test_fromisoformat_invalid_type(self) -> None:
+        """Parsing cases that should all fail"""
+        with self.assertRaises(TypeError) as context:
+            timedelta.fromisoformat(["P","1","Y","1","M"])
+        self.assertIn("expected duration to be a str", str(context.exception))
+
     def test_roundtrip_valid(self) -> None:
         """Round-trip from valid duration to string and back maintains the same value"""
         for _, valid_timedelta in valid_durations:
