@@ -1,18 +1,34 @@
 """Supplemental ISO8601 duration format support for :py:class:`datetime.timedelta`"""
 import datetime
-from typing import Iterable, Tuple, TypeAlias
+from typing import Iterable, Tuple, TypeAlias, Dict
+from dataclasses import dataclass
 
 _DIGITS, _DECIMAL_SIGNS = frozenset("0123456789"), frozenset(",.")
 _FORMAT = _DIGITS | _DECIMAL_SIGNS
 
 
+Token: TypeAlias = str
+TimedeltaArgument: TypeAlias = str
+UnparsedValue: TypeAlias = str
+ValueLimit: TypeAlias = int | None
+Components: TypeAlias = Iterable[Tuple[UnparsedValue, TimedeltaArgument, ValueLimit]]
+Measurements: TypeAlias = Iterable[Tuple[TimedeltaArgument, float]]
+
+class ParsingContext:
+    unparsed_valid_tokens: Iterable[Token]
+    token_to_timedelta_arg: Dict[Token, TimedeltaArgument]
+
+    def __init__(
+        self,
+        token_to_timedelta_arg: Dict[Token, TimedeltaArgument],
+    ):
+        self.token_to_timedelta_arg = token_to_timedelta_arg
+        self.unparsed_valid_tokens = iter(token_to_timedelta_arg)
+
 class timedelta(datetime.timedelta):
     """Subclass of :py:class:`datetime.timedelta` with additional methods to implement
     ISO8601-style parsing and formatting.
     """
-
-    Components: TypeAlias = Iterable[Tuple[str, str, int | None]]
-    Measurements: TypeAlias = Iterable[Tuple[str, float]]
 
     def __repr__(self) -> str:
         return f"timedelta_isoformat.{super().__repr__()}"
@@ -85,33 +101,47 @@ class timedelta(datetime.timedelta):
         in order of largest-to-smallest unit from left-to-right (with the exception of
         week measurements, which must be the only measurement in the string if present).
         """
-        date_tokens = iter(("Y", "years", "M", "months", "D", "days"))
-        time_tokens = iter(("H", "hours", "M", "minutes", "S", "seconds"))
-        week_tokens = iter(("W", "weeks"))
+        date_context = ParsingContext(
+            {
+                "Y": "years",
+                "M": "months",
+                "D": "days",
+            }
+        )
+        time_context = ParsingContext(
+            {
+                "H": "hours",
+                "M": "minutes",
+                "S": "seconds",
+            }
+        )
+        week_context = ParsingContext(
+            {"W": "weeks"}
+        )
 
-        tokens, value = date_tokens, ""
+        context, value = date_context, ""
         for char in duration:
             if char in _FORMAT:
                 value += char
                 continue
 
-            if char == "T" and tokens is not time_tokens:
-                tokens, value = time_tokens, ""
+            if char == "T" and context is not time_context:
+                context, value = time_context, ""
                 continue
 
-            if char == "W" and tokens is date_tokens:
-                tokens = week_tokens
+            if char == "W" and context is date_context:
+                context = week_context
                 pass
 
             # Note: this advances and may exhaust the token iterator
-            if char not in tokens:
+            if char not in context.unparsed_valid_tokens:
                 raise ValueError(f"unexpected character '{char}'")
 
-            yield value, next(tokens), None
+            yield value, context.token_to_timedelta_arg[char], None
             value = ""
 
-        weeks_parsed = next(week_tokens, None) != "W"
-        time_parsed = next(time_tokens, None) != "H" or next(date_tokens, None) != "Y"
+        weeks_parsed = next(week_context.unparsed_valid_tokens, None) != "W"
+        time_parsed = next(time_context.unparsed_valid_tokens, None) != "H" or next(date_context.unparsed_valid_tokens, None) != "Y"
         assert weeks_parsed or time_parsed, "no measurements found"
         assert weeks_parsed != time_parsed, "cannot mix weeks with other units"
 
