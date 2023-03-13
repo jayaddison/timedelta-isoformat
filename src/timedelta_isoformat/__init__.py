@@ -1,7 +1,6 @@
 """Supplemental ISO8601 duration format support for :py:class:`datetime.timedelta`"""
 import datetime
 from enum import StrEnum
-from itertools import chain
 from typing import Iterable, Tuple, TypeAlias, Dict
 from dataclasses import dataclass
 
