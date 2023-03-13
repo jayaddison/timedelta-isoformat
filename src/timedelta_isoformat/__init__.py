@@ -131,7 +131,7 @@ class timedelta(datetime.timedelta):
             value = ""
 
         weeks_parsed = next(week_tokens, None) != WeekContext.WEEKS
-        time_parsed = next(date_tokens, None) != DateContext.YEARS or next(time_tokens, None) != TimeContext.HOURS
+        time_parsed = next(time_tokens, None) != TimeContext.HOURS or next(date_tokens, None) != DateContext.YEARS
         assert weeks_parsed or time_parsed, "no measurements found"
         assert weeks_parsed != time_parsed, "cannot mix weeks with other units"
 
