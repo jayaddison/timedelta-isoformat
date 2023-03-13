@@ -13,22 +13,6 @@ MeasuredValue: TypeAlias = float
 Components: TypeAlias = Iterable[Tuple[RawValue, Unit, MeasurementLimit]]
 Measurements: TypeAlias = Iterable[Tuple[Unit, MeasuredValue]]
 
-DateContext = {
-    "Y": "years",
-    "M": "months",
-    "D": "days",
-}
-
-TimeContext = {
-    "H": "hours",
-    "M": "minutes",
-    "S": "seconds",
-}
-
-WeekContext = {
-    "W": "weeks",
-}
-
 
 class timedelta(datetime.timedelta):
     """Subclass of :py:class:`datetime.timedelta` with additional methods to implement
@@ -96,9 +80,9 @@ class timedelta(datetime.timedelta):
         in order of largest-to-smallest unit from left-to-right (with the exception of
         week measurements, which must be the only measurement in the string if present).
         """
-        date_context = iter(DateContext.items())
-        time_context = iter(TimeContext.items())
-        week_context = iter(WeekContext.items())
+        date_context = iter({"Y": "years", "M": "months", "D": "days"}.items())
+        time_context = iter({"H": "hours", "M": "minutes", "S": "seconds"}.items())
+        week_context = iter({"W": "weeks"}.items())
 
         contexts_encountered, context, value = set(), date_context, ""
         for char in duration:
