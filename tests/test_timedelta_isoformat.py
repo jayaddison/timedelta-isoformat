@@ -114,6 +114,10 @@ invalid_durations = [
     ("P10.0E-1D", "unexpected character 'E'"),
     # attempt to cause the parser to confuse duration tokens and timedelta arguments
     ("P1years1M", "unexpected character 'y'"),
+    # components with missing designators
+    ("PT1H2", "unable to parse '1H2' into time components"),
+    ("P20D4T", "expected a unit designator after '4'"),
+    ("P1D5T", "expected a unit designator after '5'"),
 ]
 
 # ambiguous cases
