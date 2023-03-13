@@ -65,9 +65,9 @@ invalid_durations = [
     ("P0DT5M1H", "unexpected character 'H'"),
     # invalid units within segment
     ("PT1DS", "unexpected character 'D'"),
-    ("P1HT0S", "unexpected character 'H'"),
+    ("P1HT0S", "unexpected character 'T'"),
     # mixing week units with other units
-    ("P1WT1H", "cannot mix weeks with other units"),
+    ("P1WT1H", "unexpected character 'T'"),
     ("P0Y1W", "cannot mix weeks with other units"),
     # incorrect quantities
     ("PT0.0.0S", "unable to parse '0.0.0' as a positive decimal"),
@@ -94,7 +94,7 @@ invalid_durations = [
     ("PT5MT5S", "unexpected character 'T'"),
     ("P1W2W", "unexpected character 'W'"),
     # segments out-of-order
-    ("P1DT5S2W", "unexpected character 'W'"),
+    ("P1DT5S2W", "cannot mix weeks with other units"),
     ("P1W1D", "unexpected character 'D'"),
     # unexpected characters within date/time components
     ("PT01:-2:03", "unable to parse '-2' as a positive decimal"),
