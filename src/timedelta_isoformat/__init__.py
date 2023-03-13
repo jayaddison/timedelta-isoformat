@@ -1,18 +1,18 @@
 """Supplemental ISO8601 duration format support for :py:class:`datetime.timedelta`"""
 import datetime
 from enum import StrEnum
-from typing import Iterable, Tuple, TypeAlias, Dict
+from typing import Iterable, Tuple, TypeAlias
 from dataclasses import dataclass
 
 _DECIMAL_CHARACTERS = frozenset("0123456789" + ",.")
 
-
-Token: TypeAlias = str
+RawValue: TypeAlias = str
 Unit: TypeAlias = str
-UnparsedValue: TypeAlias = str
-ValueLimit: TypeAlias = int | None
-Components: TypeAlias = Iterable[Tuple[UnparsedValue, Unit, ValueLimit]]
-Measurements: TypeAlias = Iterable[Tuple[Unit, float]]
+MeasurementLimit: TypeAlias = int | None
+MeasuredValue: TypeAlias = float
+
+Components: TypeAlias = Iterable[Tuple[RawValue, Unit, MeasurementLimit]]
+Measurements: TypeAlias = Iterable[Tuple[Unit, MeasuredValue]]
 
 class DateContext(StrEnum):
     YEARS = "Y"
