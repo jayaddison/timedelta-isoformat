@@ -23,24 +23,20 @@ class timedelta(datetime.timedelta):
             case _, _, _, _, "-", _, _, _:
                 yield segment[0:4], "years", None
                 yield segment[5:8], "days", 366
-
             # YYYY-MM-DD
             case _, _, _, _, "-", _, _, "-", _, _:
                 yield segment[0:4], "years", None
                 yield segment[5:7], "months", 12
                 yield segment[8:10], "days", 31
-
             # YYYYDDD
             case _, _, _, _, _, _, _:
                 yield segment[0:4], "years", None
                 yield segment[4:7], "days", 366
-
             # YYYYMMDD
             case _, _, _, _, _, _, _, _:
                 yield segment[0:4], "years", None
                 yield segment[4:6], "months", 12
                 yield segment[6:8], "days", 31
-
             case _:
                 raise ValueError(f"unable to parse '{segment}' into date components")
 
@@ -52,25 +48,21 @@ class timedelta(datetime.timedelta):
                 yield segment[0:2], "hours", 24
                 yield segment[3:5], "minutes", 60
                 yield segment[6:15], "seconds", 60
-
             # HH:MM:SS
             case _, _, ":", _, _, ":", _, _:
                 yield segment[0:2], "hours", 24
                 yield segment[3:5], "minutes", 60
                 yield segment[6:8], "seconds", 60
-
             # HHMMSS[.ssssss]
             case _, _, _, _, _, _, ".", *_:
                 yield segment[0:2], "hours", 24
                 yield segment[2:4], "minutes", 60
                 yield segment[4:13], "seconds", 60
-
             # HHMMSS
             case _, _, _, _, _, _:
                 yield segment[0:2], "hours", 24
                 yield segment[2:4], "minutes", 60
                 yield segment[4:6], "seconds", 60
-
             case _:
                 raise ValueError(f"unable to parse '{segment}' into time components")
 
