@@ -1,6 +1,5 @@
 """Supplemental ISO8601 duration format support for :py:class:`datetime.timedelta`"""
 import datetime
-from enum import StrEnum
 from typing import Iterable, Tuple, TypeAlias
 from dataclasses import dataclass
 
@@ -14,18 +13,21 @@ MeasuredValue: TypeAlias = float
 Components: TypeAlias = Iterable[Tuple[RawValue, Unit, MeasurementLimit]]
 Measurements: TypeAlias = Iterable[Tuple[Unit, MeasuredValue]]
 
-class DateContext(StrEnum):
-    YEARS = "Y"
-    MONTHS = "M"
-    DAYS = "D"
+DateContext = {
+    "Y": "years",
+    "M": "months",
+    "D": "days",
+}
 
-class TimeContext(StrEnum):
-    HOURS = "H"
-    MINUTES = "M"
-    SECONDS = "S"
+TimeContext = {
+    "H": "hours",
+    "M": "minutes",
+    "S": "seconds",
+}
 
-class WeekContext(StrEnum):
-    WEEKS = "W"
+WeekContext = {
+    "W": "weeks",
+}
 
 
 class timedelta(datetime.timedelta):
@@ -94,9 +96,9 @@ class timedelta(datetime.timedelta):
         in order of largest-to-smallest unit from left-to-right (with the exception of
         week measurements, which must be the only measurement in the string if present).
         """
-        date_context = iter(DateContext)
-        time_context = iter(TimeContext)
-        week_context = iter(WeekContext)
+        date_context = iter(DateContext.items())
+        time_context = iter(TimeContext.items())
+        week_context = iter(WeekContext.items())
 
         contexts_encountered, context, value = set(), date_context, ""
         for char in duration:
@@ -113,17 +115,18 @@ class timedelta(datetime.timedelta):
                 context = week_context
                 pass
 
-            try:
-                while (unit := next(context)) != char: continue
-            except StopIteration:
+            for designator, unit in context:
+                if designator == char:
+                    break
+            else:
                 raise ValueError(f"unexpected character '{char}'")
 
-            contexts_encountered.add(type(unit))
-            yield value, unit.name.lower(), None
+            contexts_encountered.add(context)
+            yield value, unit, None
             value = ""
 
         assert contexts_encountered, "no measurements found"
-        assert WeekContext not in contexts_encountered or len(contexts_encountered) == 1, "cannot mix weeks with other units"
+        assert week_context not in contexts_encountered or len(contexts_encountered) == 1, "cannot mix weeks with other units"
 
     @classmethod
     def _from_duration(cls, duration: str) -> Measurements:
