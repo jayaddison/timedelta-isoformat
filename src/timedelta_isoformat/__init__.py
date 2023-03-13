@@ -80,11 +80,11 @@ class timedelta(datetime.timedelta):
         in order of largest-to-smallest unit from left-to-right (with the exception of
         week measurements, which must be the only measurement in the string if present).
         """
-        date_context = iter({"Y": "years", "M": "months", "D": "days"}.items())
-        time_context = iter({"H": "hours", "M": "minutes", "S": "seconds"}.items())
-        week_context = iter({"W": "weeks"}.items())
+        date_context = {"D": "days", "M": "months", "Y": "years"}
+        time_context = {"S": "seconds", "M": "minutes", "H": "hours"}
+        week_context = {"W": "weeks"}
 
-        contexts_encountered, context, value = set(), date_context, ""
+        tokens_consumed, context, value = 0, date_context, ""
         for char in duration:
             if char in _DECIMAL_CHARACTERS:
                 value += char
@@ -99,18 +99,20 @@ class timedelta(datetime.timedelta):
                 context = week_context
                 pass
 
-            for designator, unit in context:
-                if designator == char:
-                    break
-            else:
+            try:
+                while item := context.popitem():
+                    designator, unit = item
+                    if designator == char:
+                        tokens_consumed += 1
+                        break
+            except KeyError:
                 raise ValueError(f"unexpected character '{char}'")
 
-            contexts_encountered.add(context)
             yield value, unit, None
             value = ""
 
-        assert contexts_encountered, "no measurements found"
-        assert week_context not in contexts_encountered or len(contexts_encountered) == 1, "cannot mix weeks with other units"
+        assert tokens_consumed, "no measurements found"
+        assert week_context or tokens_consumed == 1, "cannot mix weeks with other units"
 
     @classmethod
     def _from_duration(cls, duration: str) -> Measurements:
