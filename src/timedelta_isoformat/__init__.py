@@ -74,16 +74,21 @@ class timedelta(datetime.timedelta):
         in order of largest-to-smallest unit from left-to-right (with the exception of
         week measurements, which must be the only measurement in the string if present).
         """
-        time_tokens = iter(("Y", "years", "M", "months", "D", "days", "T", None, "H", "hours", "M", "minutes", "S", "seconds"))
+        date_tokens = iter(("Y", "years", "M", "months", "D", "days"))
+        time_tokens = iter(("H", "hours", "M", "minutes", "S", "seconds"))
         week_tokens = iter(("W", "weeks"))
 
-        tokens, value = time_tokens, ""
+        tokens, value = date_tokens, ""
         for char in duration:
             if char in _DECIMAL_CHARACTERS:
                 value += char
                 continue
 
-            if char == "W" and tokens is time_tokens:
+            if char == "T" and tokens is not time_tokens:
+                tokens, value = time_tokens, ""
+                continue
+
+            if char == "W" and tokens is date_tokens:
                 tokens = week_tokens
                 pass
 
@@ -91,13 +96,11 @@ class timedelta(datetime.timedelta):
             if char not in tokens:
                 raise ValueError(f"unexpected character '{char}'")
 
-            unit = next(tokens)
-            if unit:
-                yield value, unit, None
+            yield value, next(tokens), None
             value = ""
 
         weeks_parsed = next(week_tokens, None) != "W"
-        time_parsed = next(time_tokens, None) not in ("H", "Y")
+        time_parsed = next(time_tokens, None) != "H" or next(date_tokens, None) != "Y"
         assert weeks_parsed or time_parsed, "no measurements found"
         assert weeks_parsed != time_parsed, "cannot mix weeks with other units"
 
