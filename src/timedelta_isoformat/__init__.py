@@ -98,11 +98,8 @@ class timedelta(datetime.timedelta):
         in order of largest-to-smallest unit from left-to-right (with the exception of
         week measurements, which must be the only measurement in the string if present).
         """
-        date_context = iter(DateUnit)
-        time_context = iter(TimeUnit)
-        week_context = iter(WeekUnit)
-
-        context, remaining_tokens, value, values_found = DateUnit, date_context, "", 0
+        context, remaining_tokens, value = DateUnit, iter(DateUnit), ""
+        weeks_visited, values_found = False, 0
         for char in duration:
             if char in _DECIMAL_CHARACTERS:
                 value += char
@@ -110,11 +107,12 @@ class timedelta(datetime.timedelta):
 
             if char == "T" and context is not TimeUnit:
                 assert not value, f"expected a unit designator after '{value}'"
-                context, remaining_tokens, value = TimeUnit, time_context, ""
+                context, remaining_tokens, value = TimeUnit, iter(TimeUnit), ""
                 continue
 
             if char == "W" and context is DateUnit:
-                context, remaining_tokens = WeekUnit, week_context
+                context, remaining_tokens = WeekUnit, iter(WeekUnit)
+                weeks_visited = True
                 pass
 
             if char not in remaining_tokens:
@@ -125,7 +123,7 @@ class timedelta(datetime.timedelta):
             values_found += 1
 
         assert values_found, "no measurements found"
-        assert next(week_context, None) or values_found == 1, "cannot mix weeks with other units"
+        assert not weeks_visited or values_found == 1, "cannot mix weeks with other units"
 
     @classmethod
     def _from_duration(cls, duration: str) -> Measurements:
