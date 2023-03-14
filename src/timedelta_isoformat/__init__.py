@@ -8,19 +8,19 @@ _DECIMAL_CHARACTERS = frozenset("0123456789" + ",.")
 
 
 class DateUnit(StrEnum):
-    Y = "years"
-    M = "months"
-    D = "days"
+    Y = YEARS = "years"
+    M = MONTHS = "months"
+    D = DAYS = "days"
 
 
 class TimeUnit(StrEnum):
-    H = "hours"
-    M = "minutes"
-    S = "seconds"
+    H = HOURS = "hours"
+    M = MINUTES = "minutes"
+    S = SECONDS = "seconds"
 
 
 class WeekUnit(StrEnum):
-    W = "weeks"
+    W = WEEKS = "weeks"
 
 
 RawValue: TypeAlias = str
@@ -45,22 +45,22 @@ class timedelta(datetime.timedelta):
         match tuple(segment):
             # YYYY-DDD
             case _, _, _, _, "-", _, _, _:
-                yield segment[0:4], DateUnit.Y, None
-                yield segment[5:8], DateUnit.D, 366
+                yield segment[0:4], DateUnit.YEARS, None
+                yield segment[5:8], DateUnit.DAYS, 366
             # YYYY-MM-DD
             case _, _, _, _, "-", _, _, "-", _, _:
-                yield segment[0:4], DateUnit.Y, None
-                yield segment[5:7], DateUnit.M, 12
-                yield segment[8:10], DateUnit.D, 31
+                yield segment[0:4], DateUnit.YEARS, None
+                yield segment[5:7], DateUnit.MONTHS, 12
+                yield segment[8:10], DateUnit.DAYS, 31
             # YYYYDDD
             case _, _, _, _, _, _, _:
-                yield segment[0:4], DateUnit.Y, None
-                yield segment[4:7], DateUnit.D, 366
+                yield segment[0:4], DateUnit.YEARS, None
+                yield segment[4:7], DateUnit.DAYS, 366
             # YYYYMMDD
             case _, _, _, _, _, _, _, _:
-                yield segment[0:4], DateUnit.Y, None
-                yield segment[4:6], DateUnit.M, 12
-                yield segment[6:8], DateUnit.D, 31
+                yield segment[0:4], DateUnit.YEARS, None
+                yield segment[4:6], DateUnit.MONTHS, 12
+                yield segment[6:8], DateUnit.DAYS, 31
             case _:
                 raise ValueError(f"unable to parse '{segment}' into date components")
 
@@ -69,24 +69,24 @@ class timedelta(datetime.timedelta):
         match tuple(segment):
             # HH:MM:SS[.ssssss]
             case _, _, ":", _, _, ":", _, _, ".", *_:
-                yield segment[0:2], TimeUnit.H, 24
-                yield segment[3:5], TimeUnit.M, 60
-                yield segment[6:15], TimeUnit.S, 60
+                yield segment[0:2], TimeUnit.HOURS, 24
+                yield segment[3:5], TimeUnit.MINUTES, 60
+                yield segment[6:15], TimeUnit.SECONDS, 60
             # HH:MM:SS
             case _, _, ":", _, _, ":", _, _:
-                yield segment[0:2], TimeUnit.H, 24
-                yield segment[3:5], TimeUnit.M, 60
-                yield segment[6:8], TimeUnit.S, 60
+                yield segment[0:2], TimeUnit.HOURS, 24
+                yield segment[3:5], TimeUnit.MINUTES, 60
+                yield segment[6:8], TimeUnit.SECONDS, 60
             # HHMMSS[.ssssss]
             case _, _, _, _, _, _, ".", *_:
-                yield segment[0:2], TimeUnit.H, 24
-                yield segment[2:4], TimeUnit.M, 60
-                yield segment[4:13], TimeUnit.S, 60
+                yield segment[0:2], TimeUnit.HOURS, 24
+                yield segment[2:4], TimeUnit.MINUTES, 60
+                yield segment[4:13], TimeUnit.SECONDS, 60
             # HHMMSS
             case _, _, _, _, _, _:
-                yield segment[0:2], TimeUnit.H, 24
-                yield segment[2:4], TimeUnit.M, 60
-                yield segment[4:6], TimeUnit.S, 60
+                yield segment[0:2], TimeUnit.HOURS, 24
+                yield segment[2:4], TimeUnit.MINUTES, 60
+                yield segment[4:6], TimeUnit.SECONDS, 60
             case _:
                 raise ValueError(f"unable to parse '{segment}' into time components")
 
