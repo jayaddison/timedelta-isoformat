@@ -102,28 +102,25 @@ class timedelta(datetime.timedelta):
         time_context = iter(TimeUnit)
         week_context = iter(WeekUnit)
 
-        context, value, values_found = date_context, "", 0
+        context, remaining_tokens, value, values_found = DateUnit, date_context, "", 0
         for char in duration:
             if char in _DECIMAL_CHARACTERS:
                 value += char
                 continue
 
-            if char == "T" and context is not time_context:
+            if char == "T" and context is not TimeUnit:
                 assert not value, f"expected a unit designator after '{value}'"
-                context = time_context
+                context, remaining_tokens = TimeUnit, time_context
                 continue
 
-            if char == "W" and context is date_context:
-                context = week_context
+            if char == "W" and context is DateUnit:
+                context, remaining_tokens = WeekUnit, week_context
                 pass
 
-            while unit := next(context, None):
-                if unit == char:
-                    break
-            else:
+            if char not in remaining_tokens:
                 raise ValueError(f"unexpected character '{char}'")
 
-            yield value, unit, None
+            yield value, context(char), None
             value, values_found = "", values_found + 1
 
         assert values_found, "no measurements found"
