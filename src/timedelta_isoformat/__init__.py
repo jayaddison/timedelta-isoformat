@@ -19,6 +19,7 @@ class timedelta(datetime.timedelta):
     @staticmethod
     def _from_date(segment: str) -> Components:
         match tuple(segment):
+
             # YYYY-DDD
             case _, _, _, _, "-", _, _, _:
                 yield segment[0:4], "years", None
@@ -47,6 +48,7 @@ class timedelta(datetime.timedelta):
     @staticmethod
     def _from_time(segment: str) -> Components:
         match tuple(segment):
+
             # HH:MM:SS[.ssssss]
             case _, _, ":", _, _, ":", _, _, ".", *_:
                 yield segment[0:2], "hours", 24
