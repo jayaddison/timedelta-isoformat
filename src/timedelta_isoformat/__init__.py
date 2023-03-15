@@ -121,8 +121,7 @@ class timedelta(datetime.timedelta):
                 raise ValueError(f"unexpected character '{char}'")
 
             yield value, context(char), None
-            value = ""
-            values_found += 1
+            value, values_found = "", values_found + 1
 
         assert values_found, "no measurements found"
         assert next(week_context, None) or values_found == 1, "cannot mix weeks with other units"
