@@ -1,7 +1,6 @@
 """Supplemental ISO8601 duration format support for :py:class:`datetime.timedelta`"""
 import datetime
 from enum import StrEnum
-from itertools import chain
 from typing import Iterable, Tuple, TypeAlias, Dict
 from dataclasses import dataclass
 
@@ -95,26 +94,22 @@ class timedelta(datetime.timedelta):
         in order of largest-to-smallest unit from left-to-right (with the exception of
         week measurements, which must be the only measurement in the string if present).
         """
-        date_context = iter(DateContext)
-        time_context = iter(TimeContext)
-        week_context = iter(WeekContext)
-
-        contexts_encountered, context, value = set(), date_context, ""
+        contexts_encountered, context, remaining_tokens, value = set(), DateContext, iter(DateContext), ""
         for char in duration:
             if char in _DECIMAL_CHARACTERS:
                 value += char
                 continue
 
-            if char == "T" and context is not time_context:
-                context, value = time_context, ""
+            if char == "T" and context is not TimeContext:
+                context, remaining_tokens, value = TimeContext, iter(TimeContext), ""
                 continue
 
-            if char == "W" and context is date_context:
-                context = week_context
+            if char == "W" and context is DateContext:
+                context, remaining_tokens = WeekContext, iter(WeekContext)
                 pass
 
             try:
-                while (unit := next(context)) != char: continue
+                while (unit := next(remaining_tokens)) != char: continue
             except StopIteration:
                 raise ValueError(f"unexpected character '{char}'")
 
@@ -123,7 +118,7 @@ class timedelta(datetime.timedelta):
             value = ""
 
         assert contexts_encountered, "no measurements found"
-        assert week_context not in contexts_encountered or len(contexts_encountered) == 1, "cannot mix weeks with other units"
+        assert WeekContext not in contexts_encountered or len(contexts_encountered) == 1, "cannot mix weeks with other units"
 
     @classmethod
     def _from_duration(cls, duration: str) -> Measurements:
