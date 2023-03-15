@@ -111,7 +111,6 @@ class timedelta(datetime.timedelta):
             else:
                 raise ValueError(f"unexpected character '{char}'")
 
-
         assert unit, "no measurements found"
 
     @classmethod
