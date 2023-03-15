@@ -84,7 +84,7 @@ class timedelta(datetime.timedelta):
         time_context = {"S": "seconds", "M": "minutes", "H": "hours"}
         week_context = {"W": "weeks"}
 
-        context, value, values_found = date_context, "", False
+        tokens_consumed, context, value = 0, date_context, ""
         for char in duration:
             if char in _DECIMAL_CHARACTERS:
                 value += char
@@ -107,11 +107,12 @@ class timedelta(datetime.timedelta):
             except KeyError:
                 raise ValueError(f"unexpected character '{char}'")
 
-            assert week_context or not values_found, "cannot mix weeks with other units"
+            tokens_consumed += 1
             yield value, unit, None
-            value, values_found = "", True
+            value = ""
 
-        assert values_found, "no measurements found"
+        assert tokens_consumed, "no measurements found"
+        assert week_context or tokens_consumed == 1, "cannot mix weeks with other units"
 
     @classmethod
     def _from_duration(cls, duration: str) -> Measurements:
