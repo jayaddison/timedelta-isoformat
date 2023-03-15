@@ -94,31 +94,35 @@ class timedelta(datetime.timedelta):
         in order of largest-to-smallest unit from left-to-right (with the exception of
         week measurements, which must be the only measurement in the string if present).
         """
-        contexts_encountered, context, remaining_tokens, value = set(), DateContext, iter(DateContext), ""
+        date_tokens = iter(DateContext)
+        time_tokens = iter(TimeContext)
+        week_tokens = iter(WeekContext)
+
+        context, remaining_tokens, value = DateContext, date_tokens, ""
         for char in duration:
             if char in _DECIMAL_CHARACTERS:
                 value += char
                 continue
 
             if char == "T" and context is not TimeContext:
-                context, remaining_tokens, value = TimeContext, iter(TimeContext), ""
+                context, remaining_tokens, value = TimeContext, time_tokens, ""
                 continue
 
             if char == "W" and context is DateContext:
-                context, remaining_tokens = WeekContext, iter(WeekContext)
+                context, remaining_tokens = WeekContext, week_tokens
                 pass
 
-            try:
-                while (unit := next(remaining_tokens)) != char: continue
-            except StopIteration:
+            # Note: this advances and may exhaust the token iterator
+            if char not in remaining_tokens:
                 raise ValueError(f"unexpected character '{char}'")
 
-            contexts_encountered.add(context)
-            yield value, unit.name.lower(), None
+            yield value, context(char).name.lower(), None
             value = ""
 
-        assert contexts_encountered, "no measurements found"
-        assert WeekContext not in contexts_encountered or len(contexts_encountered) == 1, "cannot mix weeks with other units"
+        weeks_parsed = next(week_tokens, None) != WeekContext.WEEKS
+        time_parsed = next(time_tokens, None) != TimeContext.HOURS or next(date_tokens, None) != DateContext.YEARS
+        assert weeks_parsed or time_parsed, "no measurements found"
+        assert weeks_parsed != time_parsed, "cannot mix weeks with other units"
 
     @classmethod
     def _from_duration(cls, duration: str) -> Measurements:
