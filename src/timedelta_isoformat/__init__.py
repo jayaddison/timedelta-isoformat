@@ -15,7 +15,7 @@ Components: TypeAlias = Iterable[Tuple[UnparsedValue, TimedeltaArgument, ValueLi
 Measurements: TypeAlias = Iterable[Tuple[TimedeltaArgument, float]]
 
 class ParsingContext:
-    remaining_tokens: Iterable[Token]
+    unparsed_valid_tokens: Iterable[Token]
     token_to_timedelta_arg: Dict[Token, TimedeltaArgument]
 
     def __init__(
@@ -23,7 +23,7 @@ class ParsingContext:
         token_to_timedelta_arg: Dict[Token, TimedeltaArgument],
     ):
         self.token_to_timedelta_arg = token_to_timedelta_arg
-        self.remaining_tokens = iter(token_to_timedelta_arg)
+        self.unparsed_valid_tokens = iter(token_to_timedelta_arg)
 
 class timedelta(datetime.timedelta):
     """Subclass of :py:class:`datetime.timedelta` with additional methods to implement
@@ -137,14 +137,14 @@ class timedelta(datetime.timedelta):
                 pass
 
             # Note: this advances and may exhaust the token iterator
-            if char not in context.remaining_tokens:
+            if char not in context.unparsed_valid_tokens:
                 raise ValueError(f"unexpected character '{char}'")
 
             yield value, context.token_to_timedelta_arg[char], None
             value = ""
 
-        weeks_parsed = next(week_context.remaining_tokens, None) != "W"
-        time_parsed = next(time_context.remaining_tokens, None) != "H" or next(date_context.remaining_tokens, None) != "Y"
+        weeks_parsed = next(week_context.unparsed_valid_tokens, None) != "W"
+        time_parsed = next(time_context.unparsed_valid_tokens, None) != "H" or next(date_context.unparsed_valid_tokens, None) != "Y"
         assert weeks_parsed or time_parsed, "no measurements found"
         assert weeks_parsed != time_parsed, "cannot mix weeks with other units"
 
