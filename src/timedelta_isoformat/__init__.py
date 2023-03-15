@@ -103,7 +103,7 @@ class timedelta(datetime.timedelta):
         week_context = iter(WeekUnit)
 
         context, value = date_context, ""
-        weeks_visited, values_found = False, 0
+        values_found = 0
         for char in duration:
             if char in _DECIMAL_CHARACTERS:
                 value += char
@@ -116,7 +116,6 @@ class timedelta(datetime.timedelta):
 
             if char == "W" and context is date_context:
                 context = week_context
-                weeks_visited = True
                 pass
 
             for unit in context:
@@ -130,7 +129,7 @@ class timedelta(datetime.timedelta):
             values_found += 1
 
         assert values_found, "no measurements found"
-        assert not weeks_visited or values_found == 1, "cannot mix weeks with other units"
+        assert tuple(week_context) or values_found == 1, "cannot mix weeks with other units"
 
     @classmethod
     def _from_duration(cls, duration: str) -> Measurements:
