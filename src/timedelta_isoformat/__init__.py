@@ -103,11 +103,11 @@ class timedelta(datetime.timedelta):
                 while item := context.popitem():
                     designator, unit = item
                     if designator == char:
+                        tokens_consumed += 1
                         break
             except KeyError:
                 raise ValueError(f"unexpected character '{char}'")
 
-            tokens_consumed += 1
             yield value, unit, None
             value = ""
 
