@@ -76,7 +76,6 @@ class timedelta(datetime.timedelta):
         """
         time_tokens = iter(("Y", "years", "M", "months", "D", "days", "T", None, "H", "hours", "M", "minutes", "S", "seconds"))
         week_tokens = iter(("W", "weeks"))
-        contexts_encountered = set()
 
         tokens, value = time_tokens, ""
         for char in duration:
@@ -94,12 +93,13 @@ class timedelta(datetime.timedelta):
 
             unit = next(tokens)
             if unit:
-                contexts_encountered.add(tokens)
                 yield value, unit, None
             value = ""
 
-        assert contexts_encountered, "no measurements found"
-        assert len(contexts_encountered) == 1, "cannot mix weeks with other units"
+        weeks_parsed = next(week_tokens, None) != "W"
+        time_parsed = next(time_tokens, None) not in ("H", "Y")
+        assert weeks_parsed or time_parsed, "no measurements found"
+        assert weeks_parsed != time_parsed, "cannot mix weeks with other units"
 
     @classmethod
     def _from_duration(cls, duration: str) -> Measurements:
