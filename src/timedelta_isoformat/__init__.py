@@ -102,8 +102,7 @@ class timedelta(datetime.timedelta):
         time_context = iter(TimeUnit)
         week_context = iter(WeekUnit)
 
-        context, value = date_context, ""
-        values_found = 0
+        context, value, values_found = date_context, "", 0
         for char in duration:
             if char in _DECIMAL_CHARACTERS:
                 value += char
