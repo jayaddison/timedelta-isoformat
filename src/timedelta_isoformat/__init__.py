@@ -108,9 +108,8 @@ class timedelta(datetime.timedelta):
                 unit = next(context)
                 yield value, unit, None
                 value = ""
-                continue
-
-            raise ValueError(f"unexpected character '{char}'")
+            else:
+                raise ValueError(f"unexpected character '{char}'")
 
 
         assert unit, "no measurements found"
