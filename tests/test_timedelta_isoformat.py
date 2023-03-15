@@ -92,10 +92,10 @@ invalid_durations = [
     ("P1M.1D", "unable to parse '.1' as a positive decimal"),
     # segment repetition
     ("PT5MT5S", "unexpected character 'T'"),
-    ("P1W2W", "cannot mix weeks with other units"),
+    ("P1W2W", "unexpected character 'W'"),
     # segments out-of-order
     ("P1DT5S2W", "unexpected character 'W'"),
-    ("P1W1D", "cannot mix weeks with other units"),
+    ("P1W1D", "unexpected character 'D'"),
     # unexpected characters within date/time components
     ("PT01:-2:03", "unable to parse '-2' as a positive decimal"),
     ("P000000.1", "unable to parse '.1' as a positive decimal"),

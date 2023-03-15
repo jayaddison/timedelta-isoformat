@@ -102,13 +102,13 @@ class timedelta(datetime.timedelta):
         time_context = iter(TimeUnit)
         week_context = iter(WeekUnit)
 
-        context, value, unit = date_context, "", None
+        context, value, values_found = date_context, "", 0
         for char in duration:
             if char in _DECIMAL_CHARACTERS:
                 value += char
                 continue
 
-            if char == "T" and context is date_context:
+            if char == "T" and context is not time_context:
                 assert not value, f"expected a unit designator after '{value}'"
                 context = time_context
                 continue
@@ -117,7 +117,6 @@ class timedelta(datetime.timedelta):
                 context = week_context
                 pass
 
-            assert not (unit and context is week_context), "cannot mix weeks with other units"
             for unit in context:
                 if unit == char:
                     break
@@ -126,8 +125,10 @@ class timedelta(datetime.timedelta):
 
             yield value, unit, None
             value = ""
+            values_found += 1
 
-        assert unit, "no measurements found"
+        assert values_found, "no measurements found"
+        assert tuple(week_context) or values_found == 1, "cannot mix weeks with other units"
 
     @classmethod
     def _from_duration(cls, duration: str) -> Measurements:
