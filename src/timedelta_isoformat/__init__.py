@@ -84,31 +84,31 @@ class timedelta(datetime.timedelta):
         in order of largest-to-smallest unit from left-to-right (with the exception of
         week measurements, which must be the only measurement in the string if present).
         """
-        date_tokens = iter(("Y", "years", "M", "months", "D", "days"))
-        time_tokens = iter(("H", "hours", "M", "minutes", "S", "seconds"))
-        week_tokens = iter(("W", "weeks"))
+        date_context = iter(("Y", "years", "M", "months", "D", "days"))
+        time_context = iter(("H", "hours", "M", "minutes", "S", "seconds"))
+        week_context = iter(("W", "weeks"))
 
-        tokens, value, unit = date_tokens, "", None
+        context, value, unit = date_context, "", None
         for char in duration:
             if char in _DECIMAL_CHARACTERS:
                 value += char
                 continue
 
-            if char == "T" and tokens is date_tokens:
+            if char == "T" and context is date_context:
                 assert not value, f"expected a unit designator after '{value}'"
-                tokens = time_tokens
+                context = time_context
                 continue
 
-            if char == "W" and tokens is date_tokens:
-                tokens = week_tokens
+            if char == "W" and context is date_context:
+                context = week_context
                 pass
 
             # Note: this advances and may exhaust the token iterator
-            assert not (unit and tokens is week_tokens), "cannot mix weeks with other units"
-            if char not in tokens:
+            assert not (unit and context is week_context), "cannot mix weeks with other units"
+            if char not in context:
                 raise ValueError(f"unexpected character '{char}'")
 
-            unit = next(tokens)
+            unit = next(context)
             yield value, unit, None
             value = ""
 
