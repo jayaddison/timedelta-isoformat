@@ -16,11 +16,14 @@ Measurements: TypeAlias = Iterable[Tuple[TimedeltaArgument, float]]
 
 class ParsingContext:
     remaining_tokens: Iterable[Token]
-    units: Dict[Token, TimedeltaArgument]
+    token_to_timedelta_arg: Dict[Token, TimedeltaArgument]
 
-    def __init__(self, units: Dict[Token, TimedeltaArgument]):
-        self.units = units
-        self.remaining_tokens = iter(units)
+    def __init__(
+        self,
+        token_to_timedelta_arg: Dict[Token, TimedeltaArgument],
+    ):
+        self.token_to_timedelta_arg = token_to_timedelta_arg
+        self.remaining_tokens = iter(token_to_timedelta_arg)
 
 class timedelta(datetime.timedelta):
     """Subclass of :py:class:`datetime.timedelta` with additional methods to implement
@@ -137,7 +140,7 @@ class timedelta(datetime.timedelta):
             if char not in context.remaining_tokens:
                 raise ValueError(f"unexpected character '{char}'")
 
-            yield value, context.units[char], None
+            yield value, context.token_to_timedelta_arg[char], None
             value = ""
 
         weeks_parsed = next(week_context.remaining_tokens, None) != "W"
