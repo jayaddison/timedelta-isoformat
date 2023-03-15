@@ -105,7 +105,7 @@ class timedelta(datetime.timedelta):
 
             assert not (unit and context is week_context), "cannot mix weeks with other units"
             for delimiter, unit in context:
-                if delimiter == char:
+                if char == delimiter:
                     yield value, unit, None
                     value = ""
                     break
