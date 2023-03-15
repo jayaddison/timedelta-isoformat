@@ -98,27 +98,34 @@ class timedelta(datetime.timedelta):
         in order of largest-to-smallest unit from left-to-right (with the exception of
         week measurements, which must be the only measurement in the string if present).
         """
-        context, remaining_tokens, value = DateUnit, iter(DateUnit), ""
+        date_context = iter(DateUnit)
+        time_context = iter(TimeUnit)
+        week_context = iter(WeekUnit)
+
+        context, value = date_context, ""
         weeks_visited, values_found = False, 0
         for char in duration:
             if char in _DECIMAL_CHARACTERS:
                 value += char
                 continue
 
-            if char == "T" and context is not TimeUnit:
+            if char == "T" and context is not time_context:
                 assert not value, f"expected a unit designator after '{value}'"
-                context, remaining_tokens, value = TimeUnit, iter(TimeUnit), ""
+                context, value = time_context, ""
                 continue
 
-            if char == "W" and context is DateUnit:
-                context, remaining_tokens = WeekUnit, iter(WeekUnit)
+            if char == "W" and context is date_context:
+                context = week_context
                 weeks_visited = True
                 pass
 
-            if char not in remaining_tokens:
+            for unit in context:
+                if unit == char:
+                    break
+            else:
                 raise ValueError(f"unexpected character '{char}'")
 
-            yield value, context(char), None
+            yield value, unit, None
             value = ""
             values_found += 1
 
