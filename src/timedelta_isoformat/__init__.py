@@ -89,13 +89,13 @@ class timedelta(datetime.timedelta):
         time_tokens = iter(("H", "hours", "M", "minutes", "S", "seconds"))
         week_tokens = iter(("W", "weeks"))
 
-        tokens, value = date_tokens, ""
+        tokens, value, unit = date_tokens, "", None
         for char in duration:
             if char in _FORMAT:
                 value += char
                 continue
 
-            if char == "T" and tokens is not time_tokens:
+            if char == "T" and tokens is date_tokens:
                 tokens, value = time_tokens, ""
                 continue
 
@@ -104,16 +104,15 @@ class timedelta(datetime.timedelta):
                 pass
 
             # Note: this advances and may exhaust the token iterator
+            assert not (unit and tokens is week_tokens), "cannot mix weeks with other units"
             if char not in tokens:
                 raise ValueError(f"unexpected character '{char}'")
 
-            yield value, next(tokens), None
+            unit = next(tokens)
+            yield value, unit, None
             value = ""
 
-        weeks_parsed = next(week_tokens, None) != "W"
-        time_parsed = next(time_tokens, None) != "H" or next(date_tokens, None) != "Y"
-        assert weeks_parsed or time_parsed, "no measurements found"
-        assert weeks_parsed != time_parsed, "cannot mix weeks with other units"
+        assert unit, "no measurements found"
 
     @classmethod
     def _from_duration(cls, duration: str) -> Measurements:
