@@ -84,9 +84,9 @@ class timedelta(datetime.timedelta):
         in order of largest-to-smallest unit from left-to-right (with the exception of
         week measurements, which must be the only measurement in the string if present).
         """
-        date_context = iter(("Y", "years", "M", "months", "D", "days"))
-        time_context = iter(("H", "hours", "M", "minutes", "S", "seconds"))
-        week_context = iter(("W", "weeks"))
+        date_context = iter((("Y", "years"), ("M", "months"), ("D", "days")))
+        time_context = iter((("H", "hours"), ("M", "minutes"), ("S", "seconds")))
+        week_context = iter((("W", "weeks"),))
 
         context, value, unit = date_context, "", None
         for char in duration:
@@ -104,10 +104,11 @@ class timedelta(datetime.timedelta):
                 pass
 
             assert not (unit and context is week_context), "cannot mix weeks with other units"
-            if char in context:
-                unit = next(context)
-                yield value, unit, None
-                value = ""
+            for delimiter, unit in context:
+                if delimiter == char:
+                    yield value, unit, None
+                    value = ""
+                    break
             else:
                 raise ValueError(f"unexpected character '{char}'")
 
