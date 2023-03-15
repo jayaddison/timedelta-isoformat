@@ -103,14 +103,15 @@ class timedelta(datetime.timedelta):
                 context = week_context
                 pass
 
-            # Note: this advances and may exhaust the token iterator
             assert not (unit and context is week_context), "cannot mix weeks with other units"
-            if char not in context:
-                raise ValueError(f"unexpected character '{char}'")
+            if char in context:
+                unit = next(context)
+                yield value, unit, None
+                value = ""
+                continue
 
-            unit = next(context)
-            yield value, unit, None
-            value = ""
+            raise ValueError(f"unexpected character '{char}'")
+
 
         assert unit, "no measurements found"
 
