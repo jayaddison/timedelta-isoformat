@@ -96,7 +96,7 @@ class timedelta(datetime.timedelta):
 
             if char == "T" and tokens is date_tokens:
                 assert not value, f"expected a unit designator after '{value}'"
-                tokens, value = time_tokens, ""
+                tokens = time_tokens
                 continue
 
             if char == "W" and tokens is date_tokens:
