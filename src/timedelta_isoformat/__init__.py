@@ -118,11 +118,8 @@ class timedelta(datetime.timedelta):
                 pass
 
             assert not (unit and context is week_context), "cannot mix weeks with other units"
-            for unit in context:
-                if unit == char:
-                    break
-            else:
-                raise ValueError(f"unexpected character '{char}'")
+            unit = next(filter(char.__eq__, context), None)
+            assert unit, f"unexpected character '{char}'"
 
             yield value, unit, None
             value = ""
