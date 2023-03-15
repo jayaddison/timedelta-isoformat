@@ -98,9 +98,9 @@ class timedelta(datetime.timedelta):
         in order of largest-to-smallest unit from left-to-right (with the exception of
         week measurements, which must be the only measurement in the string if present).
         """
-        date_context = iter((DateUnit.years, DateUnit.months, DateUnit.days))
-        time_context = iter((TimeUnit.hours, TimeUnit.minutes, TimeUnit.seconds))
-        week_context = iter((WeekUnit.weeks,))
+        date_context = iter(DateUnit)
+        time_context = iter(TimeUnit)
+        week_context = iter(WeekUnit)
 
         context, value, unit = date_context, "", None
         for char in duration:
