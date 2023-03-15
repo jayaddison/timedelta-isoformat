@@ -105,7 +105,6 @@ class timedelta(datetime.timedelta):
                 continue
 
             if char == "T" and context is not time_context:
-                assert not value, f"expected a unit designator after '{value}'"
                 context, value = time_context, ""
                 continue
 
