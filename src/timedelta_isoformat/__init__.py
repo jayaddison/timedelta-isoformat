@@ -8,19 +8,19 @@ _DECIMAL_CHARACTERS = frozenset("0123456789" + ",.")
 
 
 class DateUnit(StrEnum):
-    years = "Y"
-    months = "M"
-    days = "D"
+    Y = YEARS = "years"
+    M = MONTHS = "months"
+    D = DAYS = "days"
 
 
 class TimeUnit(StrEnum):
-    hours = "H"
-    minutes = "M"
-    seconds = "S"
+    H = HOURS = "hours"
+    M = MINUTES = "minutes"
+    S = SECONDS = "seconds"
 
 
 class WeekUnit(StrEnum):
-    weeks = "W"
+    W = WEEKS = "weeks"
 
 
 RawValue: TypeAlias = str
@@ -45,22 +45,22 @@ class timedelta(datetime.timedelta):
         match tuple(segment):
             # YYYY-DDD
             case _, _, _, _, "-", _, _, _:
-                yield segment[0:4], DateUnit.years, None
-                yield segment[5:8], DateUnit.days, 366
+                yield segment[0:4], DateUnit.YEARS, None
+                yield segment[5:8], DateUnit.DAYS, 366
             # YYYY-MM-DD
             case _, _, _, _, "-", _, _, "-", _, _:
-                yield segment[0:4], DateUnit.years, None
-                yield segment[5:7], DateUnit.months, 12
-                yield segment[8:10], DateUnit.days, 31
+                yield segment[0:4], DateUnit.YEARS, None
+                yield segment[5:7], DateUnit.MONTHS, 12
+                yield segment[8:10], DateUnit.DAYS, 31
             # YYYYDDD
             case _, _, _, _, _, _, _:
-                yield segment[0:4], DateUnit.years, None
-                yield segment[4:7], DateUnit.days, 366
+                yield segment[0:4], DateUnit.YEARS, None
+                yield segment[4:7], DateUnit.DAYS, 366
             # YYYYMMDD
             case _, _, _, _, _, _, _, _:
-                yield segment[0:4], DateUnit.years, None
-                yield segment[4:6], DateUnit.months, 12
-                yield segment[6:8], DateUnit.days, 31
+                yield segment[0:4], DateUnit.YEARS, None
+                yield segment[4:6], DateUnit.MONTHS, 12
+                yield segment[6:8], DateUnit.DAYS, 31
             case _:
                 raise ValueError(f"unable to parse '{segment}' into date components")
 
@@ -69,24 +69,24 @@ class timedelta(datetime.timedelta):
         match tuple(segment):
             # HH:MM:SS[.ssssss]
             case _, _, ":", _, _, ":", _, _, ".", *_:
-                yield segment[0:2], TimeUnit.hours, 24
-                yield segment[3:5], TimeUnit.minutes, 60
-                yield segment[6:15], TimeUnit.seconds, 60
+                yield segment[0:2], TimeUnit.HOURS, 24
+                yield segment[3:5], TimeUnit.MINUTES, 60
+                yield segment[6:15], TimeUnit.SECONDS, 60
             # HH:MM:SS
             case _, _, ":", _, _, ":", _, _:
-                yield segment[0:2], TimeUnit.hours, 24
-                yield segment[3:5], TimeUnit.minutes, 60
-                yield segment[6:8], TimeUnit.seconds, 60
+                yield segment[0:2], TimeUnit.HOURS, 24
+                yield segment[3:5], TimeUnit.MINUTES, 60
+                yield segment[6:8], TimeUnit.SECONDS, 60
             # HHMMSS[.ssssss]
             case _, _, _, _, _, _, ".", *_:
-                yield segment[0:2], TimeUnit.hours, 24
-                yield segment[2:4], TimeUnit.minutes, 60
-                yield segment[4:13], TimeUnit.seconds, 60
+                yield segment[0:2], TimeUnit.HOURS, 24
+                yield segment[2:4], TimeUnit.MINUTES, 60
+                yield segment[4:13], TimeUnit.SECONDS, 60
             # HHMMSS
             case _, _, _, _, _, _:
-                yield segment[0:2], TimeUnit.hours, 24
-                yield segment[2:4], TimeUnit.minutes, 60
-                yield segment[4:6], TimeUnit.seconds, 60
+                yield segment[0:2], TimeUnit.HOURS, 24
+                yield segment[2:4], TimeUnit.MINUTES, 60
+                yield segment[4:6], TimeUnit.SECONDS, 60
             case _:
                 raise ValueError(f"unable to parse '{segment}' into time components")
 
@@ -118,7 +118,7 @@ class timedelta(datetime.timedelta):
                 pass
 
             while unit := next(context, None):
-                if unit == char:
+                if unit.name == char:
                     break
             else:
                 raise ValueError(f"unexpected character '{char}'")
@@ -165,10 +165,10 @@ class timedelta(datetime.timedelta):
                 msg = f"unable to parse '{value}' as a positive decimal"
                 raise ValueError(msg) from exc
             if quantity:
-                yield unit.name, quantity
+                yield unit, quantity
             if limit and (quantity > limit if inclusive_limit else quantity >= limit):
                 bounds = f"[0..{limit}" + ("]" if inclusive_limit else ")")
-                raise ValueError(f"{unit.name} value of {value} exceeds range {bounds}")
+                raise ValueError(f"{unit} value of {value} exceeds range {bounds}")
 
     @classmethod
     def fromisoformat(cls, duration: str) -> "timedelta":
