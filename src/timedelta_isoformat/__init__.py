@@ -99,11 +99,12 @@ class timedelta(datetime.timedelta):
                 context = week_context
                 pass
 
-            while context:
-                designator, unit = context.popitem()
-                if designator == char:
-                    break
-            else:
+            try:
+                while item := context.popitem():
+                    designator, unit = item
+                    if designator == char:
+                        break
+            except KeyError:
                 raise ValueError(f"unexpected character '{char}'")
 
             assert week_context or not values_found, "cannot mix weeks with other units"
