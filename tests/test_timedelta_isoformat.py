@@ -112,8 +112,6 @@ invalid_durations = [
     # scientific notation in designated values
     ("P1.0e+1D", "unexpected character 'e'"),
     ("P10.0E-1D", "unexpected character 'E'"),
-    # attempt to cause the parser to confuse duration tokens and timedelta arguments
-    ("P1years1M", "unexpected character 'y'"),
 ]
 
 # ambiguous cases

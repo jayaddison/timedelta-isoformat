@@ -1,37 +1,17 @@
 """Supplemental ISO8601 duration format support for :py:class:`datetime.timedelta`"""
 import datetime
-from enum import StrEnum
-from typing import Iterable, Tuple, TypeAlias, Dict
-from dataclasses import dataclass
+from typing import Iterable, Tuple, TypeAlias
 
 _DECIMAL_CHARACTERS = frozenset("0123456789" + ",.")
-
-
-Token: TypeAlias = str
-Unit: TypeAlias = str
-UnparsedValue: TypeAlias = str
-ValueLimit: TypeAlias = int | None
-Components: TypeAlias = Iterable[Tuple[UnparsedValue, Unit, ValueLimit]]
-Measurements: TypeAlias = Iterable[Tuple[Unit, float]]
-
-class DateContext(StrEnum):
-    YEARS = "Y"
-    MONTHS = "M"
-    DAYS = "D"
-
-class TimeContext(StrEnum):
-    HOURS = "H"
-    MINUTES = "M"
-    SECONDS = "S"
-
-class WeekContext(StrEnum):
-    WEEKS = "W"
 
 
 class timedelta(datetime.timedelta):
     """Subclass of :py:class:`datetime.timedelta` with additional methods to implement
     ISO8601-style parsing and formatting.
     """
+
+    Components: TypeAlias = Iterable[Tuple[str, str, int | None]]
+    Measurements: TypeAlias = Iterable[Tuple[str, float]]
 
     def __repr__(self) -> str:
         return f"timedelta_isoformat.{super().__repr__()}"
@@ -94,33 +74,33 @@ class timedelta(datetime.timedelta):
         in order of largest-to-smallest unit from left-to-right (with the exception of
         week measurements, which must be the only measurement in the string if present).
         """
-        date_tokens = iter(DateContext)
-        time_tokens = iter(TimeContext)
-        week_tokens = iter(WeekContext)
+        date_tokens = iter(("Y", "years", "M", "months", "D", "days"))
+        time_tokens = iter(("H", "hours", "M", "minutes", "S", "seconds"))
+        week_tokens = iter(("W", "weeks"))
 
-        context, remaining_tokens, value = DateContext, date_tokens, ""
+        tokens, value = date_tokens, ""
         for char in duration:
             if char in _DECIMAL_CHARACTERS:
                 value += char
                 continue
 
-            if char == "T" and context is not TimeContext:
-                context, remaining_tokens, value = TimeContext, time_tokens, ""
+            if char == "T" and tokens is not time_tokens:
+                tokens, value = time_tokens, ""
                 continue
 
-            if char == "W" and context is DateContext:
-                context, remaining_tokens = WeekContext, week_tokens
+            if char == "W" and tokens is date_tokens:
+                tokens = week_tokens
                 pass
 
             # Note: this advances and may exhaust the token iterator
-            if char not in remaining_tokens:
+            if char not in tokens:
                 raise ValueError(f"unexpected character '{char}'")
 
-            yield value, context(char).name.lower(), None
+            yield value, next(tokens), None
             value = ""
 
-        weeks_parsed = next(week_tokens, None) != WeekContext.WEEKS
-        time_parsed = next(time_tokens, None) != TimeContext.HOURS or next(date_tokens, None) != DateContext.YEARS
+        weeks_parsed = next(week_tokens, None) != "W"
+        time_parsed = next(time_tokens, None) != "H" or next(date_tokens, None) != "Y"
         assert weeks_parsed or time_parsed, "no measurements found"
         assert weeks_parsed != time_parsed, "cannot mix weeks with other units"
 
