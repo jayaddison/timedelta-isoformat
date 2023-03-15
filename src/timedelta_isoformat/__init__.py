@@ -118,12 +118,12 @@ class timedelta(datetime.timedelta):
             except StopIteration:
                 raise ValueError(f"unexpected character '{char}'")
 
-            contexts_encountered.add(type(unit))
+            contexts_encountered.add(context)
             yield value, unit.name.lower(), None
             value = ""
 
         assert contexts_encountered, "no measurements found"
-        assert WeekContext not in contexts_encountered or len(contexts_encountered) == 1, "cannot mix weeks with other units"
+        assert week_context not in contexts_encountered or len(contexts_encountered) == 1, "cannot mix weeks with other units"
 
     @classmethod
     def _from_duration(cls, duration: str) -> Measurements:
