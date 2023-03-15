@@ -1,5 +1,4 @@
 """Test coverage for :py:module:`timedelta_isoformat`"""
-from typing import Union
 import unittest
 
 from timedelta_isoformat import timedelta
@@ -87,15 +86,16 @@ invalid_durations = [
     ("PT01:0203", "unable to parse '01:0203' into time components"),
     ("PT01", "unable to parse '01' into time components"),
     ("PT01:02:3.4", "unable to parse '01:02:3.4' into time components"),
+    ("P0000y00m00", "unable to parse '0000y00m00' into date components"),
     # decimals must have a non-empty integer value before the separator
     ("PT.5S", "unable to parse '.5' as a positive decimal"),
     ("P1M.1D", "unable to parse '.1' as a positive decimal"),
     # segment repetition
     ("PT5MT5S", "unexpected character 'T'"),
-    ("P1W2W", "unexpected character 'W'"),
+    ("P1W2W", "cannot mix weeks with other units"),
     # segments out-of-order
     ("P1DT5S2W", "unexpected character 'W'"),
-    ("P1W1D", "unexpected character 'D'"),
+    ("P1W1D", "cannot mix weeks with other units"),
     # unexpected characters within date/time components
     ("PT01:-2:03", "unable to parse '-2' as a positive decimal"),
     ("P000000.1", "unable to parse '.1' as a positive decimal"),
@@ -105,6 +105,19 @@ invalid_durations = [
     ("P-1DT0S", "unexpected character '-'"),
     ("P0M-2D", "unexpected character '-'"),
     ("P0DT1M-3S", "unexpected character '-'"),
+    # positive designator-separated values
+    ("P+1DT0S", "unexpected character '+'"),
+    ("P0M+2D", "unexpected character '+'"),
+    ("P0DT1M+3S", "unexpected character '+'"),
+    # scientific notation in designated values
+    ("P1.0e+1D", "unexpected character 'e'"),
+    ("P10.0E-1D", "unexpected character 'E'"),
+    # attempt to cause the parser to confuse duration tokens and timedelta arguments
+    ("P1years1M", "unexpected character 'y'"),
+    # components with missing designators
+    ("PT1H2", "unable to parse '1H2' into time components"),
+    ("P20D4T", "expected a unit designator after '4'"),
+    ("P1D5T", "expected a unit designator after '5'"),
 ]
 
 # ambiguous cases
@@ -158,10 +171,10 @@ class TimedeltaISOFormat(unittest.TestCase):
 
         def __new__(
             cls,
-            *args: Union[float, int],
-            months: Union[float, int],
-            years: Union[float, int],
-            **kwargs: Union[float, int],
+            *args: float | int,
+            months: float | int,
+            years: float | int,
+            **kwargs: float | int,
         ) -> "TimedeltaISOFormat.YearMonthTimedelta":
             attribs = dict(
                 __repr__=cls.__repr__,

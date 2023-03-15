@@ -1,15 +1,17 @@
 """Supplemental ISO8601 duration format support for :py:class:`datetime.timedelta`"""
 import datetime
-from typing import Any, Iterable, Optional, Tuple, Type, Union
+from typing import Any, Iterable, Tuple, TypeAlias, Union
 
-_DIGITS, _DECIMAL_SIGNS = frozenset("0123456789"), frozenset(",.")
-_FORMAT = _DIGITS | _DECIMAL_SIGNS
+_DECIMAL_CHARACTERS = frozenset("0123456789" + ",.")
 
 
 class timedelta(datetime.timedelta):
     """Subclass of :py:class:`datetime.timedelta` with additional methods to implement
     ISO8601-style parsing and formatting.
     """
+
+    Components: TypeAlias = Iterable[Tuple[str, str, int | None]]
+    Measurements: TypeAlias = Iterable[Tuple[str, float]]
 
     def __new__(cls, *args: Union[float, int], **kwargs: Union[float, int]) -> "timedelta":
         positive_args, negative_args, positive_kwargs, negative_kwargs = (
@@ -85,7 +87,7 @@ class timedelta(datetime.timedelta):
         return self.__to_base__() - other
 
     @staticmethod
-    def _from_date(segment: str) -> Iterable[Tuple[str, str, Optional[int]]]:
+    def _from_date(segment: str) -> Components:
         match tuple(segment):
 
             # YYYY-DDD
@@ -111,10 +113,10 @@ class timedelta(datetime.timedelta):
                 yield segment[6:8], "days", 31
 
             case _:
-                ValueError(f"unable to parse '{segment}' into date components")
+                raise ValueError(f"unable to parse '{segment}' into date components")
 
     @staticmethod
-    def _from_time(segment: str) -> Iterable[Tuple[str, str, Optional[int]]]:
+    def _from_time(segment: str) -> Components:
         match tuple(segment):
 
             # HH:MM:SS[.ssssss]
@@ -145,7 +147,7 @@ class timedelta(datetime.timedelta):
                 raise ValueError(f"unable to parse '{segment}' into time components")
 
     @staticmethod
-    def _from_designators(duration: str) -> Iterable[Tuple[str, str, Optional[int]]]:
+    def _from_designators(duration: str) -> Components:
         """Parser for designator-separated ISO-8601 duration strings
 
         The code sweeps through the input exactly once, expecting to find measurements
@@ -156,14 +158,15 @@ class timedelta(datetime.timedelta):
         time_tokens = iter(("H", "hours", "M", "minutes", "S", "seconds"))
         week_tokens = iter(("W", "weeks"))
 
-        tokens, value = date_tokens, ""
+        tokens, value, unit = date_tokens, "", None
         for char in duration:
-            if char in _FORMAT:
+            if char in _DECIMAL_CHARACTERS:
                 value += char
                 continue
 
-            if char == "T" and tokens is not time_tokens:
-                tokens, value = time_tokens, ""
+            if char == "T" and tokens is date_tokens:
+                assert not value, f"expected a unit designator after '{value}'"
+                tokens = time_tokens
                 continue
 
             if char == "W" and tokens is date_tokens:
@@ -171,19 +174,18 @@ class timedelta(datetime.timedelta):
                 pass
 
             # Note: this advances and may exhaust the token iterator
+            assert not (unit and tokens is week_tokens), "cannot mix weeks with other units"
             if char not in tokens:
                 raise ValueError(f"unexpected character '{char}'")
 
-            yield value, next(tokens), None
+            unit = next(tokens)
+            yield value, unit, None
             value = ""
 
-        weeks_parsed = next(week_tokens, None) != "W"
-        time_parsed = next(time_tokens, None) != "H" or next(date_tokens, None) != "Y"
-        assert weeks_parsed or time_parsed, "no measurements found"
-        assert weeks_parsed != time_parsed, "cannot mix weeks with other units"
+        assert unit, "no measurements found"
 
-    @staticmethod
-    def _from_duration(duration: str) -> Iterable[Tuple[str, float]]:
+    @classmethod
+    def _from_duration(cls, duration: str) -> Measurements:
         """Selects and runs an appropriate parser for ISO-8601 duration strings
 
         The format of these strings is composed of two segments; date measurements
@@ -196,23 +198,20 @@ class timedelta(datetime.timedelta):
         assert duration.startswith("P"), "durations must begin with the character 'P'"
 
         if duration[-1].isupper():
-            components = timedelta._from_designators(duration[1:])
-            yield from timedelta._to_measurements(components)
+            components = cls._from_designators(duration[1:])
+            yield from cls._to_measurements(components, inclusive_limit=True)
             return
 
         date_segment, _, time_segment = duration[1:].partition("T")
         if date_segment:
-            components = timedelta._from_date(date_segment)
-            yield from timedelta._to_measurements(components, inclusive_limit=True)
+            components = cls._from_date(date_segment)
+            yield from cls._to_measurements(components, inclusive_limit=True)
         if time_segment:
-            components = timedelta._from_time(time_segment)
-            yield from timedelta._to_measurements(components, inclusive_limit=False)
+            components = cls._from_time(time_segment)
+            yield from cls._to_measurements(components, inclusive_limit=False)
 
     @staticmethod
-    def _to_measurements(
-        components: Iterable[Tuple[str, str, Optional[int]]],
-        inclusive_limit: bool = True,
-    ) -> Iterable[Tuple[str, float]]:
+    def _to_measurements(components: Components, inclusive_limit: bool) -> Measurements:
         for value, unit, limit in components:
             try:
                 assert value[0].isdigit()
@@ -227,7 +226,7 @@ class timedelta(datetime.timedelta):
                 raise ValueError(f"{unit} value of {value} exceeds range {bounds}")
 
     @classmethod
-    def fromisoformat(cls: Type["timedelta"], duration: str) -> "timedelta":
+    def fromisoformat(cls, duration: str) -> "timedelta":
         """Parses an input string and returns a :py:class:`timedelta` result
 
         :raises: `ValueError` with an explanatory message when parsing fails
