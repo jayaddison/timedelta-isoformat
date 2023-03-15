@@ -8,17 +8,17 @@ _FORMAT = _DIGITS | _DECIMAL_SIGNS
 
 
 Token: TypeAlias = str
-Unit: TypeAlias = str
+TimedeltaArgument: TypeAlias = str
 UnparsedValue: TypeAlias = str
 ValueLimit: TypeAlias = int | None
-Components: TypeAlias = Iterable[Tuple[UnparsedValue, Unit, ValueLimit]]
-Measurements: TypeAlias = Iterable[Tuple[Unit, float]]
+Components: TypeAlias = Iterable[Tuple[UnparsedValue, TimedeltaArgument, ValueLimit]]
+Measurements: TypeAlias = Iterable[Tuple[TimedeltaArgument, float]]
 
 class ParsingContext:
     remaining_tokens: Iterable[Token]
-    units: Dict[Token, Unit]
+    units: Dict[Token, TimedeltaArgument]
 
-    def __init__(self, units: Dict[Token, Unit]):
+    def __init__(self, units: Dict[Token, TimedeltaArgument]):
         self.units = units
         self.remaining_tokens = iter(units)
 
