@@ -98,9 +98,9 @@ class timedelta(datetime.timedelta):
         in order of largest-to-smallest unit from left-to-right (with the exception of
         week measurements, which must be the only measurement in the string if present).
         """
-        date_context = [DateUnit.days, DateUnit.months, DateUnit.years]
-        time_context = [TimeUnit.seconds, TimeUnit.minutes, TimeUnit.hours]
-        week_context = [WeekUnit.weeks]
+        date_context = iter((DateUnit.years, DateUnit.months, DateUnit.days))
+        time_context = iter((TimeUnit.hours, TimeUnit.minutes, TimeUnit.seconds))
+        week_context = iter((WeekUnit.weeks,))
 
         context, value, unit = date_context, "", None
         for char in duration:
@@ -118,11 +118,8 @@ class timedelta(datetime.timedelta):
                 pass
 
             assert not (unit and context is week_context), "cannot mix weeks with other units"
-            try:
-                while (unit := context.pop()) != char:
-                    continue
-            except IndexError:
-                raise ValueError(f"unexpected character '{char}'")
+            unit = next(filter(char.__eq__, context), None)
+            assert unit, f"unexpected character '{char}'"
 
             yield value, unit, None
             value = ""
