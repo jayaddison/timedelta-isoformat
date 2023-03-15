@@ -106,7 +106,7 @@ class timedelta(datetime.timedelta):
             else:
                 raise ValueError(f"unexpected character '{char}'")
 
-            assert len(week_context) or not values_found, "cannot mix weeks with other units"
+            assert week_context or not values_found, "cannot mix weeks with other units"
             yield value, unit, None
             value, values_found = "", True
 
