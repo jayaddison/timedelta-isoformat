@@ -99,7 +99,7 @@ class timedelta(datetime.timedelta):
                 context = time_context
                 continue
 
-            if char == "W" and context is date_context:
+            if char == "W":
                 context = week_context
                 pass
 
