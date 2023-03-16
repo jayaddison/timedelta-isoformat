@@ -155,7 +155,7 @@ class timedelta(datetime.timedelta):
                 raise ValueError(msg) from exc
             if not quantity:
                 continue
-            if limit and (quantity > limit if inclusive_limit else quantity >= limit):
+            if limit and not (0 <= quantity <= limit if inclusive_limit else 0 <= quantity < limit):
                 bounds = f"[0..{limit}" + ("]" if inclusive_limit else ")")
                 raise ValueError(f"{unit} value of {value} exceeds range {bounds}")
             yield unit, quantity
