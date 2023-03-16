@@ -2,6 +2,8 @@
 import datetime
 from typing import Iterable, Tuple, TypeAlias
 
+_DECIMAL_CHARACTERS = frozenset("0123456789" + ",.")
+
 
 class timedelta(datetime.timedelta):
     """Subclass of :py:class:`datetime.timedelta` with additional methods to implement
@@ -85,17 +87,11 @@ class timedelta(datetime.timedelta):
         date_context = iter((("Y", "years"), ("M", "months"), ("D", "days")))
         time_context = iter((("H", "hours"), ("M", "minutes"), ("S", "seconds")))
         week_context = iter((("W", "weeks"),))
-        decimal_points = {",", "."}
 
         context, value, unit = date_context, "", None
         for char in duration:
-            if char.isdigit():
+            if char in _DECIMAL_CHARACTERS:
                 value += char
-                continue
-
-            if char in decimal_points:
-                value += "."
-                decimal_points.clear()
                 continue
 
             if char == "T" and context is date_context:
@@ -149,7 +145,7 @@ class timedelta(datetime.timedelta):
         for value, unit, limit in components:
             try:
                 assert value[0].isdigit()
-                quantity = float(value)
+                quantity = float(value.replace(",", "."))
             except (AssertionError, IndexError, ValueError) as exc:
                 msg = f"unable to parse '{value}' as a positive decimal"
                 raise ValueError(msg) from exc
