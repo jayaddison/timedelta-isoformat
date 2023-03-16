@@ -10,7 +10,7 @@ class timedelta(datetime.timedelta):
     ISO8601-style parsing and formatting.
     """
 
-    Components: TypeAlias = Iterable[Tuple[str, str, int | None]]
+    Components: TypeAlias = Iterable[Tuple[str, str, int]]
     Measurements: TypeAlias = Iterable[Tuple[str, float]]
 
     def __repr__(self) -> str:
@@ -22,23 +22,23 @@ class timedelta(datetime.timedelta):
 
             # YYYY-DDD
             case _, _, _, _, "-", _, _, _:
-                yield segment[0:4], "years", None
+                yield segment[0:4], "years", 9999
                 yield segment[5:8], "days", 366
 
             # YYYY-MM-DD
             case _, _, _, _, "-", _, _, "-", _, _:
-                yield segment[0:4], "years", None
+                yield segment[0:4], "years", 9999
                 yield segment[5:7], "months", 12
                 yield segment[8:10], "days", 31
 
             # YYYYDDD
             case _, _, _, _, _, _, _:
-                yield segment[0:4], "years", None
+                yield segment[0:4], "years", 9999
                 yield segment[4:7], "days", 366
 
             # YYYYMMDD
             case _, _, _, _, _, _, _, _:
-                yield segment[0:4], "years", None
+                yield segment[0:4], "years", 9999
                 yield segment[4:6], "months", 12
                 yield segment[6:8], "days", 31
 
