@@ -2,7 +2,7 @@
 import datetime
 from typing import Iterable, Tuple, TypeAlias
 
-_DECIMAL_CHARACTERS = frozenset("0123456789" + ",.")
+_DECIMAL_POINTS = frozenset(",.")
 
 
 class timedelta(datetime.timedelta):
@@ -88,14 +88,18 @@ class timedelta(datetime.timedelta):
         time_context = iter((("H", "hours"), ("M", "minutes"), ("S", "seconds")))
         week_context = iter((("W", "weeks"),))
 
-        context, value, unit = date_context, "", None
+        context, head, tail, unit = date_context, "", "", None
         for char in duration:
-            if char in _DECIMAL_CHARACTERS:
-                value += char
+            if char.isdigit():
+                tail += char
+                continue
+
+            if char in _DECIMAL_POINTS and not head:
+                head, tail = tail, "."
                 continue
 
             if char == "T" and context is date_context:
-                assert not value, f"expected a unit designator after '{value}'"
+                assert not head + tail, f"missing unit designator after '{head}{tail}'"
                 context = time_context
                 continue
 
@@ -106,8 +110,8 @@ class timedelta(datetime.timedelta):
             assert not (unit and context is week_context), "cannot mix weeks with other units"
             for delimiter, unit in context:
                 if char == delimiter:
-                    yield value, unit, None
-                    value = ""
+                    yield head + tail, unit, None
+                    head = tail = ""
                     break
             else:
                 raise ValueError(f"unexpected character '{char}'")
@@ -145,7 +149,7 @@ class timedelta(datetime.timedelta):
         for value, unit, limit in components:
             try:
                 assert value[0].isdigit()
-                quantity = float(value.replace(",", "."))
+                quantity = float(value)
             except (AssertionError, IndexError, ValueError) as exc:
                 msg = f"unable to parse '{value}' as a positive decimal"
                 raise ValueError(msg) from exc
