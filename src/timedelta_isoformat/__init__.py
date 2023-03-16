@@ -99,7 +99,7 @@ class timedelta(datetime.timedelta):
                 continue
 
             if char == "T" and context is date_context:
-                assert not head + tail, f"missing unit designator after '{head}{tail}'"
+                assert not head + tail, f"missing unit designator after '{head + tail}'"
                 context = time_context
                 continue
 
