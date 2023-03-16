@@ -94,8 +94,8 @@ class timedelta(datetime.timedelta):
                 continue
 
             if char in decimal_points:
-                value += "."
                 decimal_points.clear()
+                value += "."
                 continue
 
             if char == "T" and context is date_context:
