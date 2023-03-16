@@ -2,8 +2,6 @@
 import datetime
 from typing import Iterable, Tuple, TypeAlias
 
-_DECIMAL_POINTS = frozenset(",.")
-
 
 class timedelta(datetime.timedelta):
     """Subclass of :py:class:`datetime.timedelta` with additional methods to implement
@@ -90,22 +88,20 @@ class timedelta(datetime.timedelta):
 
         context, head, tail, unit = date_context, "", "", None
         for char in duration:
-            if char.isdigit():
-                tail += char
-                continue
-
-            if char in _DECIMAL_POINTS and not head:
-                head, tail = tail, "."
-                continue
-
-            if char == "T" and context is date_context:
-                assert not head + tail, f"missing unit designator after '{head + tail}'"
-                context = time_context
-                continue
-
-            if char == "W":
-                context = week_context
-                pass
+            match char:
+                case "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9":
+                    tail += char
+                    continue
+                case "," | "." if not head:
+                    head, tail = tail, "."
+                    continue
+                case "T" if context is date_context:
+                    assert not head + tail, f"missing unit designator after '{head + tail}'"
+                    context = time_context
+                    continue
+                case "W":
+                    context = week_context
+                    pass
 
             assert not (unit and context is week_context), "cannot mix weeks with other units"
             for delimiter, unit in context:
