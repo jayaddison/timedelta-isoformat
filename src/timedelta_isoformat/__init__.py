@@ -2,7 +2,7 @@
 import datetime
 from typing import Iterable, Tuple, TypeAlias
 
-_DECIMAL_POINTS = frozenset(",.")
+_NUMBER_FORMAT = frozenset("0123456789,.")
 
 
 class timedelta(datetime.timedelta):
@@ -90,12 +90,8 @@ class timedelta(datetime.timedelta):
 
         context, value, unit = date_context, "", None
         for char in duration:
-            if char.isdigit():
-                value += char
-                continue
-
-            if char in _DECIMAL_POINTS:
-                value += "."
+            if char in _NUMBER_FORMAT:
+                value += char if char.isdigit() else "."
                 continue
 
             if char == "T" and context is date_context:
