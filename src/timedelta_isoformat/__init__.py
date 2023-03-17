@@ -99,16 +99,18 @@ class timedelta(datetime.timedelta):
                 head, tail = tail, "."
                 continue
 
-            if char == "T" and context is date_context:
+            if char == "T":
+                assert context is not time_context, f"unexpected character '{char}'"
+                assert context is not week_context, "cannot mix weeks with other units"
                 assert not head + tail, f"missing unit designator after '{head + tail}'"
                 context = time_context
                 continue
 
             if char == "W":
+                assert not unit, "cannot mix weeks with other units"
                 context = week_context
                 pass
 
-            assert not (unit and context is week_context), "cannot mix weeks with other units"
             for delimiter, unit in context:
                 if char == delimiter:
                     yield head + tail, unit, None
