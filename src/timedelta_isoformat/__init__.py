@@ -99,9 +99,7 @@ class timedelta(datetime.timedelta):
                 value += "."
                 continue
 
-            if char == "T":
-                assert context is not time_context, f"unexpected character '{char}' after previous time components"
-                assert context is not week_context, "cannot mix weeks with other units"
+            if char == "T" and context is date_context:
                 assert not value, f"missing unit designator after '{value}'"
                 context = time_context
                 continue
