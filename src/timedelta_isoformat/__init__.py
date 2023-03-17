@@ -88,21 +88,21 @@ class timedelta(datetime.timedelta):
         time_context = iter((("H", "hours"), ("M", "minutes"), ("S", "seconds")))
         week_context = iter((("W", "weeks"),))
 
-        context, head, tail, unit = date_context, "", "", None
+        context, value, unit = date_context, "", None
         for char in duration:
             if char.isdigit():
-                tail += char
+                value += char
                 continue
 
             if char in _DECIMAL_POINTS:
-                assert not head, f"unexpected character '{char}'"
-                head, tail = tail, "."
+                assert value.isdigit(), f"unexpected character '{char}'"
+                value += "."
                 continue
 
             if char == "T":
                 assert context is not time_context, f"unexpected character '{char}'"
                 assert context is not week_context, "cannot mix weeks with other units"
-                assert not head + tail, f"missing unit designator after '{head + tail}'"
+                assert not value, f"missing unit designator after '{value}'"
                 context = time_context
                 continue
 
@@ -113,8 +113,8 @@ class timedelta(datetime.timedelta):
             assert not (context is week_context and unit), "cannot mix weeks with other units"
             for delimiter, unit in context:
                 if char == delimiter:
-                    yield head + tail, unit, None
-                    head = tail = ""
+                    yield value, unit, None
+                    value = ""
                     break
             else:
                 raise ValueError(f"unexpected character '{char}'")

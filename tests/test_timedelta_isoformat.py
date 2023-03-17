@@ -88,8 +88,8 @@ invalid_durations = [
     ("PT01:02:3.4", "unable to parse '01:02:3.4' into time components"),
     ("P0000y00m00", "unable to parse '0000y00m00' into date components"),
     # decimals must have a non-empty integer value before the separator
-    ("PT.5S", "unable to parse '.5' as a positive decimal"),
-    ("P1M.1D", "unable to parse '.1' as a positive decimal"),
+    ("PT.5S", "unexpected character '.'"),
+    ("P1M.1D", "unexpected character '.'"),
     # segment repetition
     ("PT5MT5S", "unexpected character 'T'"),
     ("P1W2W", "cannot mix weeks with other units"),
