@@ -70,8 +70,8 @@ invalid_durations = [
     ("P1WT1H", "cannot mix weeks with other units"),
     ("P0Y1W", "cannot mix weeks with other units"),
     # incorrect quantities
-    ("PT0.0.0S", "unexpected character '.'"),
-    ("P1.,0D", "unexpected character ','"),
+    ("PT0.0.0S", "unable to parse '0.0.0' as a positive decimal"),
+    ("P1.,0D", "unable to parse '1..0' as a positive decimal"),
     # date-format durations exceeding calendar limits
     ("P0000-367", "days value of 367 exceeds range [0..366]"),
     ("P0000-400", "days value of 400 exceeds range [0..366]"),
@@ -88,8 +88,8 @@ invalid_durations = [
     ("PT01:02:3.4", "unable to parse '01:02:3.4' into time components"),
     ("P0000y00m00", "unable to parse '0000y00m00' into date components"),
     # decimals must have a non-empty integer value before the separator
-    ("PT.5S", "unexpected character '.'"),
-    ("P1M.1D", "unexpected character '.'"),
+    ("PT.5S", "unable to parse '.5' as a positive decimal"),
+    ("P1M.1D", "unable to parse '.1' as a positive decimal"),
     # segment repetition
     ("PT5MT5S", "unexpected character 'T'"),
     ("P1W2W", "cannot mix weeks with other units"),
