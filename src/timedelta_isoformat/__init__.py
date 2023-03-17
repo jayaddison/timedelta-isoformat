@@ -94,7 +94,8 @@ class timedelta(datetime.timedelta):
                 tail += char
                 continue
 
-            if char in _DECIMAL_POINTS and not head:
+            if char in _DECIMAL_POINTS:
+                assert not head, f"unexpected character '{char}'"
                 head, tail = tail, "."
                 continue
 
