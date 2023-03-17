@@ -95,7 +95,7 @@ class timedelta(datetime.timedelta):
                 continue
 
             if char in _DECIMAL_POINTS:
-                assert value.isdigit(), f"unexpected character '{char}'"
+                assert value.isdigit(), f"unexpected character '{char}' after decimal '{value}'"
                 value += "."
                 continue
 
