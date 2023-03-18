@@ -87,6 +87,10 @@ invalid_durations = [
     # decimals must have a non-empty integer value before the separator
     ("PT.5S", "incomplete measurement before character 'S'"),
     ("P1M.1D", "incomplete measurement before character 'D'"),
+    ("PT.5:00:00", ""),
+    ("PT5.:00:00", ""),
+    ("PT12:34:56e10", ""),
+    ("P0000-0.0", ""),
     # segment repetition
     ("PT5MT5S", "unexpected character 'T'"),
     ("P1W2W", "unexpected character 'W'"),
