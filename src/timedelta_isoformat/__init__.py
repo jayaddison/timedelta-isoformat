@@ -141,7 +141,7 @@ class timedelta(datetime.timedelta):
             yield from cls._to_measurements(components)
 
     @staticmethod
-    def _bounds_check(quantity, limit, context) -> bool:
+    def _bounds_check(quantity: float, limit: int | None, context: str) -> bool:
         if limit is None:
             assert 0 <= quantity, context + "[0..+∞)"
         elif limit in (24, 60):
