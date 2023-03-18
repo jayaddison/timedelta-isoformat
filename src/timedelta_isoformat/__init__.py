@@ -32,25 +32,25 @@ class timedelta(datetime.timedelta):
 
         # YYYY-DDD
         if date_length == 8 and delimiters == [4]:
-            yield date_string[0:4], "years", None
-            yield date_string[5:8], "days", 366
+            yield date_string[0:4], "years", None, True
+            yield date_string[5:8], "days", 366, True
 
         # YYYY-MM-DD
         elif date_length == 10 and delimiters == [4, 7]:
-            yield date_string[0:4], "years", None
-            yield date_string[5:7], "months", 12
-            yield date_string[8:10], "days", 31
+            yield date_string[0:4], "years", None, True
+            yield date_string[5:7], "months", 12, True
+            yield date_string[8:10], "days", 31, True
 
         # YYYYDDD
         elif date_length == 7 and delimiters == []:
-            yield date_string[0:4], "years", None
-            yield date_string[4:7], "days", 366
+            yield date_string[0:4], "years", None, True
+            yield date_string[4:7], "days", 366, True
 
         # YYYYMMDD
         elif date_length == 8 and delimiters == []:
-            yield date_string[0:4], "years", None
-            yield date_string[4:6], "months", 12
-            yield date_string[6:8], "days", 31
+            yield date_string[0:4], "years", None, True
+            yield date_string[4:6], "months", 12, True
+            yield date_string[6:8], "days", 31, True
 
         else:
             raise ValueError(f"unable to parse '{date_string}' into date components")
@@ -64,15 +64,15 @@ class timedelta(datetime.timedelta):
 
         # HH:MM:SS[.ssssss]
         if delimiters == [2, 5]:
-            yield time_string[0:2], "hours", 24
-            yield time_string[3:5], "minutes", 60
-            yield time_string[6:15], "seconds", 60
+            yield time_string[0:2], "hours", 24, True
+            yield time_string[3:5], "minutes", 60, True
+            yield time_string[6:15], "seconds", 60, False
 
         # HHMMSS[.ssssss]
         elif delimiters == []:
-            yield time_string[0:2], "hours", 24
-            yield time_string[2:4], "minutes", 60
-            yield time_string[4:13], "seconds", 60
+            yield time_string[0:2], "hours", 24, True
+            yield time_string[2:4], "minutes", 60, True
+            yield time_string[4:13], "seconds", 60, False
 
         else:
             raise ValueError(f"unable to parse '{time_string}' into time components")
@@ -117,14 +117,14 @@ class timedelta(datetime.timedelta):
             if char not in tokens:
                 raise ValueError(f"unexpected character '{char}'")
 
-            yield value, next(tokens, None), None
+            yield value, next(tokens, None), None, False
             value = ""
 
         date_tail, time_tail = (tail, value) if tokens is time_tokens else (value, None)
         if date_tail:
             yield from timedelta._fromdatestring(date_tail)
         if time_tail:
-            yield "0", "hours", 0
+            yield "0", "hours", 0, False
             yield from timedelta._fromtimestring(time_tail)
         if date_tail or time_tail:
             return
@@ -136,12 +136,12 @@ class timedelta(datetime.timedelta):
 
     @staticmethod
     def _to_measurements(components, inclusive_range=True):
-        for value, unit, limit in components:
+        for value, unit, limit, integer_only in components:
             try:
-                assert value[0].isdigit()
+                assert value.isdigit() if integer_only else value[0].isdigit()
                 quantity = float("+" + value.replace(",", "."))
             except (AssertionError, IndexError, ValueError):
-                raise ValueError(f"unable to parse '{value}' as a positive decimal")
+                raise ValueError(f"unable to parse '{value}' as a positive number")
             if limit and quantity >= limit + inclusive_range:
                 bounds = f"[0..{limit}" + ("]" if inclusive_range else ")")
                 raise ValueError(f"{unit} value of {value} exceeds range {bounds}")
