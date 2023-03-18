@@ -22,13 +22,12 @@ class timedelta(datetime.timedelta):
             try:
                 assert self.value[0].isdigit()
                 self.quantity = float(self.value)
-                assert self.valid
+                assert self._bounds_check()
             except (AssertionError, IndexError) as exc:
                 msg = f"unable to parse '{self.value}' as a positive decimal"
                 raise ValueError(msg) from exc
 
-        @property
-        def valid(self) -> bool:
+        def _bounds_check(self) -> bool:
             if not self.limit: return True
             inclusive_limit = self.limit not in (24, 60)
             if inclusive_limit and 0 <= self.quantity <= self.limit: return True
