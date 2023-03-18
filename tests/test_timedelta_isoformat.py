@@ -70,8 +70,8 @@ invalid_durations = [
     ("P1WT1H", "cannot mix weeks with other units"),
     ("P0Y1W", "cannot mix weeks with other units"),
     # incorrect quantities
-    ("PT0.0.0S", "unable to parse '0.0.0' as a positive decimal"),
-    ("P1.,0D", "unable to parse '1..0' as a positive decimal"),
+    ("PT0.0.0S", "could not convert string to float: '0.0.0'"),
+    ("P1.,0D", "could not convert string to float: '1..0'"),
     # date-format durations exceeding calendar limits
     ("P0000-367", "days value of 367 exceeds range [0..366]"),
     ("P0000-400", "days value of 400 exceeds range [0..366]"),
@@ -81,7 +81,7 @@ invalid_durations = [
     ("PT15:25:60", "seconds value of 60 exceeds range [0..60)"),
     ("PT24:00:00", "hours value of 24 exceeds range [0..24)"),
     # invalid date-format style durations
-    ("P0000-1-0", "unable to parse '1-0' as a positive decimal"),
+    ("P0000-1-0", "could not convert string to float: '1-0'"),
     ("PT1:2:3", "unable to parse '1:2:3' into time components"),
     ("PT01:0203", "unable to parse '01:0203' into time components"),
     ("PT01", "unable to parse '01' into time components"),

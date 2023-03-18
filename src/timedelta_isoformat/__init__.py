@@ -129,32 +129,35 @@ class timedelta(datetime.timedelta):
 
         if duration[-1].isupper():
             components = cls._from_designators(duration[1:])
-            yield from cls._to_measurements(components, inclusive_limit=True)
+            yield from cls._to_measurements(components)
             return
 
         date_segment, _, time_segment = duration[1:].partition("T")
         if date_segment:
             components = cls._from_date(date_segment)
-            yield from cls._to_measurements(components, inclusive_limit=True)
+            yield from cls._to_measurements(components)
         if time_segment:
             components = cls._from_time(time_segment)
-            yield from cls._to_measurements(components, inclusive_limit=False)
+            yield from cls._to_measurements(components)
 
     @staticmethod
-    def _to_measurements(components: Components, inclusive_limit: bool) -> Measurements:
+    def _bounds_check(quantity, limit, context) -> bool:
+        if limit is None:
+            assert 0 <= quantity, msg + "[0..+∞)"
+        elif limit in (24, 60):
+            assert 0 <= quantity < limit, context + f"[0..{limit})"
+        else:
+            assert 0 <= quantity <= limit, context + f"[0..{limit}]"
+        return True
+
+    @staticmethod
+    def _to_measurements(components: Components) -> Measurements:
         for value, unit, limit in components:
-            try:
-                assert value[0].isdigit()
-                quantity = float(value)
-            except (AssertionError, IndexError, ValueError) as exc:
-                msg = f"unable to parse '{value}' as a positive decimal"
-                raise ValueError(msg) from exc
-            if not quantity:
-                continue
-            if limit and not (0 <= quantity <= limit if inclusive_limit else 0 <= quantity < limit):
-                bounds = f"[0..{limit}" + ("]" if inclusive_limit else ")")
-                raise ValueError(f"{unit} value of {value} exceeds range {bounds}")
-            yield unit, quantity
+            assert value[0:1].isdigit(), f"unable to parse '{value}' as a positive decimal"
+            quantity = float(value)
+            assert timedelta._bounds_check(quantity, limit, f"{unit} value of {value} exceeds range ")
+            if quantity:
+                yield unit, quantity
 
     @classmethod
     def fromisoformat(cls, duration: str) -> "timedelta":
