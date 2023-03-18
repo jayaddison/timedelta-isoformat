@@ -128,17 +128,14 @@ class timedelta(datetime.timedelta):
         assert duration.startswith("P"), "durations must begin with the character 'P'"
 
         if duration[-1].isupper():
-            components = cls._parse_designators(duration[1:])
-            yield from cls._to_measurements(components)
+            yield from cls._to_measurements(cls._parse_designators(duration[1:]))
             return
 
         date_segment, _, time_segment = duration[1:].partition("T")
         if date_segment:
-            components = cls._parse_date(date_segment)
-            yield from cls._to_measurements(components)
+            yield from cls._to_measurements(cls._parse_date(date_segment))
         if time_segment:
-            components = cls._parse_time(time_segment)
-            yield from cls._to_measurements(components)
+            yield from cls._to_measurements(cls._parse_time(time_segment))
 
     @staticmethod
     def _bounds_check(quantity: float, limit: int | None, context: str) -> bool:
