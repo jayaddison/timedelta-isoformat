@@ -1,7 +1,7 @@
 """Supplemental ISO8601 duration format support for :py:class:`datetime.timedelta`"""
 from dataclasses import dataclass
 import datetime
-from typing import Iterable, TypeAlias
+from typing import Iterable, Tuple, TypeAlias
 
 _NUMBER_FORMAT = frozenset("0123456789,.")
 
