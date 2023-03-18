@@ -29,8 +29,7 @@ class timedelta(datetime.timedelta):
 
         def _bounds_check(self) -> bool:
             if not self.limit:
-                if 0 <= self.quantity:
-                    return True
+                return True
 
             inclusive_limit = self.limit not in (24, 60)
             if inclusive_limit:
