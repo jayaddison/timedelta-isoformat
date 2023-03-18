@@ -21,18 +21,16 @@ class timedelta(datetime.timedelta):
         def __post_init__(self) -> None:
             assert self.value[0:1].isdigit(), f"unable to parse '{self.value}' as a positive decimal"
             self.quantity = float(self.value)
-            try:
-                assert self._bounds_check()
-            except AssertionError as exc:
-                raise ValueError(f"{self.unit} value of {self.value} exceeds range {exc}")
+            assert self._bounds_check()
 
         def _bounds_check(self) -> bool:
+            msg = f"{self.unit} value of {self.value} exceeds range "
             if self.limit is None:
-                assert 0 <= self.quantity, "[0..+∞)"
+                assert 0 <= self.quantity, msg + "[0..+∞)"
             elif self.limit in (24, 60):
-                assert 0 <= self.quantity < self.limit, f"[0..{self.limit})"
+                assert 0 <= self.quantity < self.limit, msg + f"[0..{self.limit})"
             else:
-                assert 0 <= self.quantity <= self.limit, f"[0..{self.limit}]"
+                assert 0 <= self.quantity <= self.limit, msg + f"[0..{self.limit}]"
             return True
 
     Components: TypeAlias = Iterable[Component]
