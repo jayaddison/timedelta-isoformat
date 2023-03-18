@@ -1,5 +1,4 @@
 """Supplemental ISO8601 duration format support for :py:class:`datetime.timedelta`"""
-from dataclasses import dataclass
 import datetime
 from typing import Iterable, Tuple, TypeAlias
 
@@ -11,16 +10,7 @@ class timedelta(datetime.timedelta):
     ISO8601-style parsing and formatting.
     """
 
-    @dataclass
-    class Component:
-        value: str
-        unit: str
-        limit: int | None = None
-
-        def __iter__(self):
-            return iter((self.value, self.unit, self.limit))
-
-    Components: TypeAlias = Iterable[Component]
+    Components: TypeAlias = Iterable[Tuple[str, str, int | None]]
     Measurements: TypeAlias = Iterable[Tuple[str, float]]
 
     def __repr__(self) -> str:
@@ -32,25 +22,25 @@ class timedelta(datetime.timedelta):
 
             # YYYY-DDD
             case _, _, _, _, "-", _, _, _:
-                yield timedelta.Component(segment[0:4], "years")
-                yield timedelta.Component(segment[5:8], "days", 366)
+                yield segment[0:4], "years", None
+                yield segment[5:8], "days", 366
 
             # YYYY-MM-DD
             case _, _, _, _, "-", _, _, "-", _, _:
-                yield timedelta.Component(segment[0:4], "years")
-                yield timedelta.Component(segment[5:7], "months", 12)
-                yield timedelta.Component(segment[8:10], "days", 31)
+                yield segment[0:4], "years", None
+                yield segment[5:7], "months", 12
+                yield segment[8:10], "days", 31
 
             # YYYYDDD
             case _, _, _, _, _, _, _:
-                yield timedelta.Component(segment[0:4], "years")
-                yield timedelta.Component(segment[4:7], "days", 366)
+                yield segment[0:4], "years", None
+                yield segment[4:7], "days", 366
 
             # YYYYMMDD
             case _, _, _, _, _, _, _, _:
-                yield timedelta.Component(segment[0:4], "years")
-                yield timedelta.Component(segment[4:6], "months", 12)
-                yield timedelta.Component(segment[6:8], "days", 31)
+                yield segment[0:4], "years", None
+                yield segment[4:6], "months", 12
+                yield segment[6:8], "days", 31
 
             case _:
                 raise ValueError(f"unable to parse '{segment}' into date components")
@@ -61,27 +51,27 @@ class timedelta(datetime.timedelta):
 
             # HH:MM:SS[.ssssss]
             case _, _, ":", _, _, ":", _, _, ".", *_:
-                yield timedelta.Component(segment[0:2], "hours", 24)
-                yield timedelta.Component(segment[3:5], "minutes", 60)
-                yield timedelta.Component(segment[6:15], "seconds", 60)
+                yield segment[0:2], "hours", 24
+                yield segment[3:5], "minutes", 60
+                yield segment[6:15], "seconds", 60
 
             # HH:MM:SS
             case _, _, ":", _, _, ":", _, _:
-                yield timedelta.Component(segment[0:2], "hours", 24)
-                yield timedelta.Component(segment[3:5], "minutes", 60)
-                yield timedelta.Component(segment[6:8], "seconds", 60)
+                yield segment[0:2], "hours", 24
+                yield segment[3:5], "minutes", 60
+                yield segment[6:8], "seconds", 60
 
             # HHMMSS[.ssssss]
             case _, _, _, _, _, _, ".", *_:
-                yield timedelta.Component(segment[0:2], "hours", 24)
-                yield timedelta.Component(segment[2:4], "minutes", 60)
-                yield timedelta.Component(segment[4:13], "seconds", 60)
+                yield segment[0:2], "hours", 24
+                yield segment[2:4], "minutes", 60
+                yield segment[4:13], "seconds", 60
 
             # HHMMSS
             case _, _, _, _, _, _:
-                yield timedelta.Component(segment[0:2], "hours", 24)
-                yield timedelta.Component(segment[2:4], "minutes", 60)
-                yield timedelta.Component(segment[4:6], "seconds", 60)
+                yield segment[0:2], "hours", 24
+                yield segment[2:4], "minutes", 60
+                yield segment[4:6], "seconds", 60
 
             case _:
                 raise ValueError(f"unable to parse '{segment}' into time components")
@@ -116,7 +106,7 @@ class timedelta(datetime.timedelta):
             assert not (context is week_context and unit), "cannot mix weeks with other units"
             for delimiter, unit in context:
                 if char == delimiter:
-                    yield timedelta.Component(value, unit)
+                    yield value, unit, None
                     value = ""
                     break
             else:
@@ -138,17 +128,20 @@ class timedelta(datetime.timedelta):
         assert duration.startswith("P"), "durations must begin with the character 'P'"
 
         if duration[-1].isupper():
-            yield from cls._to_measurements(cls._from_designators(duration[1:]))
+            components = cls._from_designators(duration[1:])
+            yield from cls._to_measurements(components, inclusive_limit=True)
             return
 
         date_segment, _, time_segment = duration[1:].partition("T")
         if date_segment:
-            yield from cls._to_measurements(cls._from_date(date_segment))
+            components = cls._from_date(date_segment)
+            yield from cls._to_measurements(components, inclusive_limit=True)
         if time_segment:
-            yield from cls._to_measurements(cls._from_time(time_segment))
+            components = cls._from_time(time_segment)
+            yield from cls._to_measurements(components, inclusive_limit=False)
 
     @staticmethod
-    def _to_measurements(components: Components) -> Measurements:
+    def _to_measurements(components: Components, inclusive_limit: bool) -> Measurements:
         for value, unit, limit in components:
             try:
                 assert value[0].isdigit()
@@ -158,7 +151,6 @@ class timedelta(datetime.timedelta):
                 raise ValueError(msg) from exc
             if not quantity:
                 continue
-            inclusive_limit = limit not in (24, 60)
             if limit and not (0 <= quantity <= limit if inclusive_limit else 0 <= quantity < limit):
                 bounds = f"[0..{limit}" + ("]" if inclusive_limit else ")")
                 raise ValueError(f"{unit} value of {value} exceeds range {bounds}")
