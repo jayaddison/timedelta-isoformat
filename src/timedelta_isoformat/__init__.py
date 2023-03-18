@@ -26,68 +26,68 @@ class timedelta(datetime.timedelta):
     def __repr__(self) -> str:
         return f"timedelta_isoformat.{super().__repr__()}"
 
-    @classmethod
-    def _from_date(cls, segment: str) -> Components:
+    @staticmethod
+    def _from_date(segment: str) -> Components:
         match tuple(segment):
 
             # YYYY-DDD
             case _, _, _, _, "-", _, _, _:
-                yield cls.Component(segment[0:4], "years")
-                yield cls.Component(segment[5:8], "days", 366)
+                yield timedelta.Component(segment[0:4], "years")
+                yield timedelta.Component(segment[5:8], "days", 366)
 
             # YYYY-MM-DD
             case _, _, _, _, "-", _, _, "-", _, _:
-                yield cls.Component(segment[0:4], "years")
-                yield cls.Component(segment[5:7], "months", 12)
-                yield cls.Component(segment[8:10], "days", 31)
+                yield timedelta.Component(segment[0:4], "years")
+                yield timedelta.Component(segment[5:7], "months", 12)
+                yield timedelta.Component(segment[8:10], "days", 31)
 
             # YYYYDDD
             case _, _, _, _, _, _, _:
-                yield cls.Component(segment[0:4], "years")
-                yield cls.Component(segment[4:7], "days", 366)
+                yield timedelta.Component(segment[0:4], "years")
+                yield timedelta.Component(segment[4:7], "days", 366)
 
             # YYYYMMDD
             case _, _, _, _, _, _, _, _:
-                yield cls.Component(segment[0:4], "years")
-                yield cls.Component(segment[4:6], "months", 12)
-                yield cls.Component(segment[6:8], "days", 31)
+                yield timedelta.Component(segment[0:4], "years")
+                yield timedelta.Component(segment[4:6], "months", 12)
+                yield timedelta.Component(segment[6:8], "days", 31)
 
             case _:
                 raise ValueError(f"unable to parse '{segment}' into date components")
 
-    @classmethod
-    def _from_time(cls, segment: str) -> Components:
+    @staticmethod
+    def _from_time(segment: str) -> Components:
         match tuple(segment):
 
             # HH:MM:SS[.ssssss]
             case _, _, ":", _, _, ":", _, _, ".", *_:
-                yield cls.Component(segment[0:2], "hours", 24)
-                yield cls.Component(segment[3:5], "minutes", 60)
-                yield cls.Component(segment[6:15], "seconds", 60)
+                yield timedelta.Component(segment[0:2], "hours", 24)
+                yield timedelta.Component(segment[3:5], "minutes", 60)
+                yield timedelta.Component(segment[6:15], "seconds", 60)
 
             # HH:MM:SS
             case _, _, ":", _, _, ":", _, _:
-                yield cls.Component(segment[0:2], "hours", 24)
-                yield cls.Component(segment[3:5], "minutes", 60)
-                yield cls.Component(segment[6:8], "seconds", 60)
+                yield timedelta.Component(segment[0:2], "hours", 24)
+                yield timedelta.Component(segment[3:5], "minutes", 60)
+                yield timedelta.Component(segment[6:8], "seconds", 60)
 
             # HHMMSS[.ssssss]
             case _, _, _, _, _, _, ".", *_:
-                yield cls.Component(segment[0:2], "hours", 24)
-                yield cls.Component(segment[2:4], "minutes", 60)
-                yield cls.Component(segment[4:13], "seconds", 60)
+                yield timedelta.Component(segment[0:2], "hours", 24)
+                yield timedelta.Component(segment[2:4], "minutes", 60)
+                yield timedelta.Component(segment[4:13], "seconds", 60)
 
             # HHMMSS
             case _, _, _, _, _, _:
-                yield cls.Component(segment[0:2], "hours", 24)
-                yield cls.Component(segment[2:4], "minutes", 60)
-                yield cls.Component(segment[4:6], "seconds", 60)
+                yield timedelta.Component(segment[0:2], "hours", 24)
+                yield timedelta.Component(segment[2:4], "minutes", 60)
+                yield timedelta.Component(segment[4:6], "seconds", 60)
 
             case _:
                 raise ValueError(f"unable to parse '{segment}' into time components")
 
-    @classmethod
-    def _from_designators(cls, duration: str) -> Components:
+    @staticmethod
+    def _from_designators(duration: str) -> Components:
         """Parser for designator-separated ISO-8601 duration strings
 
         The code sweeps through the input exactly once, expecting to find measurements
@@ -116,7 +116,7 @@ class timedelta(datetime.timedelta):
             assert not (context is week_context and unit), "cannot mix weeks with other units"
             for delimiter, unit in context:
                 if char == delimiter:
-                    yield cls.Component(value, unit)
+                    yield timedelta.Component(value, unit)
                     value = ""
                     break
             else:
