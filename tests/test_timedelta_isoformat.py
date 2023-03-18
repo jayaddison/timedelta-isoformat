@@ -55,7 +55,7 @@ invalid_durations = [
     ("PTT", "unexpected character 'T'"),
     ("PTP", "unexpected character 'P'"),
     # incomplete measurements
-    ("P0YD", "unable to parse '' as a positive decimal"),
+    ("P0YD", "unable to parse '' as a positive number"),
     # repeated designators
     ("P1DT1H3H1M", "unexpected character 'H'"),
     ("P1D3D", "unexpected character 'D'"),
@@ -70,8 +70,8 @@ invalid_durations = [
     ("P1WT1H", "cannot mix weeks with other units"),
     ("P0Y1W", "cannot mix weeks with other units"),
     # incorrect quantities
-    ("PT0.0.0S", "unable to parse '0.0.0' as a positive decimal"),
-    ("P1.,0D", "unable to parse '1.,0' as a positive decimal"),
+    ("PT0.0.0S", "unable to parse '0.0.0' as a positive number"),
+    ("P1.,0D", "unable to parse '1.,0' as a positive number"),
     # date-format durations exceeding calendar limits
     ("P0000-367", "days value of 367 exceeds range [0..366]"),
     ("P0000-400", "days value of 400 exceeds range [0..366]"),
@@ -81,19 +81,19 @@ invalid_durations = [
     ("PT15:25:60", "seconds value of 60 exceeds range [0..60)"),
     ("PT24:00:00", "hours value of 24 exceeds range [0..24)"),
     # invalid date-format style durations
-    ("P0000-1-0", "unable to parse '1-0' as a positive decimal"),
+    ("P0000-1-0", "unable to parse '1-0' as a positive number"),
     ("PT1:2:3", "unable to parse '1:2:3' into time components"),
     ("PT01:0203", "unable to parse '01:0203' into time components"),
     ("PT01", "unable to parse '01' into time components"),
     ("PT01:02:3.4", "unable to parse '01:02:3.4' into time components"),
     ("P0000y00m00", "unable to parse '0000y00m00' into date components"),
     # decimals must have a non-empty integer value before the separator
-    ("PT.5S", "unable to parse '.5' as a positive decimal"),
-    ("P1M.1D", "unable to parse '.1' as a positive decimal"),
-    ("PT.5:00:00", ""),
-    ("PT5.:00:00", ""),
-    ("PT12:34:56e10", ""),
-    ("P0000-0.0", ""),
+    ("PT.5S", "unable to parse '.5' as a positive number"),
+    ("P1M.1D", "unable to parse '.1' as a positive number"),
+    ("PT.5:00:00", "unable to parse '.5' as a positive number"),
+    ("PT5.:00:00", "unable to parse '5.' as a positive number"),
+    ("PT12:34:56e10", "unable to parse '12:34:56e10' into time components"),
+    ("P0000-0.0", "unable to parse '0.0' as a positive number"),
     # segment repetition
     ("PT5MT5S", "unexpected character 'T'"),
     ("P1W2W", "unexpected character 'W'"),
@@ -101,8 +101,8 @@ invalid_durations = [
     ("P1DT5S2W", "unexpected character 'W'"),
     ("P1W1D", "unexpected character 'D'"),
     # unexpected characters within date/time components
-    ("PT01:-2:03", "unable to parse '-2' as a positive decimal"),
-    ("P000000.1", "unable to parse '.1' as a positive decimal"),
+    ("PT01:-2:03", "unable to parse '-2' as a positive number"),
+    ("P000000.1", "unable to parse '.1' as a positive number"),
     ("PT000000--", "unable to parse '000000--' into time components"),
     ("PT00:00:00,-", "unable to parse '00:00:00,-' into time components"),
     # negative designator-separated values
