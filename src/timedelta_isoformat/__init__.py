@@ -28,21 +28,12 @@ class timedelta(datetime.timedelta):
                 raise ValueError(msg) from exc
 
         def _bounds_check(self) -> bool:
-            if not self.limit:
-                return True
-
+            if not self.limit: return True
             inclusive_limit = self.limit not in (24, 60)
-            if inclusive_limit:
-                if 0 <= self.quantity <= self.limit:
-                    return True
-            else:
-                if 0 <= self.quantity < self.limit:
-                    return True
-
+            if inclusive_limit and 0 <= self.quantity <= self.limit: return True
+            if not inclusive_limit and 0 <= self.quantity < self.limit: return True
             bounds = f"[0..{self.limit}" + ("]" if inclusive_limit else ")")
-            raise ValueError(
-                f"{self.unit} value of {self.value} exceeds range {bounds}"
-            )
+            raise ValueError(f"{self.unit} value of {self.value} exceeds range {bounds}")
 
     Components: TypeAlias = Iterable[Component]
 
@@ -52,6 +43,7 @@ class timedelta(datetime.timedelta):
     @classmethod
     def _parse_date(cls, segment: str) -> Components:
         match tuple(segment):
+
             # YYYY-DDD
             case _, _, _, _, "-", _, _, _:
                 yield cls.Component(segment[0:4], "years")
@@ -80,6 +72,7 @@ class timedelta(datetime.timedelta):
     @classmethod
     def _parse_time(cls, segment: str) -> Components:
         match tuple(segment):
+
             # HH:MM:SS[.ssssss]
             case _, _, ":", _, _, ":", _, _, ".", *_:
                 yield cls.Component(segment[0:2], "hours", 24)
@@ -134,9 +127,7 @@ class timedelta(datetime.timedelta):
                 context = week_context
                 pass
 
-            assert not (
-                context is week_context and unit
-            ), "cannot mix weeks with other units"
+            assert not (context is week_context and unit), "cannot mix weeks with other units"
             for delimiter, unit in context:
                 if char == delimiter:
                     yield cls.Component(value, unit)
@@ -177,13 +168,7 @@ class timedelta(datetime.timedelta):
         :raises: `ValueError` with an explanatory message when parsing fails
         """
         try:
-            return cls(
-                **{
-                    m.unit: m.quantity
-                    for m in cls._parse_duration(duration)
-                    if m.quantity
-                }
-            )
+            return cls(**{m.unit: m.quantity for m in cls._parse_duration(duration) if m.quantity})
         except (AssertionError, ValueError) as exc:
             raise ValueError(f"could not parse duration '{duration}': {exc}") from exc
 
