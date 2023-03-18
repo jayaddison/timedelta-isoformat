@@ -28,18 +28,13 @@ class timedelta(datetime.timedelta):
                 raise ValueError(msg) from exc
 
         def _bounds_check(self) -> bool:
-            if not self.limit:
-                return True
+            upper_limit_inclusive = self.limit not in (24, 60) if self.limit else None
+            match upper_limit_inclusive:
+                case None if 0 <= self.quantity: return True
+                case True if 0 <= self.quantity <= self.limit: return True
+                case False if 0 <= self.quantity < self.limit: return True
 
-            inclusive_limit = self.limit not in (24, 60)
-            if inclusive_limit:
-                if 0 <= self.quantity <= self.limit:
-                    return True
-            else:
-                if 0 <= self.quantity < self.limit:
-                    return True
-
-            bounds = f"[0..{self.limit}" + ("]" if inclusive_limit else ")")
+            bounds = f"[0..{self.limit}" + ("]" if upper_limit_inclusive else ")")
             raise ValueError(f"{self.unit} value of {self.value} exceeds range {bounds}")
 
     Components: TypeAlias = Iterable[Component]
