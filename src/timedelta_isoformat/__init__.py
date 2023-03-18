@@ -143,7 +143,7 @@ class timedelta(datetime.timedelta):
     @staticmethod
     def _bounds_check(quantity, limit, context) -> bool:
         if limit is None:
-            assert 0 <= quantity, msg + "[0..+∞)"
+            assert 0 <= quantity, context + "[0..+∞)"
         elif limit in (24, 60):
             assert 0 <= quantity < limit, context + f"[0..{limit})"
         else:
