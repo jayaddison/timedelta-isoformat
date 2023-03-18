@@ -90,6 +90,10 @@ invalid_durations = [
     # decimals must have a non-empty integer value before the separator
     ("PT.5S", "unable to parse '.5' as a positive decimal"),
     ("P1M.1D", "unable to parse '.1' as a positive decimal"),
+    ("PT.5:00:00", ""),
+    ("PT5.:00:00", ""),
+    ("PT12:34:56e10", ""),
+    ("P0000-0.0", ""),
     # segment repetition
     ("PT5MT5S", "unexpected character 'T'"),
     ("P1W2W", "unexpected character 'W'"),
