@@ -18,7 +18,7 @@ class timedelta(datetime.timedelta):
         limit: int | None = None
         quantity: float = 0
 
-        def __post_init__(self) -> None:
+        def __post_init__(self):
             try:
                 assert self.value[0].isdigit()
                 self.quantity = float(self.value)
@@ -27,7 +27,7 @@ class timedelta(datetime.timedelta):
                 raise ValueError(msg) from exc
 
         @property
-        def valid(self) -> bool:
+        def valid(self):
             if not self.quantity: return False
             if not self.limit: return True
 
