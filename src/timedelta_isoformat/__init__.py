@@ -19,13 +19,9 @@ class timedelta(datetime.timedelta):
         quantity: float = 0
 
         def __post_init__(self) -> None:
-            try:
-                assert self.value[0].isdigit()
-                self.quantity = float(self.value)
-                assert self._bounds_check()
-            except (AssertionError, IndexError) as exc:
-                msg = f"unable to parse '{self.value}' as a positive decimal"
-                raise ValueError(msg) from exc
+            assert self.value[0:1].isdigit(), f"unable to parse '{self.value}' as a positive decimal"
+            self.quantity = float(self.value)
+            assert self._bounds_check()
 
         def _bounds_check(self) -> bool:
             inclusive_limit = self.limit not in (24, 60)
