@@ -22,25 +22,25 @@ class timedelta(datetime.timedelta):
 
             # YYYY-DDD
             case _, _, _, _, "-", _, _, _:
-                yield segment[0:4], "years", None
-                yield segment[5:8], "days", 366
+                yield segment[0:4], "years", None, True
+                yield segment[5:8], "days", 366, True
 
             # YYYY-MM-DD
             case _, _, _, _, "-", _, _, "-", _, _:
-                yield segment[0:4], "years", None
-                yield segment[5:7], "months", 12
-                yield segment[8:10], "days", 31
+                yield segment[0:4], "years", None, True
+                yield segment[5:7], "months", 12, True
+                yield segment[8:10], "days", 31, True
 
             # YYYYDDD
             case _, _, _, _, _, _, _:
-                yield segment[0:4], "years", None
-                yield segment[4:7], "days", 366
+                yield segment[0:4], "years", None, True
+                yield segment[4:7], "days", 366, True
 
             # YYYYMMDD
             case _, _, _, _, _, _, _, _:
-                yield segment[0:4], "years", None
-                yield segment[4:6], "months", 12
-                yield segment[6:8], "days", 31
+                yield segment[0:4], "years", None, True
+                yield segment[4:6], "months", 12, True
+                yield segment[6:8], "days", 31, True
 
             case _:
                 raise ValueError(f"unable to parse '{segment}' into date components")
@@ -51,27 +51,27 @@ class timedelta(datetime.timedelta):
 
             # HH:MM:SS[.ssssss]
             case _, _, ":", _, _, ":", _, _, ".", *_:
-                yield segment[0:2], "hours", 24
-                yield segment[3:5], "minutes", 60
-                yield segment[6:15], "seconds", 60
+                yield segment[0:2], "hours", 24, True
+                yield segment[3:5], "minutes", 60, True
+                yield segment[6:15], "seconds", 60, False
 
             # HH:MM:SS
             case _, _, ":", _, _, ":", _, _:
-                yield segment[0:2], "hours", 24
-                yield segment[3:5], "minutes", 60
-                yield segment[6:8], "seconds", 60
+                yield segment[0:2], "hours", 24, True
+                yield segment[3:5], "minutes", 60, True
+                yield segment[6:8], "seconds", 60, True
 
             # HHMMSS[.ssssss]
             case _, _, _, _, _, _, ".", *_:
-                yield segment[0:2], "hours", 24
-                yield segment[2:4], "minutes", 60
-                yield segment[4:13], "seconds", 60
+                yield segment[0:2], "hours", 24, True
+                yield segment[2:4], "minutes", 60, True
+                yield segment[4:13], "seconds", 60, False
 
             # HHMMSS
             case _, _, _, _, _, _:
-                yield segment[0:2], "hours", 24
-                yield segment[2:4], "minutes", 60
-                yield segment[4:6], "seconds", 60
+                yield segment[0:2], "hours", 24, True
+                yield segment[2:4], "minutes", 60, True
+                yield segment[4:6], "seconds", 60, True
 
             case _:
                 raise ValueError(f"unable to parse '{segment}' into time components")
@@ -106,7 +106,7 @@ class timedelta(datetime.timedelta):
             assert not (context is week_context and unit), "cannot mix weeks with other units"
             for delimiter, unit in context:
                 if char == delimiter:
-                    yield value, unit, None
+                    yield value, unit, None, False
                     value = ""
                     break
             else:
@@ -138,6 +138,14 @@ class timedelta(datetime.timedelta):
             yield from cls._to_measurements(cls._parse_time(time_segment))
 
     @staticmethod
+    def _type_check(value: str, integer_only: bool) -> bool:
+        if integer_only:
+            assert value.isdigit(), f"unable to parse '{value}' as a positive number"
+        else:
+            assert value[0:1].isdigit(), f"unable to parse '{value}' as a positive number"
+        return True
+
+    @staticmethod
     def _bounds_check(quantity: float, limit: int | None, context: str) -> bool:
         if limit is None:
             assert 0 <= quantity, context + "[0..+∞)"
@@ -149,8 +157,8 @@ class timedelta(datetime.timedelta):
 
     @staticmethod
     def _to_measurements(components: Components) -> Measurements:
-        for value, unit, limit in components:
-            assert value[0:1].isdigit(), f"unable to parse '{value}' as a positive decimal"
+        for value, unit, limit, integer_only in components:
+            assert timedelta._type_check(value, integer_only)
             quantity = float(value)
             assert timedelta._bounds_check(quantity, limit, f"{unit} value of {value} exceeds range ")
             if quantity:
