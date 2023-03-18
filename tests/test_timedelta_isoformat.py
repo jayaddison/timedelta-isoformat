@@ -83,7 +83,7 @@ invalid_durations = [
     ("P0000-1-0", "unable to parse '0000-1-0' into date components"),
     ("PT1:2:3", "unable to parse '1:2:3' into time components"),
     ("PT01:0203", "unable to parse '01:0203' into time components"),
-    ("PT01", "unexpected prefix '' in minutes value ''"),
+    ("PT01", "unable to parse minutes value '' as a positive integer"),
     # decimals must have a non-empty integer value before the separator
     ("PT.5S", "incomplete measurement before character 'S'"),
     ("P1M.1D", "incomplete measurement before character 'D'"),
@@ -98,14 +98,14 @@ invalid_durations = [
     ("P1DT5S2W", "unexpected character 'W'"),
     ("P1W1D", "unexpected character 'D'"),
     # unexpected characters within date/time components
-    ("PT01:-2:03", "unexpected prefix '-' in minutes value '-2'"),
-    ("P000000.1", "unexpected prefix '.' in days value '.1'"),
+    ("PT01:-2:03", "unable to parse minutes value '-2' as a positive integer"),
+    ("P000000.1", "unable to parse days value '.1' as a positive integer"),
     ("PT000000--", "unexpected character '-'"),
-    ("PT00:00:00,-", "unexpected prefix '-' in microseconds value '-00000'"),
+    ("PT00:00:00,-", "unable to parse microseconds value '-00000' as a positive integer"),
     # negative designator-separated values
-    ("P-1DT0S", "unexpected prefix '-' in days value '-1'"),
-    ("P0M-2D", "unexpected prefix '-' in days value '-2'"),
-    ("P0DT1M-3S", "unexpected prefix '-' in seconds value '-3'"),
+    ("P-1DT0S", "unable to parse days value '-1' as a positive integer"),
+    ("P0M-2D", "unable to parse days value '-2' as a positive integer"),
+    ("P0DT1M-3S", "unable to parse seconds value '-3' as a positive integer"),
 ]
 
 # ambiguous cases
