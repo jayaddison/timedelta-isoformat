@@ -45,7 +45,7 @@ class timedelta(datetime.timedelta):
         return f"timedelta_isoformat.{super().__repr__()}"
 
     @classmethod
-    def _from_date(cls, segment: str) -> Components:
+    def _parse_date(cls, segment: str) -> Components:
         match tuple(segment):
 
             # YYYY-DDD
@@ -74,7 +74,7 @@ class timedelta(datetime.timedelta):
                 raise ValueError(f"unable to parse '{segment}' into date components")
 
     @classmethod
-    def _from_time(cls, segment: str) -> Components:
+    def _parse_time(cls, segment: str) -> Components:
         match tuple(segment):
 
             # HH:MM:SS[.ssssss]
@@ -105,7 +105,7 @@ class timedelta(datetime.timedelta):
                 raise ValueError(f"unable to parse '{segment}' into time components")
 
     @classmethod
-    def _from_designators(cls, duration: str) -> Components:
+    def _parse_designators(cls, duration: str) -> Components:
         """Parser for designator-separated ISO-8601 duration strings
 
         The code sweeps through the input exactly once, expecting to find measurements
@@ -143,7 +143,7 @@ class timedelta(datetime.timedelta):
         assert unit, "no measurements found"
 
     @classmethod
-    def _from_duration(cls, duration: str) -> Measurements:
+    def _parse_duration(cls, duration: str) -> Measurements:
         """Selects and runs an appropriate parser for ISO-8601 duration strings
 
         The format of these strings is composed of two segments; date measurements
@@ -156,14 +156,14 @@ class timedelta(datetime.timedelta):
         assert duration.startswith("P"), "durations must begin with the character 'P'"
 
         if duration[-1].isupper():
-            yield from cls._from_designators(duration[1:])
+            yield from cls._parse_designators(duration[1:])
             return
 
         date_segment, _, time_segment = duration[1:].partition("T")
         if date_segment:
-            yield from cls._from_date(date_segment)
+            yield from cls._parse_date(date_segment)
         if time_segment:
-            yield from cls._from_time(time_segment)
+            yield from cls._parse_time(time_segment)
 
     @classmethod
     def fromisoformat(cls, duration: str) -> "timedelta":
@@ -172,7 +172,7 @@ class timedelta(datetime.timedelta):
         :raises: `ValueError` with an explanatory message when parsing fails
         """
         try:
-            return cls(**{m.unit: m.quantity for m in cls._from_duration(duration) if m.valid})
+            return cls(**{m.unit: m.quantity for m in cls._parse_duration(duration) if m.valid})
         except (AssertionError, ValueError) as exc:
             raise ValueError(f"could not parse duration '{duration}': {exc}") from exc
 
