@@ -21,25 +21,25 @@ class timedelta(datetime.timedelta):
 
         # YYYY-DDD
         if date_length == 8 and delimiters == [4]:
-            yield segment[0:4], "years", None
-            yield segment[5:8], "days", 366
+            yield segment[0:4], "years", None, True
+            yield segment[5:8], "days", 366, True
 
         # YYYY-MM-DD
         elif date_length == 10 and delimiters == [4, 7]:
-            yield segment[0:4], "years", None
-            yield segment[5:7], "months", 12
-            yield segment[8:10], "days", 31
+            yield segment[0:4], "years", None, True
+            yield segment[5:7], "months", 12, True
+            yield segment[8:10], "days", 31, True
 
         # YYYYDDD
         elif date_length == 7 and not delimiters:
-            yield segment[0:4], "years", None
-            yield segment[4:7], "days", 366
+            yield segment[0:4], "years", None, True
+            yield segment[4:7], "days", 366, True
 
         # YYYYMMDD
         elif date_length == 8 and not delimiters:
-            yield segment[0:4], "years", None
-            yield segment[4:6], "months", 12
-            yield segment[6:8], "days", 31
+            yield segment[0:4], "years", None, True
+            yield segment[4:6], "months", 12, True
+            yield segment[6:8], "days", 31, True
 
         else:
             raise ValueError(f"unable to parse '{segment}' into date components")
@@ -53,15 +53,15 @@ class timedelta(datetime.timedelta):
 
         # HH:MM:SS[.ssssss]
         if delimiters == [2, 5]:
-            yield segment[0:2], "hours", 24
-            yield segment[3:5], "minutes", 60
-            yield segment[6:15], "seconds", 60
+            yield segment[0:2], "hours", 24, True
+            yield segment[3:5], "minutes", 60, True
+            yield segment[6:15], "seconds", 60, False
 
         # HHMMSS[.ssssss]
         elif not delimiters:
-            yield segment[0:2], "hours", 24
-            yield segment[2:4], "minutes", 60
-            yield segment[4:13], "seconds", 60
+            yield segment[0:2], "hours", 24, True
+            yield segment[2:4], "minutes", 60, True
+            yield segment[4:13], "seconds", 60, False
 
         else:
             raise ValueError(f"unable to parse '{segment}' into time components")
@@ -96,7 +96,7 @@ class timedelta(datetime.timedelta):
             if char not in tokens:
                 raise ValueError(f"unexpected character '{char}'")
 
-            yield value, next(tokens), None
+            yield value, next(tokens), None, False
             value = ""
 
         weeks_parsed = next(week_tokens, None) != "W"
@@ -135,12 +135,12 @@ class timedelta(datetime.timedelta):
         components: Iterable[Tuple[str, str, Optional[int]]],
         inclusive_range: bool = True,
     ) -> Iterable[Tuple[str, float]]:
-        for value, unit, limit in components:
+        for value, unit, limit, integer_only in components:
             try:
-                assert value[0].isdigit()
+                assert value.isdigit() if integer_only else value[0].isdigit()
                 quantity = float("+" + value.replace(",", "."))
             except (AssertionError, IndexError, ValueError) as exc:
-                msg = f"unable to parse '{value}' as a positive decimal"
+                msg = f"unable to parse '{value}' as a positive number"
                 raise ValueError(msg) from exc
             if not quantity:
                 continue
