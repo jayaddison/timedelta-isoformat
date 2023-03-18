@@ -33,10 +33,9 @@ class timedelta(datetime.timedelta):
                 case None, _ if 0 <= self.quantity: return True
                 case _, True if 0 <= self.quantity <= self.limit: return True
                 case _, False if 0 <= self.quantity < self.limit: return True
-                case _:
-                    bounds = f"[0..{self.limit}" + ("]" if inclusive_limit else ")")
-                    msg = f"{self.unit} value of {self.value} exceeds range {bounds}"
-                    raise ValueError(msg)
+
+            bounds = f"[0..{self.limit}" + ("]" if inclusive_limit else ")")
+            raise ValueError(f"{self.unit} value of {self.value} exceeds range {bounds}")
 
     Components: TypeAlias = Iterable[Component]
 
