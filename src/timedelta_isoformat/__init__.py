@@ -115,7 +115,7 @@ class timedelta(datetime.timedelta):
         assert unit, "no measurements found"
 
     @classmethod
-    def _parse_duration(cls, duration: str) -> Measurements:
+    def _parse_duration(cls, duration: str) -> Components:
         """Selects and runs an appropriate parser for ISO-8601 duration strings
 
         The format of these strings is composed of two segments; date measurements
@@ -128,14 +128,14 @@ class timedelta(datetime.timedelta):
         assert duration.startswith("P"), "durations must begin with the character 'P'"
 
         if duration[-1].isupper():
-            yield from cls._to_measurements(cls._parse_designators(duration[1:]))
+            yield from cls._parse_designators(duration[1:])
             return
 
         date_segment, _, time_segment = duration[1:].partition("T")
         if date_segment:
-            yield from cls._to_measurements(cls._parse_date(date_segment))
+            yield from cls._parse_date(date_segment)
         if time_segment:
-            yield from cls._to_measurements(cls._parse_time(time_segment))
+            yield from cls._parse_time(time_segment)
 
     @staticmethod
     def _to_measurements(components: Components) -> Measurements:
@@ -158,7 +158,7 @@ class timedelta(datetime.timedelta):
         :raises: `ValueError` with an explanatory message when parsing fails
         """
         try:
-            return cls(**dict(cls._parse_duration(duration)))
+            return cls(**dict(cls._to_measurements(cls._parse_duration(duration))))
         except (AssertionError, ValueError) as exc:
             raise ValueError(f"could not parse duration '{duration}': {exc}") from exc
 
