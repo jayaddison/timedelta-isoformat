@@ -129,13 +129,12 @@ class timedelta(datetime.timedelta):
 
         if duration[-1].isupper():
             yield from cls._parse_designators(duration[1:])
-            return
-
-        date_segment, _, time_segment = duration[1:].partition("T")
-        if date_segment:
-            yield from cls._parse_date(date_segment)
-        if time_segment:
-            yield from cls._parse_time(time_segment)
+        else:
+            date_segment, _, time_segment = duration[1:].partition("T")
+            if date_segment:
+                yield from cls._parse_date(date_segment)
+            if time_segment:
+                yield from cls._parse_time(time_segment)
 
     @staticmethod
     def _to_measurements(components: Components) -> Measurements:
