@@ -10,7 +10,7 @@ class timedelta(datetime.timedelta):
     ISO8601-style parsing and formatting.
     """
 
-    Components: TypeAlias = Iterable[Tuple[str, str, int | None]]
+    Components: TypeAlias = Iterable[Tuple[str, str, int | None, bool]]
     Measurements: TypeAlias = Iterable[Tuple[str, float]]
 
     def __repr__(self) -> str:
