@@ -138,29 +138,16 @@ class timedelta(datetime.timedelta):
             yield from cls._to_measurements(cls._parse_time(time_segment))
 
     @staticmethod
-    def _type_check(value: str, integer_only: bool) -> bool:
-        if integer_only:
-            assert value.isdigit(), f"unable to parse '{value}' as a positive number"
-        else:
-            assert value[0:1].isdigit(), f"unable to parse '{value}' as a positive number"
-        return True
-
-    @staticmethod
-    def _bounds_check(quantity: float, limit: int | None, context: str) -> bool:
-        if limit is None:
-            assert 0 <= quantity, context + "[0..+∞)"
-        elif limit in (24, 60):
-            assert 0 <= quantity < limit, context + f"[0..{limit})"
-        else:
-            assert 0 <= quantity <= limit, context + f"[0..{limit}]"
-        return True
-
-    @staticmethod
     def _to_measurements(components: Components) -> Measurements:
         for value, unit, limit, integer_only in components:
-            assert timedelta._type_check(value, integer_only)
+            assert value.isdigit() if integer_only else value[0:1].isdigit(), f"unable to parse '{value}' as a positive number"
             quantity = float(value)
-            assert timedelta._bounds_check(quantity, limit, f"{unit} value of {value} exceeds range ")
+            if limit is None:
+                assert 0 <= quantity, f"{unit} value of {value} exceeds range [0..+∞)"
+            elif limit in (24, 60):
+                assert 0 <= quantity < limit, f"{unit} value of {value} exceeds range [0..{limit})"
+            else:
+                assert 0 <= quantity <= limit, f"{unit} value of {value} exceeds range [0..{limit}]"
             if quantity:
                 yield unit, quantity
 
