@@ -160,11 +160,9 @@ class TimedeltaISOFormat(unittest.TestCase):
             with self.subTest(valid_timedelta=valid_timedelta):
                 duration_string = valid_timedelta.isoformat()
                 parsed_timedelta = timedelta.fromisoformat(duration_string)
+                parsed_duration_string = parsed_timedelta.isoformat()
                 self.assertEqual(parsed_timedelta, valid_timedelta)
-                self.assertLessEqual(
-                    len(parsed_timedelta.isoformat()),
-                    len(duration_string),
-                )
+                self.assertFalse(len(parsed_duration_string) > len(duration_string))
 
     class YearMonthTimedelta(timedelta):
         """Subclass of :py:class:`timedelta_isoformat.timedelta` for year/month tests"""
