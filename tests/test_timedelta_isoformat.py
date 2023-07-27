@@ -152,7 +152,7 @@ class TimedeltaISOFormat(unittest.TestCase):
     def test_fromisoformat_invalid_type(self) -> None:
         """Parsing cases that should all fail"""
         with self.assertRaises(AssertionError) as context:
-            timedelta.fromisoformat(["P", "1", "Y", "1", "M"])
+            timedelta.fromisoformat(["P", "1", "Y", "1", "M"])  # type: ignore
         self.assertIn("expected duration to be a str", str(context.exception))
 
     def test_roundtrip_valid(self) -> None:
