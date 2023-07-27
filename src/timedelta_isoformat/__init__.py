@@ -154,6 +154,7 @@ class timedelta(datetime.timedelta):
 
         :raises: `ValueError` with an explanatory message when parsing fails
         """
+        assert isinstance(duration, str), "expected duration to be a str"
         try:
             return cls(**dict(cls._to_measurements(cls._parse_duration(duration))))
         except (AssertionError, ValueError) as exc:
