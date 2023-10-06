@@ -1,5 +1,4 @@
 """Test coverage for :py:module:`timedelta_isoformat`"""
-from typing import Union
 import unittest
 
 from timedelta_isoformat import timedelta
@@ -56,7 +55,7 @@ invalid_durations = [
     ("PTT", "unexpected character 'T'"),
     ("PTP", "unexpected character 'P'"),
     # incomplete measurements
-    ("P0YD", "unable to parse '' as a positive decimal"),
+    ("P0YD", "unable to parse '' as a positive number"),
     # repeated designators
     ("P1DT1H3H1M", "unexpected character 'H'"),
     ("P1D3D", "unexpected character 'D'"),
@@ -71,8 +70,8 @@ invalid_durations = [
     ("P1WT1H", "cannot mix weeks with other units"),
     ("P0Y1W", "cannot mix weeks with other units"),
     # incorrect quantities
-    ("PT0.0.0S", "unable to parse '0.0.0' as a positive decimal"),
-    ("P1.,0D", "unable to parse '1.,0' as a positive decimal"),
+    ("PT0.0.0S", "could not convert string to float: '0.0.0'"),
+    ("P1.,0D", "could not convert string to float: '1..0'"),
     # date-format durations exceeding calendar limits
     ("P0000-367", "days value of 367 exceeds range [0..366]"),
     ("P0000-400", "days value of 400 exceeds range [0..366]"),
@@ -82,29 +81,48 @@ invalid_durations = [
     ("PT15:25:60", "seconds value of 60 exceeds range [0..60)"),
     ("PT24:00:00", "hours value of 24 exceeds range [0..24)"),
     # invalid date-format style durations
-    ("P0000-1-0", "unable to parse '1-0' as a positive decimal"),
+    ("P0000-1-0", "unable to parse '1-0' as a positive number"),
     ("PT1:2:3", "unable to parse '1:2:3' into time components"),
     ("PT01:0203", "unable to parse '01:0203' into time components"),
     ("PT01", "unable to parse '01' into time components"),
     ("PT01:02:3.4", "unable to parse '01:02:3.4' into time components"),
+    ("P0000y00m00", "unable to parse '0000y00m00' into date components"),
     # decimals must have a non-empty integer value before the separator
-    ("PT.5S", "unable to parse '.5' as a positive decimal"),
-    ("P1M.1D", "unable to parse '.1' as a positive decimal"),
+    ("PT.5S", "unable to parse '.5' as a positive number"),
+    ("P1M.1D", "unable to parse '.1' as a positive number"),
+    ("PT.5:00:00", "unable to parse '.5' as a positive number"),
+    ("PT5.:00:00", "unable to parse '5.' as a positive number"),
+    ("PT12:34:56e10", "unable to parse '12:34:56e10' into time components"),
+    ("P0000-0.0", "unable to parse '0.0' as a positive number"),
     # segment repetition
     ("PT5MT5S", "unexpected character 'T'"),
-    ("P1W2W", "unexpected character 'W'"),
+    ("P1W2W", "cannot mix weeks with other units"),
     # segments out-of-order
-    ("P1DT5S2W", "unexpected character 'W'"),
-    ("P1W1D", "unexpected character 'D'"),
+    ("P1DT5S2W", "cannot mix weeks with other units"),
+    ("P1W1D", "cannot mix weeks with other units"),
     # unexpected characters within date/time components
-    ("PT01:-2:03", "unable to parse '-2' as a positive decimal"),
-    ("P000000.1", "unable to parse '.1' as a positive decimal"),
+    ("PT01:-2:03", "unable to parse '-2' as a positive number"),
+    ("P000000.1", "unable to parse '.1' as a positive number"),
     ("PT000000--", "unable to parse '000000--' into time components"),
     ("PT00:00:00,-", "unable to parse '00:00:00,-' into time components"),
+    ("P-999Y", "unexpected character '-'"),
     # negative designator-separated values
     ("P-1DT0S", "unexpected character '-'"),
     ("P0M-2D", "unexpected character '-'"),
     ("P0DT1M-3S", "unexpected character '-'"),
+    # positive designator-separated values
+    ("P+1DT0S", "unexpected character '+'"),
+    ("P0M+2D", "unexpected character '+'"),
+    ("P0DT1M+3S", "unexpected character '+'"),
+    # scientific notation in designated values
+    ("P1.0e+1D", "unexpected character 'e'"),
+    ("P10.0E-1D", "unexpected character 'E'"),
+    # attempt to cause the parser to confuse duration tokens and timedelta arguments
+    ("P1years1M", "unexpected character 'y'"),
+    # components with missing designators
+    ("PT1H2", "unable to parse '1H2' into time components"),
+    ("P20D4T", "missing unit designator after '4'"),
+    ("P1D5T", "missing unit designator after '5'"),
 ]
 
 # ambiguous cases
@@ -154,6 +172,12 @@ class TimedeltaISOFormat(unittest.TestCase):
                     timedelta.fromisoformat(duration_string)
                 self.assertIn(expected_reason, str(context.exception))
 
+    def test_fromisoformat_invalid_type(self) -> None:
+        """Parsing cases that should all fail"""
+        with self.assertRaises(AssertionError) as context:
+            timedelta.fromisoformat(["P", "1", "Y", "1", "M"])  # type: ignore
+        self.assertIn("expected duration to be a str", str(context.exception))
+
     def test_roundtrip_valid(self) -> None:
         """Round-trip from valid duration to string and back maintains the same value"""
         for _, valid_timedelta in valid_durations:
@@ -169,10 +193,10 @@ class TimedeltaISOFormat(unittest.TestCase):
 
         def __new__(
             cls,
-            *args: Union[float, int],
-            months: Union[float, int],
-            years: Union[float, int],
-            **kwargs: Union[float, int],
+            *args: float | int,
+            months: float | int,
+            years: float | int,
+            **kwargs: float | int,
         ) -> "TimedeltaISOFormat.YearMonthTimedelta":
             attribs = dict(
                 __repr__=cls.__repr__,
