@@ -172,7 +172,7 @@ class timedelta(datetime.timedelta):
         if not self:
             return "P0D"
 
-        if self.days % 7 == 0 and self.seconds == 0 and self.microseconds == 0:
+        if self.days % 7 == 0 and not self.seconds and not self.microseconds:
             return f"P{int(self.days / 7)}W"
 
         days = self.days
