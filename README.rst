@@ -20,9 +20,9 @@ Usage
    >>>
    >>> td = timedelta(seconds=(second - first).total_seconds())
    >>> td.isoformat()
-   'P56DT14H'
+   'PT1358H'
    >>>
-   >>> first + timedelta.fromisoformat('P56DT14H')
+   >>> first + timedelta.fromisoformat('PT1358H')
    datetime.datetime(2022, 11, 27, 14, 0)
 
 Design decisions
@@ -36,3 +36,4 @@ Some of the significant design decisions made within this library are:
 * Empty time segments at the end of duration strings are allowed (``P1DT`` is considered valid)
 * Measurement limits are checked within date/time segments (``PT20:59:01`` is within limits; ``PT20:60:01`` is not)
 * Measurement values are parsed into floating-point values (at the time of writing, precise procedural algorithms to parse base-ten strings into integers for large inputs are not practical -- or not widely known)
+* When inputs are reliably known to be of correct type and format, assertions should be safe to remove (for example, by including the `-O command-line flag when invoking the Python interpreter <https://docs.python.org/3/using/cmdline.html#cmdoption-O>`_) to improve runtime performance
