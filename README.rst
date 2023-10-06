@@ -20,9 +20,9 @@ Usage
    >>>
    >>> td = timedelta(seconds=(second - first).total_seconds())
    >>> td.isoformat()
-   'P56DT14H'
+   'PT1358H'
    >>>
-   >>> first + timedelta.fromisoformat('P56DT14H')
+   >>> first + timedelta.fromisoformat('PT1358H')
    datetime.datetime(2022, 11, 27, 14, 0)
 
 Design decisions

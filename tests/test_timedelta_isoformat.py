@@ -136,9 +136,21 @@ format_expectations = [
     (timedelta(seconds=1, microseconds=500), "PT1.0005S"),
     (timedelta(seconds=10, microseconds=0), "PT10S"),
     (timedelta(minutes=10), "PT10M"),
-    (timedelta(seconds=5400), "PT1H30M"),
-    (timedelta(hours=20, minutes=5), "PT20H5M"),
-    (timedelta(days=1.5, minutes=4000), "P4DT6H40M"),
+    # concise representations
+    (timedelta(minutes=120, hours=2), "PT4H"),
+    (timedelta(hours=48), "P2D"),
+    (timedelta(hours=60), "PT60H"),
+    (timedelta(days=14), "P2W"),
+    (timedelta(days=15), "P15D"),
+    (timedelta(seconds=5400), "PT90M"),
+    (timedelta(hours=20, minutes=5), "PT1205M"),
+    (timedelta(days=1.5, minutes=4000), "PT6160M"),
+    (timedelta(hours=12, minutes=30, seconds=59), "PT45059S"),
+    (timedelta(hours=12, minutes=30, seconds=60), "PT751M"),
+    (timedelta(hours=12, minutes=31), "PT751M"),
+    (timedelta(days=12, hours=31, seconds=500), "PT1148900S"),
+    (timedelta(days=12, hours=32), "PT320H"),
+    (timedelta(seconds=86400), "P1D"),
 ]
 
 
@@ -172,7 +184,9 @@ class TimedeltaISOFormat(unittest.TestCase):
             with self.subTest(valid_timedelta=valid_timedelta):
                 duration_string = valid_timedelta.isoformat()
                 parsed_timedelta = timedelta.fromisoformat(duration_string)
+                parsed_duration_string = parsed_timedelta.isoformat()
                 self.assertEqual(parsed_timedelta, valid_timedelta)
+                self.assertFalse(len(parsed_duration_string) > len(duration_string))
 
     class YearMonthTimedelta(timedelta):
         """Subclass of :py:class:`timedelta_isoformat.timedelta` for year/month tests"""
