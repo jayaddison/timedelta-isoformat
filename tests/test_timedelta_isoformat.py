@@ -43,6 +43,9 @@ valid_durations = [
     # matching datetime.timedelta day-to-microsecond carry precision
     ("P0.000001D", timedelta(microseconds=86400)),
     ("P0.00000000001D", timedelta(microseconds=1)),
+    # matching datetime.timedelta microsecond range
+    ("P4DT0.000001S", timedelta(days=4, microseconds=1)),
+    ("PT0.999999S", timedelta(microseconds=999999)),
 ]
 
 invalid_durations = [
