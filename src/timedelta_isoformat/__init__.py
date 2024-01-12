@@ -1,6 +1,6 @@
 """Supplemental ISO8601 duration format support for :py:class:`datetime.timedelta`"""
 import datetime
-from typing import Iterable, Tuple, TypeAlias
+from typing import Iterable, TypeAlias
 
 _NUMBER_FORMAT = frozenset("0123456789,.")
 
@@ -10,8 +10,8 @@ class timedelta(datetime.timedelta):
     ISO8601-style parsing and formatting.
     """
 
-    Components: TypeAlias = Iterable[Tuple[str, str, int | None, bool]]
-    Measurements: TypeAlias = Iterable[Tuple[str, float]]
+    Components: TypeAlias = Iterable[tuple[str, str, int | None, bool]]
+    Measurements: TypeAlias = Iterable[tuple[str, float]]
 
     def __repr__(self) -> str:
         return f"timedelta_isoformat.{super().__repr__()}"
