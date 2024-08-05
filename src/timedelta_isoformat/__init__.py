@@ -2,8 +2,6 @@
 import datetime
 from typing import Iterable, TypeAlias
 
-_NUMBER_FORMAT = frozenset("0123456789,.")
-
 
 class timedelta(datetime.timedelta):
     """Subclass of :py:class:`datetime.timedelta` with additional methods to implement
@@ -90,7 +88,7 @@ class timedelta(datetime.timedelta):
 
         context, value, unit = date_context, "", None
         for char in duration:
-            if char in _NUMBER_FORMAT:
+            if char in {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", ",", "."}:
                 value += char if char.isdigit() else "."
                 continue
 
