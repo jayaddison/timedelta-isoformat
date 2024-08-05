@@ -70,7 +70,7 @@ invalid_durations = [
     ("PT1DS", "unexpected character 'D'"),
     ("P1HT0S", "unexpected character 'H'"),
     # mixing week units with other units
-    ("P1WT1H", "cannot mix weeks with other units"),
+    ("P1WT1H", "unexpected character 'T'"),
     ("P0Y1W", "cannot mix weeks with other units"),
     # incorrect quantities
     ("PT0.0.0S", "could not convert string to float: '0.0.0'"),
@@ -102,7 +102,7 @@ invalid_durations = [
     ("P1W2W", "cannot mix weeks with other units"),
     # segments out-of-order
     ("P1DT5S2W", "cannot mix weeks with other units"),
-    ("P1W1D", "cannot mix weeks with other units"),
+    ("P1W1D", "unexpected character 'D'"),
     # unexpected characters within date/time components
     ("PT01:-2:03", "unable to parse '-2' as a positive number"),
     ("P000000.1", "unable to parse '.1' as a positive number"),
