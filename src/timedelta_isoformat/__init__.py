@@ -88,7 +88,7 @@ class timedelta(datetime.timedelta):
 
         context, value, unit = date_context, "", None
         for char in duration:
-            if char in {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", ",", "."}:
+            if char in {",", ".", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9"}:
                 value += char if char.isdigit() else "."
                 continue
 
