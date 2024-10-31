@@ -7,6 +7,7 @@ class timedelta(datetime.timedelta):
     """Subclass of :py:class:`datetime.timedelta` with additional methods to implement
     ISO8601-style parsing and formatting.
     """
+    __slots__ = ()
 
     Components: TypeAlias = Iterable[tuple[str, str, int | None, bool]]
     Measurements: TypeAlias = Iterable[tuple[str, float]]
