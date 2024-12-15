@@ -76,7 +76,7 @@ class timedelta(datetime.timedelta):
                 raise ValueError(f"unable to parse '{segment}' into time components")
 
     @staticmethod
-    def _parse(duration: Iterator[str]) -> Components:
+    def _parse(duration: Iterator[str], context=None, unit=None) -> Components:
         """Parser for ISO-8601 duration strings
 
         The format of these strings is composed of two segments; date measurements
@@ -87,22 +87,22 @@ class timedelta(datetime.timedelta):
         in order of largest-to-smallest unit from left-to-right (with the exception of
         week measurements, which must be the only measurement in the string if present).
         """
-        context = iter(("Y", "years", "M", "months", "D", "days", "T"))
+        parser = timedelta._parse_date if not context else timedelta._parse_time
+        if context is None:
+            context = iter(("Y", "years", "M", "months", "D", "days", "T"))
+            char = next(duration, None)
+            assert char == "P", "durations must begin with the character 'P'"
 
-        char, accumulator, unit = next(duration, None), "", None
-        assert char == "P", "durations must begin with the character 'P'"
+        accumulator = ""
         for char in duration:
             if char in {",", "-", ".", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", ":"}:
                 accumulator += "." if char == "," else char
                 continue
 
             if char == "T" and char in context:
-                if accumulator:
-                    assert not unit, f"missing unit designator after '{accumulator}'"
-                    yield from timedelta._parse_date(accumulator)
-                    accumulator = ""
-                context = iter(("H", "hours", "M", "minutes", "S", "seconds"))
-                continue
+                time_context = iter(("H", "hours", "M", "minutes", "S", "seconds"))
+                yield from timedelta._parse(duration, context=time_context, unit=unit)
+                break
 
             if char == "W":
                 assert not unit, "cannot mix weeks with other units"
@@ -115,14 +115,12 @@ class timedelta(datetime.timedelta):
             value, unit, accumulator = accumulator, next(context), ""
             yield value, unit, None, False
 
-        if accumulator:
-            assert not unit, f"missing unit designator after '{accumulator}'"
-            yield from (timedelta._parse_date if "T" in context else timedelta._parse_time)(accumulator)
-            return
-        assert unit, "no measurements found"
+        assert not accumulator or not unit, f"missing unit designator after '{accumulator}'"
+        yield from parser(accumulator) if accumulator else ()
 
     @staticmethod
     def _to_measurements(components: Components) -> Measurements:
+        unit = None
         for value, unit, limit, integer_only in components:
             assert value.isdigit() if integer_only else value[0:1].isdigit(), f"unable to parse '{value}' as a positive number"
             quantity = float(value)
@@ -134,6 +132,7 @@ class timedelta(datetime.timedelta):
                 assert 0 <= quantity <= limit, f"{unit} value of {value} exceeds range [0..{limit}]"
             if quantity:
                 yield unit, quantity
+        assert unit, "no measurements found"
 
     @staticmethod
     def fromisoformat(duration: str) -> "timedelta":
