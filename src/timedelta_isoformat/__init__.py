@@ -76,8 +76,12 @@ class timedelta(datetime.timedelta):
                 raise ValueError(f"unable to parse '{segment}' into time components")
 
     @staticmethod
-    def _parse_designators(duration: Iterator[str]) -> Components:
-        """Parser for designator-separated ISO-8601 duration strings
+    def _parse(duration: Iterator[str]) -> Components:
+        """Parser for ISO-8601 duration strings
+
+        The format of these strings is composed of two segments; date measurements
+        are situated between the 'P' and 'T' characters, and time measurements are
+        situated between the 'T' character and the end-of-string.
 
         The code sweeps through the input exactly once, expecting to find measurements
         in order of largest-to-smallest unit from left-to-right (with the exception of
@@ -139,7 +143,7 @@ class timedelta(datetime.timedelta):
         """
         assert isinstance(duration, str), "expected duration to be a str"
         try:
-            return timedelta(**dict(timedelta._to_measurements(timedelta._parse_designators(iter(duration)))))
+            return timedelta(**dict(timedelta._to_measurements(timedelta._parse(iter(duration)))))
         except (AssertionError, ValueError) as exc:
             raise ValueError(f"could not parse duration '{duration}': {exc}") from exc
 
