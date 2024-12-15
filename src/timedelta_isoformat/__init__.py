@@ -92,12 +92,12 @@ class timedelta(datetime.timedelta):
                 continue
 
             if char == "T" and context is date_context:
-                assert not value, f"missing unit designator after '{value}'"
+                assert value == "", f"missing unit designator after '{value}'"
                 context = iter(("H", "hours", "M", "minutes", "S", "seconds"))
                 continue
 
             if char == "W":
-                assert not unit, "cannot mix weeks with other units"
+                assert unit is None, "cannot mix weeks with other units"
                 context = iter(("W", "weeks"))
                 pass
 
