@@ -86,8 +86,8 @@ class timedelta(datetime.timedelta):
         assert duration.startswith("P"), "durations must begin with the character 'P'"
 
         context = iter(("Y", "years", "M", "months", "D", "days", "T"))
-        parser, value, unit = timedelta._parse_date, "", None
 
+        value, unit = "", None
         for char in duration[1:]:
             if char in {",", "-", ".", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", ":"}:
                 value += "." if char == "," else char
@@ -96,9 +96,9 @@ class timedelta(datetime.timedelta):
             if char == "T" and char in context:
                 assert not value or not unit, f"missing unit designator after '{value}'"
                 if value:
-                    yield from parser(value)
+                    yield from timedelta._parse_date(value)
+                    value = ""
                 context = iter(("H", "hours", "M", "minutes", "S", "seconds"))
-                parser, value, unit = timedelta._parse_time, "", unit
                 continue
 
             if char == "W":
@@ -115,7 +115,7 @@ class timedelta(datetime.timedelta):
 
         assert not value or not unit, f"missing unit designator after '{value}'"
         if value:
-            yield from parser(value)
+            yield from (timedelta._parse_date if "T" in context else timedelta._parse_time)(value)
             return
         assert unit, "no measurements found"
 
