@@ -89,7 +89,7 @@ class timedelta(datetime.timedelta):
         """
         date_context = iter(("Y", "years", "M", "months", "D", "days"))
 
-        context, accumulator, unit = context or date_context, "", None
+        context, unit, accumulator = context or date_context, None, ""
         for char in duration:
             if char in {",", "-", ".", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", ":"}:
                 accumulator += "." if char == "," else char
