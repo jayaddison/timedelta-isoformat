@@ -1,4 +1,5 @@
 """Test coverage for :py:module:`timedelta_isoformat`"""
+import sys
 import unittest
 
 from timedelta_isoformat import timedelta
@@ -167,6 +168,7 @@ class TimedeltaISOFormat(unittest.TestCase):
                 parsed_timedelta = timedelta.fromisoformat(duration_string)
                 self.assertEqual(parsed_timedelta, expected_timedelta)
 
+    @unittest.skipIf(sys.flags.optimize, "Some optimizations assume valid input")
     def test_fromisoformat_invalid(self) -> None:
         """Parsing cases that should all fail"""
         for duration_string, expected_reason in invalid_durations:
@@ -175,6 +177,7 @@ class TimedeltaISOFormat(unittest.TestCase):
                     timedelta.fromisoformat(duration_string)
                 self.assertIn(expected_reason, str(context.exception))
 
+    @unittest.skipIf(sys.flags.optimize, "Some optimizations assume valid input")
     def test_fromisoformat_invalid_type(self) -> None:
         """Parsing cases that should all fail"""
         with self.assertRaises(AssertionError) as context:
