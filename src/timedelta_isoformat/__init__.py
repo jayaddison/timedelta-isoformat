@@ -92,10 +92,7 @@ class timedelta(datetime.timedelta):
         week measurements, which must be the only measurement in the string if present).
         """
         parser = timedelta._parse_date if not context else timedelta._parse_time
-        if context is None:
-            context = iter(("Y", "years", "M", "months", "D", "days", "T"))
-            char = next(duration, None)
-            assert char == "P", "durations must begin with the character 'P'"
+        context = context or iter(("Y", "years", "M", "months", "D", "days", "T"))
 
         accumulator = ""
         for char in duration:
@@ -146,7 +143,8 @@ class timedelta(datetime.timedelta):
         """
         assert isinstance(duration, str), "expected duration to be a str"
         try:
-            return timedelta(**dict(timedelta._to_measurements(timedelta._parse(iter(duration)))))
+            assert duration.startswith("P"), "durations must begin with the character 'P'"
+            return timedelta(**dict(timedelta._to_measurements(timedelta._parse(iter(duration[1:])))))
         except (AssertionError, ValueError) as exc:
             raise ValueError(f"could not parse duration '{duration}': {exc}") from exc
 
