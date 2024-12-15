@@ -100,9 +100,9 @@ invalid_durations = [
     ("P0000-0.0", "unable to parse '0.0' as a positive number"),
     # segment repetition
     ("PT5MT5S", "unexpected character 'T'"),
-    ("P1W2W", "unexpected character 'W'"),
+    ("P1W2W", "cannot mix weeks with other units"),
     # segments out-of-order
-    ("P1DT5S2W", "unexpected character 'W'"),
+    ("P1DT5S2W", "cannot mix weeks with other units"),
     ("P1W1D", "unexpected character 'D'"),
     # unexpected characters within date/time components
     ("PT01:-2:03", "unable to parse '-2' as a positive number"),

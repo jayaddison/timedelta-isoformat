@@ -87,23 +87,22 @@ class timedelta(datetime.timedelta):
         in order of largest-to-smallest unit from left-to-right (with the exception of
         week measurements, which must be the only measurement in the string if present).
         """
-        parser = timedelta._parse_date if not context else timedelta._parse_time
-        context = context or iter(("Y", "years", "M", "months", "D", "days"))
+        date_context = iter(("Y", "years", "M", "months", "D", "days"))
 
-        accumulator, unit = "", None
+        context, accumulator, unit = context or date_context, "", None
         for char in duration:
             if char in {",", "-", ".", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", ":"}:
                 accumulator += "." if char == "," else char
                 continue
 
-            if char == "T" and parser is timedelta._parse_date:
+            if char == "T" and context is date_context:
                 time_context = iter(("H", "hours", "M", "minutes", "S", "seconds"))
                 yield from timedelta._parse(duration, context=time_context)
                 break
 
-            if char == "W" and parser is timedelta._parse_date:
+            if char == "W":
                 assert not unit, "cannot mix weeks with other units"
-                parser, context = None, iter(("W", "weeks"))
+                context = iter(("W", "weeks"))
                 pass
 
             if char not in context:
@@ -112,7 +111,11 @@ class timedelta(datetime.timedelta):
             value, unit, accumulator = accumulator, next(context), ""
             yield value, unit, None, False
 
-        assert not accumulator or not unit, f"missing unit designator after '{accumulator}'"
+        if not accumulator:
+            return
+
+        assert not unit, f"missing unit designator after '{accumulator}'"
+        parser = timedelta._parse_date if context is date_context else timedelta._parse_time
         yield from parser(accumulator) if accumulator else ()
 
     @staticmethod
