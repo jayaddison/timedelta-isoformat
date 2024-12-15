@@ -1,6 +1,6 @@
 """Supplemental ISO8601 duration format support for :py:class:`datetime.timedelta`"""
 import datetime
-from typing import Iterable, TypeAlias
+from typing import Iterator, TypeAlias
 
 
 class timedelta(datetime.timedelta):
@@ -9,8 +9,8 @@ class timedelta(datetime.timedelta):
     """
     __slots__ = ()
 
-    Components: TypeAlias = Iterable[tuple[str, str, int | None, bool]]
-    Measurements: TypeAlias = Iterable[tuple[str, float]]
+    Components: TypeAlias = Iterator[tuple[str, str, int | None, bool]]
+    Measurements: TypeAlias = Iterator[tuple[str, float]]
 
     def __repr__(self) -> str:
         return f"timedelta_isoformat.{super().__repr__()}"
@@ -76,19 +76,18 @@ class timedelta(datetime.timedelta):
                 raise ValueError(f"unable to parse '{segment}' into time components")
 
     @staticmethod
-    def _parse_designators(duration: str) -> Components:
+    def _parse_designators(duration: Iterator[str]) -> Components:
         """Parser for designator-separated ISO-8601 duration strings
 
         The code sweeps through the input exactly once, expecting to find measurements
         in order of largest-to-smallest unit from left-to-right (with the exception of
         week measurements, which must be the only measurement in the string if present).
         """
-        assert duration.startswith("P"), "durations must begin with the character 'P'"
-
         context = iter(("Y", "years", "M", "months", "D", "days", "T"))
 
-        value, unit = "", None
-        for char in duration[1:]:
+        char, value, unit = next(duration, None), "", None
+        assert char == "P", "durations must begin with the character 'P'"
+        for char in duration:
             if char in {",", "-", ".", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", ":"}:
                 value += "." if char == "," else char
                 continue
@@ -141,7 +140,7 @@ class timedelta(datetime.timedelta):
         """
         assert isinstance(duration, str), "expected duration to be a str"
         try:
-            return timedelta(**dict(timedelta._to_measurements(timedelta._parse_designators(duration))))
+            return timedelta(**dict(timedelta._to_measurements(timedelta._parse_designators(iter(duration)))))
         except (AssertionError, ValueError) as exc:
             raise ValueError(f"could not parse duration '{duration}': {exc}") from exc
 
