@@ -83,15 +83,15 @@ class timedelta(datetime.timedelta):
         in order of largest-to-smallest unit from left-to-right (with the exception of
         week measurements, which must be the only measurement in the string if present).
         """
-        date_context = iter(("Y", "years", "M", "months", "D", "days"))
+        context = iter(("Y", "years", "M", "months", "D", "days", "T"))
 
-        context, value, unit = date_context, "", None
+        value, unit = "", None
         for char in duration:
             if char in {",", ".", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9"}:
                 value += char if char.isdigit() else "."
                 continue
 
-            if char == "T" and context is date_context:
+            if char == "T" and char in context:
                 assert value == "", f"missing unit designator after '{value}'"
                 context = iter(("H", "hours", "M", "minutes", "S", "seconds"))
                 continue
