@@ -117,7 +117,7 @@ class timedelta(datetime.timedelta):
 
         assert not unit, f"missing unit designator after '{accumulator}'"
         parser = timedelta._parse_date if context is date_context else timedelta._parse_time
-        yield from parser(accumulator) if accumulator else ()
+        yield from parser(accumulator)
 
     @staticmethod
     def _to_measurements(components: Components) -> Measurements:
