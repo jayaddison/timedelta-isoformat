@@ -92,7 +92,7 @@ class timedelta(datetime.timedelta):
         context, unit, accumulator = context or date_context, None, ""
         for char in duration:
             match char:
-                case _ if char in {",", "-", ".", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", ":"}:
+                case _ if char in ",-.0123456789:":
                     accumulator += "." if char == "," else char
                     continue
 
