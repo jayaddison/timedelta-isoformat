@@ -108,7 +108,7 @@ class timedelta(datetime.timedelta):
             yield value, unit, None, False
             value = ""
 
-        assert unit is not None, "no measurements found"
+        assert unit, "no measurements found"
 
     @classmethod
     def _parse_duration(cls, duration: str) -> Components:
