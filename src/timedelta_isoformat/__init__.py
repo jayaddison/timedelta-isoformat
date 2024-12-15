@@ -85,18 +85,18 @@ class timedelta(datetime.timedelta):
         """
         context = iter(("Y", "years", "M", "months", "D", "days", "T"))
 
-        char, value, unit = next(duration, None), "", None
+        char, accumulator, unit = next(duration, None), "", None
         assert char == "P", "durations must begin with the character 'P'"
         for char in duration:
             if char in {",", "-", ".", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", ":"}:
-                value += "." if char == "," else char
+                accumulator += "." if char == "," else char
                 continue
 
             if char == "T" and char in context:
-                if value:
-                    assert not unit, f"missing unit designator after '{value}'"
-                    yield from timedelta._parse_date(value)
-                    value = ""
+                if accumulator:
+                    assert not unit, f"missing unit designator after '{accumulator}'"
+                    yield from timedelta._parse_date(accumulator)
+                    accumulator = ""
                 context = iter(("H", "hours", "M", "minutes", "S", "seconds"))
                 continue
 
@@ -108,13 +108,12 @@ class timedelta(datetime.timedelta):
             if char not in context:
                 raise ValueError(f"unexpected character '{char}'")
 
-            unit = next(context)
+            value, unit, accumulator = accumulator, next(context), ""
             yield value, unit, None, False
-            value = ""
 
-        if value:
-            assert not unit, f"missing unit designator after '{value}'"
-            yield from (timedelta._parse_date if "T" in context else timedelta._parse_time)(value)
+        if accumulator:
+            assert not unit, f"missing unit designator after '{accumulator}'"
+            yield from (timedelta._parse_date if "T" in context else timedelta._parse_time)(accumulator)
             return
         assert unit, "no measurements found"
 
