@@ -76,7 +76,11 @@ class timedelta(datetime.timedelta):
                 raise ValueError(f"unable to parse '{segment}' into time components")
 
     @staticmethod
-    def _parse(duration: Iterator[str], context=None, unit=None) -> Components:
+    def _parse(
+        duration: Iterator[str],
+        context: Iterator[str] | None = None,
+        unit: str | None = None,
+    ) -> Components:
         """Parser for ISO-8601 duration strings
 
         The format of these strings is composed of two segments; date measurements
