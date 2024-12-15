@@ -93,8 +93,8 @@ class timedelta(datetime.timedelta):
                 continue
 
             if char == "T" and char in context:
-                assert not value or not unit, f"missing unit designator after '{value}'"
                 if value:
+                    assert not unit, f"missing unit designator after '{value}'"
                     yield from timedelta._parse_date(value)
                     value = ""
                 context = iter(("H", "hours", "M", "minutes", "S", "seconds"))
@@ -112,8 +112,8 @@ class timedelta(datetime.timedelta):
             yield value, unit, None, False
             value = ""
 
-        assert not value or not unit, f"missing unit designator after '{value}'"
         if value:
+            assert not unit, f"missing unit designator after '{value}'"
             yield from (timedelta._parse_date if "T" in context else timedelta._parse_time)(value)
             return
         assert unit, "no measurements found"
