@@ -109,8 +109,9 @@ class timedelta(datetime.timedelta):
             if char not in context:
                 raise ValueError(f"unexpected character '{char}'")
 
-            value, unit, accumulator = accumulator, next(context), ""
-            yield value, unit, None, False
+            unit = next(context)
+            yield accumulator, unit, None, False
+            accumulator = ""
 
         if not accumulator:
             return
