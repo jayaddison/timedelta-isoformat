@@ -110,8 +110,8 @@ class timedelta(datetime.timedelta):
 
         assert unit, "no measurements found"
 
-    @classmethod
-    def _parse_duration(cls, duration: str) -> Components:
+    @staticmethod
+    def _parse_duration(duration: str) -> Components:
         """Selects and runs an appropriate parser for ISO-8601 duration strings
 
         The format of these strings is composed of two segments; date measurements
@@ -124,11 +124,11 @@ class timedelta(datetime.timedelta):
         assert duration.startswith("P"), "durations must begin with the character 'P'"
 
         if duration[-1].isupper():
-            yield from cls._parse_designators(duration[1:])
+            yield from timedelta._parse_designators(duration[1:])
         else:
             date_segment, _, time_segment = duration[1:].partition("T")
-            yield from cls._parse_date(date_segment) if date_segment else ()
-            yield from cls._parse_time(time_segment) if time_segment else ()
+            yield from timedelta._parse_date(date_segment) if date_segment else ()
+            yield from timedelta._parse_time(time_segment) if time_segment else ()
 
     @staticmethod
     def _to_measurements(components: Components) -> Measurements:
@@ -144,15 +144,15 @@ class timedelta(datetime.timedelta):
             if quantity:
                 yield unit, quantity
 
-    @classmethod
-    def fromisoformat(cls, duration: str) -> "timedelta":
+    @staticmethod
+    def fromisoformat(duration: str) -> "timedelta":
         """Parses an input string and returns a :py:class:`timedelta` result
 
         :raises: `ValueError` with an explanatory message when parsing fails
         """
         assert isinstance(duration, str), "expected duration to be a str"
         try:
-            return cls(**dict(cls._to_measurements(cls._parse_duration(duration))))
+            return timedelta(**dict(timedelta._to_measurements(timedelta._parse_duration(duration))))
         except (AssertionError, ValueError) as exc:
             raise ValueError(f"could not parse duration '{duration}': {exc}") from exc
 
