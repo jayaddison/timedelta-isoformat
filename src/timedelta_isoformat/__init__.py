@@ -95,12 +95,12 @@ class timedelta(datetime.timedelta):
                 accumulator += "." if char == "," else char
                 continue
 
-            if char == "T" and context is date_context:
+            elif char == "T" and context is date_context:
                 time_context = iter(("H", "hours", "M", "minutes", "S", "seconds"))
                 yield from timedelta._parse(duration, context=time_context)
                 break
 
-            if char == "W":
+            elif char == "W":
                 assert not unit, "cannot mix weeks with other units"
                 context = iter(("W", "weeks"))
                 pass
