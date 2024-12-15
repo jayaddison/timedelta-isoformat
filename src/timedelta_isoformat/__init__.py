@@ -83,17 +83,21 @@ class timedelta(datetime.timedelta):
         in order of largest-to-smallest unit from left-to-right (with the exception of
         week measurements, which must be the only measurement in the string if present).
         """
+        assert duration.startswith("P"), "durations must begin with the character 'P'"
+
         context = iter(("Y", "years", "M", "months", "D", "days", "T"))
 
         value, unit = "", None
-        for char in duration:
-            if char in {",", ".", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9"}:
+        for char in duration[1:]:
+            if char in {",", "-", ".", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", ":"}:
                 value += "." if char == "," else char
                 continue
 
             if char == "T" and char in context:
-                assert not value, f"missing unit designator after '{value}'"
+                assert not value or not unit, f"missing unit designator after '{value}'"
+                yield from timedelta._parse_date(value) if value else ()
                 context = iter(("H", "hours", "M", "minutes", "S", "seconds"))
+                value = ""
                 continue
 
             if char == "W":
@@ -108,27 +112,9 @@ class timedelta(datetime.timedelta):
             yield value, unit, None, False
             value = ""
 
-        assert unit, "no measurements found"
-
-    @staticmethod
-    def _parse_duration(duration: str) -> Components:
-        """Selects and runs an appropriate parser for ISO-8601 duration strings
-
-        The format of these strings is composed of two segments; date measurements
-        are situated between the 'P' and 'T' characters, and time measurements are
-        situated between the 'T' character and the end-of-string.
-
-        If no unit designator is found at the end of the duration string, then
-        an attempt is made to parse the segment as a fixed-length date or time.
-        """
-        assert duration.startswith("P"), "durations must begin with the character 'P'"
-
-        if duration[-1].isupper():
-            yield from timedelta._parse_designators(duration[1:])
-        else:
-            date_segment, _, time_segment = duration[1:].partition("T")
-            yield from timedelta._parse_date(date_segment) if date_segment else ()
-            yield from timedelta._parse_time(time_segment) if time_segment else ()
+        assert not value or not unit, f"missing unit designator after '{value}'"
+        yield from (timedelta._parse_date if "T" in context else timedelta._parse_time)(value) if value else ()
+        assert value or unit, "no measurements found"
 
     @staticmethod
     def _to_measurements(components: Components) -> Measurements:
@@ -152,7 +138,7 @@ class timedelta(datetime.timedelta):
         """
         assert isinstance(duration, str), "expected duration to be a str"
         try:
-            return timedelta(**dict(timedelta._to_measurements(timedelta._parse_duration(duration))))
+            return timedelta(**dict(timedelta._to_measurements(timedelta._parse_designators(duration))))
         except (AssertionError, ValueError) as exc:
             raise ValueError(f"could not parse duration '{duration}': {exc}") from exc
 

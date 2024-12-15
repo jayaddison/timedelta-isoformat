@@ -89,13 +89,13 @@ invalid_durations = [
     ("PT01:0203", "unable to parse '01:0203' into time components"),
     ("PT01", "unable to parse '01' into time components"),
     ("PT01:02:3.4", "unable to parse '01:02:3.4' into time components"),
-    ("P0000y00m00", "unable to parse '0000y00m00' into date components"),
+    ("P0000y00m00", "unexpected character 'y'"),
     # decimals must have a non-empty integer value before the separator
     ("PT.5S", "unable to parse '.5' as a positive number"),
     ("P1M.1D", "unable to parse '.1' as a positive number"),
     ("PT.5:00:00", "unable to parse '.5' as a positive number"),
     ("PT5.:00:00", "unable to parse '5.' as a positive number"),
-    ("PT12:34:56e10", "unable to parse '12:34:56e10' into time components"),
+    ("PT12:34:56e10", "unexpected character 'e'"),
     ("P0000-0.0", "unable to parse '0.0' as a positive number"),
     # segment repetition
     ("PT5MT5S", "unexpected character 'T'"),
@@ -107,12 +107,12 @@ invalid_durations = [
     ("PT01:-2:03", "unable to parse '-2' as a positive number"),
     ("P000000.1", "unable to parse '.1' as a positive number"),
     ("PT000000--", "unable to parse '000000--' into time components"),
-    ("PT00:00:00,-", "unable to parse '00:00:00,-' into time components"),
-    ("P-999Y", "unexpected character '-'"),
+    ("PT00:00:00,-", "could not convert string to float: '00.-'"),
+    ("P-999Y", "unable to parse '-999' as a positive number"),
     # negative designator-separated values
-    ("P-1DT0S", "unexpected character '-'"),
-    ("P0M-2D", "unexpected character '-'"),
-    ("P0DT1M-3S", "unexpected character '-'"),
+    ("P-1DT0S", "unable to parse '-1' as a positive number"),
+    ("P0M-2D", "unable to parse '-2' as a positive number"),
+    ("P0DT1M-3S", "unable to parse '-3' as a positive number"),
     # positive designator-separated values
     ("P+1DT0S", "unexpected character '+'"),
     ("P0M+2D", "unexpected character '+'"),
@@ -123,7 +123,7 @@ invalid_durations = [
     # attempt to cause the parser to confuse duration tokens and timedelta arguments
     ("P1years1M", "unexpected character 'y'"),
     # components with missing designators
-    ("PT1H2", "unable to parse '1H2' into time components"),
+    ("PT1H2", "missing unit designator after '2'"),
     ("P20D4T", "missing unit designator after '4'"),
     ("P1D5T", "missing unit designator after '5'"),
 ]
