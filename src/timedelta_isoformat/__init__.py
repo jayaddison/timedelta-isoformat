@@ -76,11 +76,7 @@ class timedelta(datetime.timedelta):
                 raise ValueError(f"unable to parse '{segment}' into time components")
 
     @staticmethod
-    def _parse(
-        duration: Iterator[str],
-        context: Iterator[str] | None = None,
-        unit: str | None = None,
-    ) -> Components:
+    def _parse(duration: Iterator[str], context: Iterator[str] | None = None) -> Components:
         """Parser for ISO-8601 duration strings
 
         The format of these strings is composed of two segments; date measurements
@@ -92,22 +88,22 @@ class timedelta(datetime.timedelta):
         week measurements, which must be the only measurement in the string if present).
         """
         parser = timedelta._parse_date if not context else timedelta._parse_time
-        context = context or iter(("Y", "years", "M", "months", "D", "days", "T"))
+        context = context or iter(("Y", "years", "M", "months", "D", "days"))
 
-        accumulator = ""
+        accumulator, unit = "", None
         for char in duration:
             if char in {",", "-", ".", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", ":"}:
                 accumulator += "." if char == "," else char
                 continue
 
-            if char == "T" and char in context:
+            if char == "T" and parser is timedelta._parse_date:
                 time_context = iter(("H", "hours", "M", "minutes", "S", "seconds"))
-                yield from timedelta._parse(duration, context=time_context, unit=unit)
+                yield from timedelta._parse(duration, context=time_context)
                 break
 
-            if char == "W":
+            if char == "W" and parser is timedelta._parse_date:
                 assert not unit, "cannot mix weeks with other units"
-                context = iter(("W", "weeks"))
+                parser, context = None, iter(("W", "weeks"))
                 pass
 
             if char not in context:
