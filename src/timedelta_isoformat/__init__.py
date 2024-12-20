@@ -88,8 +88,7 @@ class timedelta(datetime.timedelta):
         week measurements, which must be the only measurement in the string if present).
         """
         date_context = iter(("Y", "years", "M", "months", "D", "days"))
-        if not context and next(duration, None) == "P":
-            context = date_context
+        context = date_context if not context and next(duration, "") == "P" else context
         assert context, "durations must begin with the character 'P'"
 
         unit, accumulator = None, ""
