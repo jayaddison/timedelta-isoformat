@@ -95,20 +95,19 @@ class timedelta(datetime.timedelta):
 
         context, accumulator = context or date_context, ""
         for char in duration:
-            match char:
-                case _ if char in ",-.0123456789:":
-                    accumulator += "." if char == "," else char
-                    continue
+            if char in ",-.0123456789:":
+                accumulator += "." if char == "," else char
+                continue
 
-                case "T" if context is date_context:
-                    time_context = iter(("H", "hours", "M", "minutes", "S", "seconds"))
-                    yield from timedelta._parse(duration, context=time_context, unit=unit)
-                    break
+            elif char == "T" and context is date_context:
+                time_context = iter(("H", "hours", "M", "minutes", "S", "seconds"))
+                yield from timedelta._parse(duration, context=time_context, unit=unit)
+                break
 
-                case "W":
-                    assert not unit, "cannot mix weeks with other units"
-                    context = iter(("W", "weeks"))
-                    pass
+            elif char == "W":
+                assert not unit, "cannot mix weeks with other units"
+                context = iter(("W", "weeks"))
+                pass
 
             if char not in context:
                 raise ValueError(f"unexpected character '{char}'")
