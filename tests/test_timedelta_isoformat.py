@@ -72,7 +72,7 @@ invalid_durations = [
     ("P1HT0S", "unexpected character 'H'"),
     # mixing week units with other units
     ("P1WT1H", "unexpected character 'T'"),
-    ("P0Y1W", "cannot mix weeks with other units"),
+    ("P0Y1W", "unexpected character 'W'"),
     ("P1DT1W", "unexpected character 'W'"),
     # incorrect quantities
     ("PT0.0.0S", "could not convert string to float: '0.0.0'"),

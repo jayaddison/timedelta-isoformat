@@ -100,8 +100,7 @@ class timedelta(datetime.timedelta):
                 yield from timedelta._parse(duration, context=time_context)
                 break
 
-            elif char == "W" and context is date_context:
-                assert not unit, "cannot mix weeks with other units"
+            elif char == "W" and context is date_context and not unit:
                 context = iter(("W", "weeks"))
                 pass
 
