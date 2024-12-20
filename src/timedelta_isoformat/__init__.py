@@ -91,7 +91,7 @@ class timedelta(datetime.timedelta):
         context = date_context if not context and next(duration, "") == "P" else context
         assert context, "durations must begin with the character 'P'"
 
-        unit, accumulator = None, ""
+        accumulator, unit = "", None
         for char in duration:
             if char in ",-.0123456789:":
                 accumulator += "." if char == "," else char
