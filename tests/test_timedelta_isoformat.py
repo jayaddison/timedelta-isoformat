@@ -167,6 +167,7 @@ formatting_unavailable = [
     timedelta(seconds=-1, microseconds=999999),
 ]
 
+
 class TimedeltaISOFormat(unittest.TestCase):
     """Functional testing for :class:`timedelta_isoformat.timedelta`"""
 
