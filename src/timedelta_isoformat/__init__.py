@@ -149,6 +149,7 @@ class timedelta(datetime.timedelta):
 
     def isoformat(self) -> str:
         """Produce an ISO8601-style representation of this :py:class:`timedelta`"""
+        assert self >= timedelta(0), f"cannot produce ISO format for negative {self!r}"
         if not self:
             return "P0D"
 
