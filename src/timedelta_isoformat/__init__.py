@@ -79,13 +79,15 @@ class timedelta(datetime.timedelta):
     def _parse(duration: Iterator[str], context: Iterator[str] | None = None) -> Components:
         """Parser for ISO-8601 duration strings
 
-        The format of these strings is composed of two segments; date measurements
-        are situated between the 'P' and 'T' characters, and time measurements are
-        situated between the 'T' character and the end-of-string.
+        Each string in this format is composed of either one or two segments: date
+        measurements are situated between the initial 'P' and subsequent (optional) 'T'
+        character, and when present, time measurements are situated between the 'T'
+        character and the end of the string.
 
-        The code sweeps through the input exactly once, expecting to find measurements
-        in order of largest-to-smallest unit from left-to-right (with the exception of
-        week measurements, which must be the only measurement in the string if present).
+        The implementation sweeps through the input exactly once, expecting to encounter
+        measurements in order of largest-to-smallest unit from left-to-right. As an
+        exception, week measurement units must not be combined with any other date or
+        time units. Segments that lack units are parsed as ISO8601 date/time strings.
         """
         date_context = iter(("Y", "years", "M", "months", "D", "days"))
         context = date_context if not context and next(duration, "") == "P" else context
