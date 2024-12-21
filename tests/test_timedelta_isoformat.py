@@ -157,6 +157,14 @@ format_expectations = [
     (timedelta(days=12, hours=31, seconds=500), "PT1148900S"),
     (timedelta(days=12, hours=32), "PT320H"),
     (timedelta(seconds=86400), "P1D"),
+    (timedelta(days=-1, hours=25), "PT1H"),
+    (timedelta(seconds=-1, microseconds=1000000), "P0D"),
+]
+
+formatting_unavailable = [
+    timedelta(hours=-1),
+    timedelta(seconds=-1),
+    timedelta(seconds=-1, microseconds=999999),
 ]
 
 
@@ -258,3 +266,10 @@ class TimedeltaISOFormat(unittest.TestCase):
         for sample_timedelta, expected_format in format_expectations:
             with self.subTest(sample_timedelta=sample_timedelta):
                 self.assertEqual(expected_format, sample_timedelta.isoformat())
+
+    @unittest.skipIf(sys.flags.optimize, "Some optimizations assume valid input")
+    def test_formatting_unavailable(self) -> None:
+        """Durations that cannot be formatted as-is"""
+        for sample_timedelta in formatting_unavailable:
+            with self.assertRaises(AssertionError):
+                sample_timedelta.isoformat()
